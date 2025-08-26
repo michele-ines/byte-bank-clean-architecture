@@ -39,12 +39,14 @@ export const tokens = {
 
   // 🖋️ Tipografia
   fontInter: "Inter, System",
-  textXs: 12,
-  textSm: 14,
-  textBase: 16,
-  textMd: 18,
-  textLg: 20,
-  textXl: 24,
+
+  textXxs: 13,
+  textXs: 14,
+  textSm: 16,
+  textBase: 18,
+  textMd: 20,
+  textLg: 25,
+  textXl: 28,
 
   fontNormal: "400" as const,
   fontMedium: "500" as const,
@@ -80,4 +82,9 @@ export const tokens = {
   illustrationSignupHeight: 150,
   logoWidth: 100,
   logoHeight: 28,
+
+  // 💬 Textos do Sistema
+  loadingText: "Carregando...",
+  hiddenBalanceText: "Saldo oculto",
+  hiddenBalanceMask: "••••••",
 };
