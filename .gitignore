@@ -84,8 +84,3 @@ lcov.info
 # =========================
 app-example/
 
-
-# =========================
-# config firebase
-# =========================
-src/config/firebaseConfig.ts
