@@ -1,8 +1,6 @@
-import { auth } from "@/src/config/firebaseConfig";
 import { tokens } from "@/src/theme/tokens";
 import ExpoCheckbox from "expo-checkbox";
 import { router } from "expo-router";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
   Alert,
@@ -15,6 +13,8 @@ import {
 } from "react-native";
 
 import SignupIllustration from "@/assets/images/cadastro/ilustracao-cadastro.svg";
+import { useAuth } from "@/src/contexts/AuthContext"; // 🔌 plugando no contexto
+import { routes } from "@/src/routes"; // ✅ centralizando rotas
 import { styles } from "./SignupForm.styles";
 
 type SignupFormProps = {
@@ -30,6 +30,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   const [isChecked, setChecked] = useState<boolean>(false);
   const [emailError, setEmailError] = useState<string>("");
 
+  const { signup } = useAuth(); // 🔌 usando signup do contexto
+
   const validateEmail = (text: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regex.test(text) && text.length > 0) {
@@ -40,13 +42,11 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     setEmail(text);
   };
 
-  const handlePasswordChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+  const handlePasswordChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
     setPassword(e.nativeEvent.text);
-  };
 
-  const handleConfirmPasswordChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+  const handleConfirmPasswordChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
     setConfirmPassword(e.nativeEvent.text);
-  };
 
   const handleSubmit = async () => {
     if (!name || !email || !password || !confirmPassword) {
@@ -67,10 +67,10 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await signup(email, password); // 🔌 via contexto
       onSignupSuccess?.(email);
-      Alert.alert("Sucesso!", "Conta criada. Você será redirecionado para o login.");
-      router.push("/");
+      Alert.alert("Sucesso!", "Conta criada. Você será redirecionado.");
+      router.replace(routes.dashboard); // ✅ vai direto para o dashboard
     } catch (error: any) {
       console.error(error);
       if (error.code === "auth/email-already-in-use") {
@@ -142,6 +142,14 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
 
       <Pressable onPress={handleSubmit} style={[styles.button, styles.submitButton]}>
         <Text style={styles.buttonText}>Criar conta</Text>
+      </Pressable>
+
+      {/* ✅ botão extra para voltar ao login */}
+      <Pressable
+        onPress={() => router.push(routes.login)}
+        style={[styles.button, styles.backButton]}
+      >
+        <Text style={styles.backText}>Voltar ao login</Text>
       </Pressable>
     </View>
   );

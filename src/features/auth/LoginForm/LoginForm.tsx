@@ -1,7 +1,7 @@
 import LoginIllustration from "@/assets/images/login/ilustracao-login.svg";
-import { auth } from "@/src/config/firebaseConfig";
+import { useAuth } from "@/src/contexts/AuthContext"; // 🔌 usando contexto
+import { routes } from "@/src/routes"; // ✅ centralizando rotas
 import { Link, router } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import {
   Alert,
@@ -23,9 +23,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
+  const { login } = useAuth(); // 🔌 hook do contexto
+
   const handleChangeEmail = (text: string) => setEmail(text);
-  const handleChangePassword = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
-    setPassword(e.nativeEvent.text);
+  const handleChangePassword = (
+    e: NativeSyntheticEvent<TextInputChangeEventData>
+  ) => setPassword(e.nativeEvent.text);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -33,9 +36,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       return;
     }
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await login(email, password); // 🔌 chamada pelo contexto
       onLoginSuccess?.(email);
-      router.replace("/dashboard");
+      router.replace(routes.dashboard); // ✅ rota tipada
     } catch (error: any) {
       console.error(error);
       Alert.alert("Erro de Login", "Email ou senha inválidos.");
@@ -43,7 +46,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   };
 
   const handleCreateAccount = () => {
-    router.push("/cadastro");
+    router.push(routes.signup); // ✅ rota tipada
   };
 
   return (
@@ -66,22 +69,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       <Text style={styles.label}>Senha</Text>
       <TextInput
         placeholder="Digite sua senha"
+        value={password}
         secureTextEntry
         onChange={handleChangePassword}
         style={styles.input}
       />
 
-      <Link href="/esqueci-senha" asChild>
+      <Link href={routes.forgotPassword} asChild>
         <Pressable>
           <Text style={styles.forgot}>Esqueci a senha!</Text>
         </Pressable>
       </Link>
 
       <View style={styles.alignButtons}>
-        <Pressable onPress={handleLogin} style={[styles.button, styles.submitButton]}>
+        <Pressable
+          onPress={handleLogin}
+          style={[styles.button, styles.submitButton]}
+        >
           <Text style={styles.buttonText}>Acessar</Text>
         </Pressable>
-        <Pressable onPress={handleCreateAccount} style={[styles.button, styles.createButton]}>
+        <Pressable
+          onPress={handleCreateAccount}
+          style={[styles.button, styles.createButton]}
+        >
           <Text style={styles.buttonText}>Criar conta</Text>
         </Pressable>
       </View>

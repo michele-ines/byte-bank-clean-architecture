@@ -1,9 +1,9 @@
 import { tokens } from "@/src/theme/tokens";
-import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 
 type SignupFormStyles = {
   card: ViewStyle;
-  illustration: ImageStyle;
+  illustration: ViewStyle;
   title: TextStyle;
   label: TextStyle;
   input: TextStyle;
@@ -15,75 +15,57 @@ type SignupFormStyles = {
   button: ViewStyle;
   submitButton: ViewStyle;
   buttonText: TextStyle;
+  backButton: ViewStyle;
+  backText: TextStyle;
 };
 
 export const styles = StyleSheet.create<SignupFormStyles>({
   card: {
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    padding: 24,
-    gap: 12,
+    width: "100%",
+    maxWidth: 720,
+    marginHorizontal: "auto",
+    backgroundColor: tokens.byteBgDefault,
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: tokens.byteGray900,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 3,
+    gap: 8,
   },
-  illustration: {
-    alignSelf: "center",
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 16,
-    color: tokens.byteGray800,
-    lineHeight: 28,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: tokens.byteGray800,
-    marginBottom: -4,
-  },
+  illustration: { marginBottom: 12 },
+  title: { fontSize: 18, fontWeight: "700", textAlign: "center", marginBottom: 8 },
+  label: { fontSize: 14, fontWeight: "600", color: tokens.byteGray700 },
   input: {
     borderWidth: 1,
-    borderColor: tokens.byteGray200,
+    borderColor: tokens.byteGray300,
     borderRadius: 8,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 12,
     fontSize: 16,
-    backgroundColor: tokens.byteColorGreen100,
+    backgroundColor: tokens.byteGray50,
   },
-  inputError: {
-    borderColor: tokens.byteColorError,
-  },
-  errorText: {
-    color: tokens.byteColorError,
-    fontSize: 12,
-    marginTop: 4,
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 16,
-  },
-  checkbox: {
-    marginRight: 12,
-  },
-  checkboxLabel: {
-    flex: 1,
-    color: tokens.byteTextMediumGray,
-  },
+  inputError: { borderColor: tokens.byteColorRed500 },
+  errorText: { color: tokens.byteColorRed500, fontSize: 12, marginBottom: 4 },
+  checkboxContainer: { flexDirection: "row", alignItems: "flex-start", marginVertical: 8 },
+  checkbox: { marginRight: 8, marginTop: 3 },
+  checkboxLabel: { flex: 1, fontSize: 12, color: tokens.byteGray600 },
+
   button: {
-    paddingVertical: 14,
+    marginTop: 12,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
+  },
+  submitButton: { backgroundColor: tokens.byteColorBlue500 },
+  buttonText: { color: tokens.byteBgDefault, fontWeight: "700" },
+
+  backButton: {
     marginTop: 8,
+    borderWidth: 1,
+    borderColor: tokens.byteGray300,
+    backgroundColor: tokens.byteBgDefault,
   },
-  submitButton: {
-    backgroundColor: tokens.byteColorOrange500,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  backText: { color: tokens.byteGray700, fontWeight: "600" },
 });

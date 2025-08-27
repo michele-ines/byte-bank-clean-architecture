@@ -1,7 +1,7 @@
 import { ForgotPasswordForm } from "@/src/features/auth/ForgotPasswordForm/ForgotPasswordForm";
+import { styles } from "@/src/styles/ForgotPage.styles";
 import React from "react";
 import { View } from "react-native";
-import { styles } from "./ForgotPage.styles";
 
 const ForgotPage: React.FC = () => {
   return (

@@ -1,7 +1,7 @@
 import { SignupForm } from "@/src/features/auth/SignupForm/SignupForm";
+import { styles } from "@/src/styles/CadastroPage.styles";
 import React from "react";
 import { View } from "react-native";
-import { styles } from "./CadastroPage.styles";
 
 const CadastroPage: React.FC = () => {
   return (

@@ -1,3 +1,6 @@
+import { useAuth } from "@/src/contexts/AuthContext";
+import { routes } from "@/src/routes"; // ✅ centralizando rotas
+import { router } from "expo-router"; // ✅ para navegação
 import React, { useState } from "react";
 import {
   Alert,
@@ -15,24 +18,36 @@ type ForgotPasswordFormProps = {
   onSubmitSuccess?: (email: string) => void;
 };
 
-export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSubmitSuccess }) => {
+export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
+  onSubmitSuccess,
+}) => {
   const [email, setEmail] = useState<string>("");
+  const { resetPassword } = useAuth(); // 🔌 usando AuthContext
 
-  const handleChangeText = (text: string) => {
-    setEmail(text);
-  };
+  const handleChangeText = (text: string) => setEmail(text);
 
-  const handleChangeEvent = (e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setEmail(e.nativeEvent.text);
-  };
+  const handleChangeEvent = (
+    e: NativeSyntheticEvent<TextInputChangeEventData>
+  ) => setEmail(e.nativeEvent.text);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!email) {
       Alert.alert("Atenção", "Informe o e-mail cadastrado.");
       return;
     }
-    Alert.alert("Pronto!", "Se estiver cadastrado, enviaremos um link de recuperação.");
-    onSubmitSuccess?.(email);
+
+    try {
+      await resetPassword(email);
+      Alert.alert(
+        "Pronto!",
+        "Se estiver cadastrado, enviaremos um link de recuperação."
+      );
+      onSubmitSuccess?.(email);
+      router.replace(routes.login); // ✅ redireciona para login depois de enviar
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert("Erro", "Não foi possível enviar o link de recuperação.");
+    }
   };
 
   return (
@@ -43,8 +58,8 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSubmit
       <TextInput
         placeholder="Digite seu e-mail cadastrado"
         value={email}
-        onChangeText={handleChangeText} // tipado: (text: string) => void
-        onChange={handleChangeEvent}    // tipado: NativeSyntheticEvent<TextInputChangeEventData>
+        onChangeText={handleChangeText}
+        onChange={handleChangeEvent}
         style={styles.input}
         autoCapitalize="none"
         keyboardType="email-address"
@@ -53,6 +68,14 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onSubmit
 
       <Pressable onPress={handleSubmit} style={styles.submit}>
         <Text style={styles.submitText}>ENVIAR LINK</Text>
+      </Pressable>
+
+      {/* ✅ botão extra para voltar ao login */}
+      <Pressable
+        onPress={() => router.push(routes.login)}
+        style={styles.backButton}
+      >
+        <Text style={styles.backText}>Voltar ao login</Text>
       </Pressable>
     </View>
   );
