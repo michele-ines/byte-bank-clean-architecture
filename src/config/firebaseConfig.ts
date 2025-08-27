@@ -1,26 +1,3 @@
-// // src/config/firebaseConfig.ts
-// import { FirebaseApp, initializeApp } from "firebase/app";
-// import { getAuth, type Auth } from "firebase/auth";
-// import { getFirestore, type Firestore } from "firebase/firestore";
-// import { getStorage, type FirebaseStorage } from "firebase/storage";
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyB0vrAljSszWA69V_gWMNh6-r64cfae0EI",
-//   authDomain: "fiap-tc-3-c846a.firebaseapp.com",
-//   projectId: "fiap-tc-3-c846a",
-//   storageBucket: "fiap-tc-3-c846a.firebasestorage.app",
-//   messagingSenderId: "1020690642850",
-//   appId: "1:1020690642850:web:f716dc5c8bc572ee08e4fb"
-// };
-
-// // Inicializa App
-// const app: FirebaseApp = initializeApp(firebaseConfig);
-
-// // Serviços
-// export const auth: Auth = getAuth(app);
-// export const db: Firestore = getFirestore(app);
-// export const storage: FirebaseStorage = getStorage(app);
-// src/config/firebaseConfig.ts
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
