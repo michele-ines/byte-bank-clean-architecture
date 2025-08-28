@@ -18,8 +18,9 @@ export const tokens = {
   byteColorBlue500: "#2567f9",
   byteColorPurple500: "#8f3cff",
   byteColorMagenta500: "#ff3c82",
+  byteColorWhite: "#ffffff",
 
-  // ⚪ Escala de Cinza (50 → 900) — padrão Tailwind-like
+  // ⚪ Escala de Cinza (50 → 900)
   byteGray50: "#f9fafb",
   byteGray100: "#f3f4f6",
   byteGray200: "#e5e7eb",
@@ -46,12 +47,30 @@ export const tokens = {
   textLg: 25,
   textXl: 28,
 
-  fontNormal: "400",
-  fontMedium: "500",
-  fontSemibold: "600",
-  fontBold: "700",
+  fontNormal: "400" as const,
+  fontMedium: "500" as const,
+  fontSemibold: "600" as const,
+  fontBold: "700" as const,
 
   // 📏 Espaçamento vertical do texto
   lineHeightTight: 1.0,
-  lineHeightNormal: 1.2, // padrão
+  lineHeightNormal: 1.2,
+
+  // 📐 Radius (consistência nos cantos arredondados)
+  radiusSm: 8,
+  radiusMd: 12,
+  radiusLg: 16,
+
+  // 👤 Avatar (tamanhos padrão)
+  avatarSm: 40,
+  avatarMd: 60,
+  avatarLg: 80,
+
+  // 📏 Spacing (escala 4px → padrão Tailwind-like)
+  spacing2Xs: 4,
+  spacingXs: 8,
+  spacingSm: 12,
+  spacingMd: 16,
+  spacingLg: 24,
+  spacingXl: 32,
 };

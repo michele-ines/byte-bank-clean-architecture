@@ -1,8 +1,30 @@
-// src/contexts/AuthContext.tsx
 import { router } from "expo-router";
-import { User, UserCredential, createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import React, { ReactNode, createContext, useContext, useEffect, useState } from "react";
+import {
+  User,
+  UserCredential,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import React, {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { auth } from "../config/firebaseConfig";
+
+const AUTH_ROUTES = {
+  login: "/", 
+  dashboard: "/dashboard", 
+} as const;
+
+const AUTH_MESSAGES = {
+  logoutError: "Erro ao fazer logout",
+} as const;
 
 interface AuthContextData {
   user: User | null;
@@ -16,7 +38,9 @@ interface AuthContextData {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,15 +59,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = (email: string, password: string) =>
     signInWithEmailAndPassword(auth, email, password);
 
-  const resetPassword = (email: string) =>
-    sendPasswordResetEmail(auth, email);
+  const resetPassword = (email: string) => sendPasswordResetEmail(auth, email);
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      router.replace("/");
+      router.replace(AUTH_ROUTES.login);
     } catch (error) {
-      console.error("Erro ao fazer logout: ", error);
+      console.error(`${AUTH_MESSAGES.logoutError}:`, error); 
     }
   };
 
