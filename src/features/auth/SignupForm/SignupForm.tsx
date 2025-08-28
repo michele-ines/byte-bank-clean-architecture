@@ -13,24 +13,23 @@ import {
 } from "react-native";
 
 import SignupIllustration from "@/assets/images/cadastro/ilustracao-cadastro.svg";
-import { useAuth } from "@/src/contexts/AuthContext"; // 🔌 plugando no contexto
-import { routes } from "@/src/routes"; // ✅ centralizando rotas
+import { useAuth } from "@/src/contexts/AuthContext";
+import { routes } from "@/src/routes";
 import { styles } from "./SignupForm.styles";
 
 type SignupFormProps = {
-  /** Callback opcional após cadastro com sucesso */
   onSignupSuccess?: (email: string) => void;
 };
 
 export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [isChecked, setChecked] = useState<boolean>(false);
-  const [emailError, setEmailError] = useState<string>("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isChecked, setChecked] = useState(false);
+  const [emailError, setEmailError] = useState("");
 
-  const { signup } = useAuth(); // 🔌 usando signup do contexto
+  const { signup } = useAuth();
 
   const validateEmail = (text: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,10 +66,11 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     }
 
     try {
-      await signup(email, password); // 🔌 via contexto
+      await signup(email, password, name);
+
       onSignupSuccess?.(email);
       Alert.alert("Sucesso!", "Conta criada. Você será redirecionado.");
-      router.replace(routes.dashboard); // ✅ vai direto para o dashboard
+      router.replace(routes.dashboard);
     } catch (error: any) {
       console.error(error);
       if (error.code === "auth/email-already-in-use") {
@@ -83,7 +83,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
 
   return (
     <View style={styles.card}>
-      <SignupIllustration width={"100%"} height={150} style={styles.illustration} />
+      <SignupIllustration width="100%" height={150} style={styles.illustration} />
 
       <Text style={styles.title}>
         Preencha os campos abaixo para criar sua conta corrente!
@@ -144,7 +144,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
         <Text style={styles.buttonText}>Criar conta</Text>
       </Pressable>
 
-      {/* ✅ botão extra para voltar ao login */}
       <Pressable
         onPress={() => router.push(routes.login)}
         style={[styles.button, styles.backButton]}

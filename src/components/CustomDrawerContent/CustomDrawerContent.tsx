@@ -11,11 +11,22 @@ import { styles } from "./CustomDrawerContent.styles";
 type CustomDrawerContentProps = DrawerContentComponentProps;
 
 export function CustomDrawerContent(props: CustomDrawerContentProps) {
-  const { signOut } = useAuth();
+  const { user, userData, signOut } = useAuth();
 
   const handleLogout = (): void => {
     signOut();
   };
+
+  const displayName =
+    userData?.name ?? user?.displayName ?? user?.email?.split("@")[0] ?? "Usuário";
+
+  const email = userData?.email ?? user?.email ?? "sem-email";
+
+  const initials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
 
   return (
     <View style={styles.container}>
@@ -29,32 +40,13 @@ export function CustomDrawerContent(props: CustomDrawerContentProps) {
           style={styles.avatarCircle}
           accessible
           accessibilityRole="image"
-          accessibilityLabel="Foto de perfil de Michele Sabri"
+          accessibilityLabel={`Avatar de ${displayName}`}
         >
-          <Text
-            style={styles.avatarText}
-            accessibilityRole="text"
-            accessibilityLabel="Iniciais do usuário: M S"
-          >
-            MS
-          </Text>
+          <Text style={styles.avatarText}>{initials}</Text>
         </View>
 
-        <Text
-          style={styles.userName}
-          accessibilityRole="text"
-          accessibilityLabel="Nome do usuário: Michele Sabri"
-        >
-          Michele Sabri
-        </Text>
-
-        <Text
-          style={styles.userEmail}
-          accessibilityRole="text"
-          accessibilityLabel="E-mail do usuário: michele@email.com"
-        >
-          michele@email.com
-        </Text>
+        <Text style={styles.userName}>{displayName}</Text>
+        <Text style={styles.userEmail}>{email}</Text>
       </View>
 
       <DrawerContentScrollView
@@ -75,13 +67,7 @@ export function CustomDrawerContent(props: CustomDrawerContentProps) {
           accessibilityLabel="Sair da conta"
           accessibilityHint="Finaliza a sessão e retorna para a tela inicial"
         >
-          <Text
-            style={styles.logoutButtonText}
-            accessibilityRole="text"
-            accessibilityLabel="Botão de logout"
-          >
-            Sair
-          </Text>
+          <Text style={styles.logoutButtonText}>Sair</Text>
         </Pressable>
       </DrawerContentScrollView>
     </View>
