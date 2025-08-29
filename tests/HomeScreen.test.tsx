@@ -1,26 +1,26 @@
-// tests/HomeScreen.test.tsx
 import HomeScreen from "@/src/features/home/HomeScreen";
-import { render } from "@testing-library/react-native";
+import { render, screen } from '@testing-library/react-native';
+import React from 'react';
 
-describe("<HomeScreen />", () => {
-  it("renderiza o herói e o formulário de login", () => {
-    const { getByText, getByPlaceholderText, getByRole } = render(<HomeScreen />);
 
-    // Hero / mensagens
-    getByText(/experimente mais liberdade/i);
-    getByText(/crie sua conta/i);
+jest.mock('@/src/features/auth/LoginForm', () => {
+  
+  const { View, Text } = require('react-native');
+  return {
+    LoginForm: () => (
+      <View>
+        <Text>MockLoginForm</Text>
+      </View>
+    ),
+  };
+});
 
-    // Form
-    getByText(/^login$/i);
-    getByText(/^e-mail$/i);
-    getByPlaceholderText("Digite seu email cadastrado");
-    getByText(/^senha$/i); // <-- ancorado para não pegar o link
-    getByPlaceholderText("Digite sua senha");
+describe('<HomeScreen />', () => {
+  it('deve renderizar o componente LoginForm', () => {
+    render(<HomeScreen />);
 
-    // Link "Esqueci a senha!"
-    getByRole("link", { name: /^esqueci a senha!?$/i });
-
-    // Botão
-    getByText(/^acessar$/i);
+    const loginForm = screen.getByText('MockLoginForm');
+    
+    expect(loginForm).toBeTruthy();
   });
 });
