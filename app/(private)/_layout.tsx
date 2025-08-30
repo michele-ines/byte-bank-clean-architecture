@@ -15,6 +15,7 @@ import { Header } from "@/src/shared/Header/Header";
 import { tokens } from "@/src/theme/tokens";
 import { MaterialIcons } from "@expo/vector-icons";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
+import { SafeAreaView } from "react-native-safe-area-context"; // ✅ importado
 
 const drawerIcons = {
   home: "home",
@@ -56,7 +57,7 @@ export default function AppLayout(): JSX.Element {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
       <Drawer
         drawerContent={(props: DrawerContentComponentProps) => (
           <CustomDrawerContent {...props} />
@@ -153,7 +154,7 @@ export default function AppLayout(): JSX.Element {
           }}
         />
       </Drawer>
-    </View>
+    </SafeAreaView>
   );
 }
 

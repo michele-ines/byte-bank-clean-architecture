@@ -20,7 +20,7 @@ export const tokens = {
   byteColorMagenta500: "#ff3c82",
   byteColorWhite: "#ffffff",
 
-  // ⚪ Escala de Cinza (50 → 900)
+  // ⚪ Escala de Cinza
   byteGray50: "#f9fafb",
   byteGray100: "#f3f4f6",
   byteGray200: "#e5e7eb",
@@ -39,38 +39,41 @@ export const tokens = {
 
   // 🖋️ Tipografia
   fontInter: "Inter, System",
-
-  textXs: 14,
-  textSm: 16,
-  textBase: 18,
-  textMd: 20,
-  textLg: 25,
-  textXl: 28,
+  textXs: 12,
+  textSm: 14,
+  textBase: 16,
+  textMd: 18,
+  textLg: 20,
+  textXl: 24,
 
   fontNormal: "400" as const,
   fontMedium: "500" as const,
   fontSemibold: "600" as const,
   fontBold: "700" as const,
 
-  // 📏 Espaçamento vertical do texto
-  lineHeightTight: 1.0,
-  lineHeightNormal: 1.2,
+  // 📏 Line Heights
+  lineHeightTight: 16,
+  lineHeightNormal: 20,
+  lineHeightRelaxed: 24,
 
-  // 📐 Radius (consistência nos cantos arredondados)
+  // 📐 Radius
   radiusSm: 8,
   radiusMd: 12,
   radiusLg: 16,
 
-  // 👤 Avatar (tamanhos padrão)
+  // 👤 Avatar
   avatarSm: 40,
   avatarMd: 60,
   avatarLg: 80,
 
-  // 📏 Spacing (escala 4px → padrão Tailwind-like)
+  // 📏 Spacing
   spacing2Xs: 4,
   spacingXs: 8,
   spacingSm: 12,
   spacingMd: 16,
   spacingLg: 24,
   spacingXl: 32,
+  spacingXxl: 40,
+
+    illustrationSignupHeight: 150, 
 };
