@@ -1,17 +1,14 @@
 import { useAuth } from "@/src/contexts/AuthContext";
 import { Feather } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { router } from "expo-router";
 import React from "react";
-import {
-  GestureResponderEvent,
-  Pressable,
-  Text,
-  View
-} from "react-native";
+import { GestureResponderEvent, Pressable, View } from "react-native";
 import { tokens } from "../../theme/tokens";
 import { styles } from "./Header.styles";
 
-// Tipagem explícita do componente
+import HeaderLogo from "@/assets/images/header/header-logo.svg";
+
 export const Header: React.FC = () => {
   const navigation = useNavigation();
   const { isAuthenticated } = useAuth();
@@ -27,34 +24,53 @@ export const Header: React.FC = () => {
         styles.container,
         {
           backgroundColor: isAuthenticated
-            ? tokens.byteColorDash // logado
-            : tokens.byteColorBlack, // visitante
+            ? tokens.byteColorDash 
+            : tokens.byteColorBlack, 
         },
       ]}
       accessibilityRole="header"
-      accessibilityLabel="Cabeçalho principal com logo e menu de navegação"
     >
-      <Pressable
-        onPress={openDrawer}
-        hitSlop={tokens.spacingSm}
-        accessibilityRole="button"
-        accessibilityLabel="Abrir menu de navegação lateral"
-        accessibilityHint="Abre o menu lateral com opções de navegação"
-      >
-        <Feather
-          name="menu"
-          size={tokens.textLg}
-          color={tokens.byteColorGreen500}
-        />
-      </Pressable>
+      {isAuthenticated ? (
+        <View style={styles.row}>
+          <Pressable
+            onPress={openDrawer}
+            hitSlop={tokens.spacingSm}
+            accessibilityRole="button"
+            accessibilityLabel="Abrir menu de navegação lateral"
+            accessibilityHint="Abre o menu lateral com opções de navegação"
+          >
+            <Feather
+              name="menu"
+              size={tokens.textLg}
+              color={tokens.byteColorGreen500}
+            />
+          </Pressable>
 
-      <Text
-        style={styles.logo}
-        accessibilityRole="text"
-        accessibilityLabel="Logotipo Bytebank"
-      >
-        Bytebank
-      </Text>
+          <Pressable
+            onPress={() => router.push("/")}
+            accessibilityRole="imagebutton"
+            accessibilityLabel="Logotipo Bytebank, voltar para Home"
+          >
+            <HeaderLogo
+              width={tokens.logoWidth}
+              height={tokens.logoHeight}
+            />
+          </Pressable>
+        </View>
+      ) : (
+
+        <Pressable
+          onPress={() => router.push("/")}
+          style={styles.centerLogo}
+          accessibilityRole="imagebutton"
+          accessibilityLabel="Logotipo Bytebank, voltar para Home"
+        >
+          <HeaderLogo
+            width={tokens.logoWidth}
+            height={tokens.logoHeight}
+          />
+        </Pressable>
+      )}
     </View>
   );
 };
