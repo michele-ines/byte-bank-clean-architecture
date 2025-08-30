@@ -1,2 +1,4 @@
-import HomeScreen from "../../src/features/home/HomeScreen";
+// app/(public)/index.tsx
+import HomeScreen from "@/src/features/main/MainScreen";
+
 export default HomeScreen;
