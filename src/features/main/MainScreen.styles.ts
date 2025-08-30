@@ -8,9 +8,9 @@ export const styles = StyleSheet.create({
   gradientBg: {
     flex: 1,
   },
-  content: {
-    padding: tokens.spacingMd,
-    flexGrow: 1,
+  innerContent: {
+    paddingHorizontal: tokens.spacingMd,
+    paddingBottom: tokens.spacingXl,
   },
   hero: {
     alignItems: "center",
@@ -20,12 +20,13 @@ export const styles = StyleSheet.create({
     fontSize: tokens.textLg,
     fontWeight: tokens.fontBold,
     textAlign: "center",
+    marginTop: tokens.spacingMl,
     marginBottom: tokens.spacingXs,
     color: tokens.byteColorBlack,
   },
   heroSubtitle: {
-    fontSize: 18, // ✅ tamanho fixo (px)
-    fontWeight: tokens.fontBold, // ✅ negrito
+    fontSize: tokens.textMd,
+    fontWeight: tokens.fontBold,
     textAlign: "center",
     marginBottom: tokens.spacingMd,
     color: tokens.byteColorGreen500,
@@ -40,20 +41,25 @@ export const styles = StyleSheet.create({
     paddingVertical: tokens.spacingSm,
     paddingHorizontal: tokens.spacingLg,
     borderRadius: tokens.radiusMd,
+    borderWidth: 1, 
   },
   btnPrimary: {
-    backgroundColor: tokens.byteColorGreen500,
+    backgroundColor: tokens.byteColorBlack,
+    borderColor: tokens.byteColorBlack,
   },
   btnPrimaryText: {
     color: tokens.byteColorWhite,
     fontWeight: tokens.fontBold,
+    textAlign: "center",
   },
   btnSecondary: {
-    backgroundColor: tokens.byteColorBlack,
+    backgroundColor: "transparent", 
+    borderColor: tokens.byteColorBlack,
   },
   btnSecondaryText: {
-    color: tokens.byteColorWhite,
+    color: tokens.byteColorBlack,
     fontWeight: tokens.fontBold,
+    textAlign: "center",
   },
   section: {
     marginBottom: tokens.spacingXl,
@@ -71,17 +77,17 @@ export const styles = StyleSheet.create({
     paddingHorizontal: tokens.spacingMd,
   },
   cardTitle: {
-    fontSize: tokens.textSm,
+    fontSize: tokens.textLg,
     fontWeight: tokens.fontSemibold,
     textAlign: "center",
     marginTop: tokens.spacingXs,
     marginBottom: tokens.spacing2Xs,
-    color: tokens.byteColorGreen500, // ✅ título verde
+    color: tokens.byteColorGreen500,
   },
   cardDescription: {
-    fontSize: tokens.textXs,
+    fontSize: tokens.textBase,
     textAlign: "center",
     color: tokens.byteTextMediumGray,
-    lineHeight: tokens.lineHeightRelaxed, // ✅ melhor legibilidade
+    lineHeight: tokens.lineHeightRelaxed,
   },
 });

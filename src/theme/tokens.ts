@@ -1,4 +1,4 @@
-export const tokens = {
+export const tokens = { 
   // 🎨 Cores Base
   byteBgDefault: "#ffffff",
   byteBgDashboard: "#e4ede3",
@@ -71,9 +71,13 @@ export const tokens = {
   spacingXs: 8,
   spacingSm: 12,
   spacingMd: 16,
+  spacingMl: 20,  
   spacingLg: 24,
   spacingXl: 32,
   spacingXxl: 40,
 
-    illustrationSignupHeight: 150, 
+  // 🔑 Extras
+  illustrationSignupHeight: 150,
+  logoWidth: 100,
+  logoHeight: 28,
 };

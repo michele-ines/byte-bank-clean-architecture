@@ -1,42 +1,73 @@
+import { tokens } from "@/src/theme/tokens";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { tokens } from "../../theme/tokens";
+import { Pressable, Text, View } from "react-native";
+import { styles } from "./Footer.styles";
+
+// ✅ SVGs
+import InstaSvg from "@/assets/images/footer/ft-instagram.svg";
+import LogoSvg from "@/assets/images/footer/ft-logo.svg";
+import WaSvg from "@/assets/images/footer/ft-whatsapp.svg";
+import YtSvg from "@/assets/images/footer/ft-youtube.svg";
 
 export const Footer: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.col}>
-        <Text style={styles.title}>Serviços</Text>
-        <Text style={styles.link}>Conta corrente</Text>
-        <Text style={styles.link}>Conta PJ</Text>
-        <Text style={styles.link}>Cartão de crédito</Text>
+    <View
+      style={styles.container}
+      accessibilityLabel="Rodapé do aplicativo com informações de serviços, contato e redes sociais"
+    >
+      {/* Serviços */}
+      <View style={styles.section}>
+        <Text style={styles.title} accessibilityRole="header">
+          Serviços
+        </Text>
+        <Pressable accessibilityRole="link" accessibilityLabel="Acessar conta corrente">
+          <Text style={styles.link}>Conta corrente</Text>
+        </Pressable>
+        <Pressable accessibilityRole="link" accessibilityLabel="Acessar conta PJ">
+          <Text style={styles.link}>Conta PJ</Text>
+        </Pressable>
+        <Pressable accessibilityRole="link" accessibilityLabel="Acessar cartão de crédito">
+          <Text style={styles.link}>Cartão de crédito</Text>
+        </Pressable>
       </View>
-      <View style={styles.col}>
-        <Text style={styles.title}>Contato</Text>
-        <Text style={styles.link}>0800 504 3058</Text>
-        <Text style={styles.link}>suporte@bytebank.com</Text>
-        <Text style={styles.link}>contato@bytebank.com</Text>
+
+      {/* Contato */}
+      <View style={styles.section}>
+        <Text style={styles.title} accessibilityRole="header">
+          Contato
+        </Text>
+        <Text style={styles.link} accessibilityLabel="Telefone 0800 504 3058">
+          0800 504 3058
+        </Text>
+        <Text style={styles.link} accessibilityLabel="E-mail suporte arroba bytebank ponto com">
+          suporte@bytebank.com
+        </Text>
+        <Text style={styles.link} accessibilityLabel="E-mail contato arroba bytebank ponto com">
+          contato@bytebank.com
+        </Text>
       </View>
-      <View style={styles.col}>
-        <Text style={styles.title}>Developed by Front‑End</Text>
-        <Text style={styles.link}>@Bytebank</Text>
+
+      {/* Desenvolvido */}
+      <View style={styles.section}>
+        <Text style={styles.title}>Desenvolvido por Front-End</Text>
+        <LogoSvg
+          width={tokens.logoWidth}
+          height={tokens.logoHeight}
+          style={{ marginTop: tokens.spacing2Xs }}
+          accessibilityLabel="Logo da Bytebank"
+        />
+        <View style={styles.social}>
+          <Pressable accessibilityRole="link" accessibilityLabel="Visitar Instagram">
+            <InstaSvg width={22} height={22} />
+          </Pressable>
+          <Pressable accessibilityRole="link" accessibilityLabel="Visitar YouTube">
+            <YtSvg width={22} height={22} />
+          </Pressable>
+          <Pressable accessibilityRole="link" accessibilityLabel="Conversar no WhatsApp">
+            <WaSvg width={22} height={22} />
+          </Pressable>
+        </View>
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    backgroundColor: tokens.byteColorDash,
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 16,
-    marginTop: 24,
-  },
-  col: { gap: 6 },
-  title: { color: "#fff", fontWeight: "700", marginBottom: 6 },
-  link: { color: "#fff" },
-});
