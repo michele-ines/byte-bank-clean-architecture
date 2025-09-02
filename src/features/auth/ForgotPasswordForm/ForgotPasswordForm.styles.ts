@@ -15,16 +15,9 @@ type ForgotPasswordFormStyles = {
 export const styles = StyleSheet.create<ForgotPasswordFormStyles>({
   card: {
     width: "100%",
-    maxWidth: 720,
     marginHorizontal: "auto",
     backgroundColor: tokens.byteBgDefault,
-    borderRadius: 12,
     padding: 20,
-    shadowColor: tokens.byteGray900,
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 3,
     gap: 8,
   },
   title: { fontSize: 20, fontWeight: "700", textAlign: "center", marginBottom: 8 },
@@ -40,7 +33,7 @@ export const styles = StyleSheet.create<ForgotPasswordFormStyles>({
   },
   submit: {
     marginTop: 12,
-    backgroundColor: tokens.byteColorBlue500,
+    backgroundColor: tokens.byteColorGreen500,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
@@ -48,13 +41,13 @@ export const styles = StyleSheet.create<ForgotPasswordFormStyles>({
   submitText: { color: tokens.byteBgDefault, fontWeight: "700" },
 
   backButton: {
-    marginTop: 8,
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: tokens.byteGray300,
     backgroundColor: tokens.byteBgDefault,
+    marginTop: tokens.spacingXs,
+    borderColor: tokens.byteColorDash,
   },
   backText: {
     color: tokens.byteGray700,

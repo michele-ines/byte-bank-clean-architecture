@@ -8,7 +8,6 @@ type ForgotPageStyles = {
 export const styles = StyleSheet.create<ForgotPageStyles>({
   container: { 
     flex: 1, 
-    padding: 16, 
     backgroundColor: tokens.byteBgDefault,
   },
 });

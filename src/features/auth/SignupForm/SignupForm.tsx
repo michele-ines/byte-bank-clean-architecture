@@ -3,7 +3,6 @@ import ExpoCheckbox from "expo-checkbox";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   NativeSyntheticEvent,
   Platform,
@@ -18,6 +17,7 @@ import {
 import SignupIllustration from "@/assets/images/cadastro/ilustracao-cadastro.svg";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { routes } from "@/src/routes";
+import Toast from "react-native-toast-message";
 import { styles } from "./SignupForm.styles";
 
 const signupFormTexts = {
@@ -85,32 +85,32 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     const { alerts } = signupFormTexts;
 
     if (!name || !email || !password || !confirmPassword) {
-      Alert.alert(alerts.emptyFields.title, alerts.emptyFields.message);
+      Toast.show({ type: 'error', text1: alerts.emptyFields.title, text2: alerts.emptyFields.message });
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert(alerts.passwordMismatch.title, alerts.passwordMismatch.message);
+      Toast.show({ type: 'error', text1: alerts.passwordMismatch.title, text2: alerts.passwordMismatch.message });
       return;
     }
     if (!isChecked) {
-      Alert.alert(alerts.termsNotAccepted.title, alerts.termsNotAccepted.message);
+      Toast.show({ type: 'error', text1: alerts.termsNotAccepted.title, text2: alerts.termsNotAccepted.message });
       return;
     }
     if (emailError) {
-      Alert.alert(alerts.emailInvalid.title, alerts.emailInvalid.message);
+      Toast.show({ type: 'error', text1: alerts.emailInvalid.title, text2: alerts.emailInvalid.message });
       return;
     }
 
     try {
       await signup(email, password, name);
       onSignupSuccess?.(email);
-      Alert.alert(alerts.success.title, alerts.success.message);
+      Toast.show({ type: 'success', text1: alerts.success.title, text2: alerts.success.message });
       router.replace(routes.dashboard);
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
-        Alert.alert(alerts.emailInUse.title, alerts.emailInUse.message);
+        Toast.show({ type: 'error', text1: alerts.emailInUse.title, text2: alerts.emailInUse.message });
       } else {
-        Alert.alert(alerts.genericError.title, alerts.genericError.message);
+        Toast.show({ type: 'error', text1: alerts.genericError.title, text2: alerts.genericError.message });
       }
     }
   };
@@ -122,9 +122,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     >
       <ScrollView
         style={{ flex: 1, backgroundColor: tokens.byteBgDefault }}
-        contentContainerStyle={{ flexGrow: 1, padding: tokens.spacingLg }}
         keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false} // 👈 scroll invisível
+        showsVerticalScrollIndicator={false}
       >
         <View
           style={styles.card}
@@ -135,9 +134,10 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             width="100%"
             height={tokens.illustrationSignupHeight}
             style={styles.illustration}
+            accessibilityLabel="Ilustração de uma pessoa a interagir com um ecrã de portátil seguro"
           />
 
-          <Text style={styles.title}>{signupFormTexts.title}</Text>
+          <Text style={styles.title} accessibilityRole="header">{signupFormTexts.title}</Text>
 
           {/* Nome */}
           <Text style={styles.label}>{signupFormTexts.fields.name}</Text>
@@ -160,7 +160,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             autoCapitalize="none"
             accessibilityLabel={signupFormTexts.fields.email}
           />
-          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+          {emailError ? <Text style={styles.errorText} accessibilityLiveRegion="polite">{emailError}</Text> : null}
 
           {/* Senha */}
           <Text style={styles.label}>{signupFormTexts.fields.password}</Text>
@@ -193,6 +193,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
               color={isChecked ? tokens.byteColorGreen500 : undefined}
               accessibilityRole="checkbox"
               accessibilityLabel={signupFormTexts.checkboxLabel}
+              accessibilityState={{ checked: isChecked }}
             />
             <Text style={styles.checkboxLabel}>{signupFormTexts.checkboxLabel}</Text>
           </View>
@@ -221,3 +222,4 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     </KeyboardAvoidingView>
   );
 };
+

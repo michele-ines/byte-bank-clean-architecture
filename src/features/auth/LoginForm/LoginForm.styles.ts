@@ -1,16 +1,15 @@
 import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from "react-native";
 
 type LoginFormStyles = {
   card: ViewStyle;
-  illustration: ViewStyle;
+  illustration: ImageStyle;
   title: TextStyle;
   label: TextStyle;
-  input: TextStyle;
-  inputError: TextStyle;
+  input: TextStyle; 
   forgot: TextStyle;
-  alignButtons: ViewStyle;
   button: ViewStyle;
+  alignButtons: ViewStyle;
   submitButton: ViewStyle;
   createButton: ViewStyle;
   buttonText: TextStyle;
@@ -18,42 +17,63 @@ type LoginFormStyles = {
 
 export const styles = StyleSheet.create<LoginFormStyles>({
   card: {
-    width: "100%",
-    maxWidth: 720,
-    marginHorizontal: "auto",
-    backgroundColor: tokens.byteBgDefault,
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: tokens.byteGray900,
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 3,
-    gap: 8,
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: tokens.byteColorGreen100,
+    paddingHorizontal: 24,
+    gap: 12,
   },
-  illustration: { marginBottom: 12 },
-  title: { fontSize: 20, fontWeight: "700", textAlign: "center", marginBottom: 8 },
-  label: { fontSize: 14, fontWeight: "600", color: tokens.byteGray700 },
+  illustration: {
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 16,
+    color: tokens.byteGray800,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: tokens.byteGray800,
+    marginBottom: -4,
+  },
   input: {
     borderWidth: 1,
-    borderColor: tokens.byteGray300,
+    borderColor: tokens.byteGray200,
     borderRadius: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: tokens.byteGray50,
+    backgroundColor: tokens.byteColorGreen100,
   },
-  inputError: { borderColor: tokens.byteColorRed500 },
-  forgot: { color: tokens.byteGray600, fontSize: 13, textAlign: "right" },
-  alignButtons: { flexDirection: "row", justifyContent: "space-between", marginTop: 12 },
+  forgot: {
+    color: tokens.byteColorGreen500,
+    textAlign: "left",
+    fontWeight: '600',
+    marginTop: 4,
+    marginBottom: 16,
+    textDecorationLine: 'underline'
+  },
   button: {
-    flex: 1,
-    marginHorizontal: 4,
-    paddingVertical: 12,
+    width: 144,
+    paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
+    marginTop: 8,
   },
-  submitButton: { backgroundColor: tokens.byteColorBlue500 },
-  createButton: { backgroundColor: tokens.byteGray200 },
-  buttonText: { color: tokens.byteBgDefault, fontWeight: "700" },
+  alignButtons: {
+    alignItems: 'center'
+  },
+  submitButton: {
+    backgroundColor: tokens.byteColorGreen500,
+  },
+  createButton: {
+    backgroundColor: tokens.byteColorOrange500,
+  },
+  buttonText: {
+    color: tokens.gradientTealTo,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 });
