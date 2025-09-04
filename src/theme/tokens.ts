@@ -57,6 +57,7 @@ export const tokens = {
   lineHeightTight: 16,
   lineHeightNormal: 20,
   lineHeightRelaxed: 24,
+  lineHeightXl: 32,
 
   // 📐 Radius
   radiusSm: 8,
@@ -77,6 +78,8 @@ export const tokens = {
   spacingLg: 24,
   spacingXl: 32,
   spacingXxl: 40,
+  spacing3Xl: 44,
+  spacingBalanceHorizontal: 66,
 
   // 🔑 Extras
   illustrationSignupHeight: 150,
@@ -87,4 +90,37 @@ export const tokens = {
   loadingText: "Carregando...",
   hiddenBalanceText: "Saldo oculto",
   hiddenBalanceMask: "••••••",
+
+  // 🔧 Layout tokens
+  flexRow: "row" as const,
+  flexCol: "column" as const,
+  alignCenter: "center" as const,
+  alignStart: "flex-start" as const,
+  justifyCenter: "center" as const,
+  textAlignCenter: "center" as const,
+  positionAbsolute: "absolute" as const,
+  overflowHidden: "hidden" as const,
+
+  // 🔧 Valores fixos comuns
+  zero: 0,
+  borderThin: 2,
+
+  // 📐 Alturas mínimas
+  minHeightBalance: 600,
+
+  // 🔲 Full sizes
+  fullWidth: "100%" as const,
+  fullHeight: "100%" as const,
+
+  // 🌫️ Opacidade
+  opacityHigh: 0.9,
+  opacityMedium: 0.8,
+
+  // 🔝 Z-index
+  zIndexBase: 2,
+
+  // 🎨 Dimensões relativas das imagens
+  pixels1Width: "90%" as const,
+  pixels2Width: "45%" as const,
+  pixels2Height: "50%" as const,
 };
