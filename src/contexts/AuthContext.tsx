@@ -11,6 +11,7 @@ import {
 import {
   doc,
   getDoc,
+  serverTimestamp,
   setDoc,
 } from "firebase/firestore";
 import React, {
@@ -32,15 +33,16 @@ const AUTH_MESSAGES = {
 } as const;
 
 interface UserData {
+  uuid: string; 
   name: string;
   email: string;
   photoURL?: string | null;
-  createdAt?: Date;
+  createdAt?: any;
 }
 
 interface AuthContextData {
-  user: User | null;             
-  userData: UserData | null;     
+  user: User | null;
+  userData: UserData | null;
   isAuthenticated: boolean;
   loading: boolean;
   signup: (email: string, password: string, name: string) => Promise<UserCredential>;
@@ -81,11 +83,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const signup = async (email: string, password: string, name: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-    await setDoc(doc(db, "users", userCredential.user.uid), {
+    const newUser = userCredential.user;
+   
+    await setDoc(doc(db, "users", newUser.uid), {
+      uuid: newUser.uid, 
       name,
       email,
-      createdAt: new Date(),
+      createdAt: serverTimestamp(), 
     });
 
     return userCredential;

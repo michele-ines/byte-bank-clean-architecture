@@ -1,79 +1,54 @@
+import { sharedStyles } from "@/src/styles/shared.styles";
 import { tokens } from "@/src/theme/tokens";
-import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 
-type LoginFormStyles = {
-  card: ViewStyle;
-  illustration: ImageStyle;
-  title: TextStyle;
-  label: TextStyle;
-  input: TextStyle; 
-  forgot: TextStyle;
-  button: ViewStyle;
-  alignButtons: ViewStyle;
-  submitButton: ViewStyle;
-  createButton: ViewStyle;
-  buttonText: TextStyle;
-};
-
-export const styles = StyleSheet.create<LoginFormStyles>({
+export const styles = StyleSheet.create({
+ 
+  keyboardView: {
+    ...sharedStyles.keyboardView,
+  },
   card: {
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: tokens.byteColorGreen100,
-    paddingHorizontal: 24,
-    gap: 12,
+    ...sharedStyles.formContainer,
+    backgroundColor: tokens.byteColorGreen100, 
   },
   illustration: {
-    marginBottom: 16,
+    width: '100%',
+    marginBottom: tokens.spacingMd,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 16,
-    color: tokens.byteGray800,
+    ...sharedStyles.title,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: tokens.byteGray800,
-    marginBottom: -4,
+    ...sharedStyles.label,
   },
   input: {
-    borderWidth: 1,
-    borderColor: tokens.byteGray200,
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    backgroundColor: tokens.byteColorGreen100,
-  },
-  forgot: {
-    color: tokens.byteColorGreen500,
-    textAlign: "left",
-    fontWeight: '600',
-    marginTop: 4,
-    marginBottom: 16,
-    textDecorationLine: 'underline'
+    ...sharedStyles.input,
+    backgroundColor: tokens.byteColorGreen100, 
   },
   button: {
-    width: 144,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 8,
+    ...sharedStyles.button,
   },
-  alignButtons: {
-    alignItems: 'center'
+  buttonText: {
+    ...sharedStyles.buttonText,
   },
   submitButton: {
     backgroundColor: tokens.byteColorGreen500,
   },
+  submitButtonDisabled: {
+    ...sharedStyles.buttonDisabled,
+  },
   createButton: {
     backgroundColor: tokens.byteColorOrange500,
   },
-  buttonText: {
-    color: tokens.gradientTealTo,
-    fontWeight: "bold",
-    fontSize: 16,
+  alignButtons: {
+    alignItems: 'center',
+  },
+  forgot: {
+    color: tokens.byteColorGreen500,
+    textAlign: "left",
+    fontWeight: tokens.fontSemibold,
+    marginTop: tokens.spacing2Xs,
+    marginBottom: tokens.spacingMd,
+    textDecorationLine: 'underline',
   },
 });

@@ -1,20 +1,52 @@
 import { useAuth } from "@/src/contexts/AuthContext";
-import { routes } from "@/src/routes"; // ✅ centralizando rotas
-import { router } from "expo-router"; // ✅ para navegação
+import { routes } from "@/src/routes";
+import { tokens } from "@/src/theme/tokens";
+import { ToastType } from "@/src/types/types";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  NativeSyntheticEvent,
+  ActivityIndicator,
   Pressable,
   Text,
   TextInput,
-  TextInputChangeEventData,
   View,
 } from "react-native";
-import Toast from "react-native-toast-message"; // 1. Importar o Toast
+import Toast from "react-native-toast-message";
 import { styles } from "./ForgotPasswordForm.styles";
 
+const formTexts = {
+  title: "Recuperar Senha",
+  label: "E-mail",
+  placeholder: "Digite seu e-mail cadastrado",
+  buttons: {
+    submit: "ENVIAR LINK",
+    back: "Voltar ao Login",
+  },
+  accessibility: {
+    form: "Formulário de recuperação de senha",
+    emailInput: "Campo de entrada para o e-mail de recuperação",
+    submitButton: "Botão para enviar link de recuperação de senha",
+    submitHint: "Envia um link de recuperação para o e-mail informado",
+    backButton: "Botão para voltar à tela de login",
+  },
+  toasts: {
+    emptyEmail: {
+      title: "Atenção",
+      message: "Informe o e-mail cadastrado.",
+    },
+    success: {
+      title: "Pronto!",
+      message: "Se o e-mail estiver cadastrado, um link será enviado.",
+    },
+    error: {
+      title: "Erro",
+      message: "Não foi possível enviar o link de recuperação.",
+    },
+  },
+};
+
+
 type ForgotPasswordFormProps = {
-  /** Callback opcional para submit externo */
   onSubmitSuccess?: (email: string) => void;
 };
 
@@ -22,80 +54,80 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   onSubmitSuccess,
 }) => {
   const [email, setEmail] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { resetPassword } = useAuth();
 
-  const handleChangeText = (text: string) => setEmail(text);
-
-  const handleChangeEvent = (
-    e: NativeSyntheticEvent<TextInputChangeEventData>
-  ) => setEmail(e.nativeEvent.text);
+  const showToast = (type: ToastType, text1: string, text2: string) => {
+    Toast.show({ type, text1, text2 });
+  };
 
   const handleSubmit = async () => {
     if (!email) {
-      Toast.show({
-        type: 'error',
-        text1: 'Atenção',
-        text2: 'Informe o e-mail cadastrado.'
-      });
+      showToast("error", formTexts.toasts.emptyEmail.title, formTexts.toasts.emptyEmail.message);
       return;
     }
 
+    setIsLoading(true);
     try {
       await resetPassword(email);
-      Toast.show({
-        type: 'success',
-        text1: 'Pronto!',
-        text2: 'Se estiver cadastrado, enviaremos um link de recuperação.'
-      });
+      showToast("success", formTexts.toasts.success.title, formTexts.toasts.success.message);
       onSubmitSuccess?.(email);
       router.replace(routes.login);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      Toast.show({
-        type: 'error',
-        text1: 'Erro',
-        text2: 'Não foi possível enviar o link de recuperação.'
-      });
+      const message = error instanceof Error ? error.message : formTexts.toasts.error.message;
+      showToast("error", formTexts.toasts.error.title, message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const isButtonDisabled = !email || isLoading;
+
   return (
-    <View 
+    <View
       style={styles.card}
       accessible
-      accessibilityLabel="Formulário de recuperação de senha"
+      accessibilityLabel={formTexts.accessibility.form}
     >
-      <Text style={styles.title} accessibilityRole="header">Recuperar senha</Text>
+      <Text style={styles.title} accessibilityRole="header">
+        {formTexts.title}
+      </Text>
 
-      <Text style={styles.label}>E-mail</Text>
+      <Text style={styles.label}>{formTexts.label}</Text>
       <TextInput
-        placeholder="Digite seu e-mail cadastrado"
+        placeholder={formTexts.placeholder}
         value={email}
-        onChangeText={handleChangeText}
-        onChange={handleChangeEvent}
+        onChangeText={setEmail}
         style={styles.input}
         autoCapitalize="none"
         keyboardType="email-address"
         textContentType="emailAddress"
-        accessibilityLabel="Campo de entrada para o e-mail de recuperação"
+        accessibilityLabel={formTexts.accessibility.emailInput}
       />
 
-      <Pressable 
-        onPress={handleSubmit} 
-        style={styles.submit}
+      <Pressable
+        onPress={handleSubmit}
+        style={[styles.submit, isButtonDisabled && styles.submitDisabled]}
+        disabled={isButtonDisabled} 
         accessibilityRole="button"
-        accessibilityLabel="Botão para enviar link de recuperação de senha"
+        accessibilityLabel={formTexts.accessibility.submitButton}
+        accessibilityHint={formTexts.accessibility.submitHint}
       >
-        <Text style={styles.submitText}>ENVIAR LINK</Text>
+        {isLoading ? (
+          <ActivityIndicator color={tokens.byteColorWhite} />
+        ) : (
+          <Text style={styles.submitText}>{formTexts.buttons.submit}</Text>
+        )}
       </Pressable>
 
       <Pressable
         onPress={() => router.push(routes.login)}
         style={styles.backButton}
         accessibilityRole="button"
-        accessibilityLabel="Botão para voltar à tela de login"
+        accessibilityLabel={formTexts.accessibility.backButton}
       >
-        <Text style={styles.backText}>Voltar ao login</Text>
+        <Text style={styles.backText}>{formTexts.buttons.back}</Text>
       </Pressable>
     </View>
   );

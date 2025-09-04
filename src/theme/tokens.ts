@@ -80,4 +80,10 @@ export const tokens = {
   illustrationSignupHeight: 150,
   logoWidth: 100,
   logoHeight: 28,
+
+  //border
+  borderLeft0:0,  
+
+  //height
+  height80:80
 };

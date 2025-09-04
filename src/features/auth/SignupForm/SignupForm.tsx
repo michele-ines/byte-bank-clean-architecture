@@ -1,27 +1,27 @@
-import { tokens } from "@/src/theme/tokens";
-import ExpoCheckbox from "expo-checkbox";
+import SignupIllustration from "@/assets/images/cadastro/ilustracao-cadastro.svg";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { routes } from "@/src/routes";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
-  NativeSyntheticEvent,
   Platform,
   Pressable,
   ScrollView,
   Text,
   TextInput,
-  TextInputChangeEventData,
   View,
 } from "react-native";
 
-import SignupIllustration from "@/assets/images/cadastro/ilustracao-cadastro.svg";
-import { useAuth } from "@/src/contexts/AuthContext";
-import { routes } from "@/src/routes";
+import { tokens } from "@/src/theme/tokens";
+import { ToastType } from "@/src/types/types";
+import ExpoCheckbox from "expo-checkbox";
 import Toast from "react-native-toast-message";
 import { styles } from "./SignupForm.styles";
 
 const signupFormTexts = {
-  title: "Preencha os campos abaixo para criar sua conta corrente!",
+  title: "Preencha os campos para criar sua conta!",
   fields: {
     name: "Nome",
     email: "Email",
@@ -29,26 +29,38 @@ const signupFormTexts = {
     confirmPassword: "Confirmar Senha",
   },
   placeholders: {
-    name: "Digite seu nome",
+    name: "Digite seu nome completo",
     email: "Digite seu email",
-    password: "Digite sua senha",
+    password: "Mínimo 8 caracteres",
     confirmPassword: "Confirme sua senha",
   },
   checkboxLabel:
     "Li e estou ciente quanto às condições de tratamento dos meus dados conforme descrito na Política de Privacidade do banco.",
   buttons: {
-    submit: "Criar conta",
-    back: "Voltar ao login",
+    submit: "CRIAR CONTA",
+    back: "VOLTAR AO LOGIN",
   },
-  alerts: {
+  accessibility: {
+    form: "Formulário de cadastro de conta corrente",
+    illustration: "Ilustração de uma pessoa interagindo com um ecrã de portátil seguro.",
+    checkbox: "Checkbox para aceitar os termos de privacidade.",
+    submitHint: "Cria uma nova conta e redireciona para o dashboard.",
+    backHint: "Volta para a tela de login sem salvar as alterações.",
+  },
+  toasts: {
     emptyFields: { title: "Atenção", message: "Por favor, preencha todos os campos." },
     passwordMismatch: { title: "Atenção", message: "As senhas não coincidem." },
+    passwordWeak: { title: "Senha Fraca", message: "A senha deve ter no mínimo 8 caracteres." },
     termsNotAccepted: { title: "Atenção", message: "Você precisa aceitar os termos e condições." },
     emailInvalid: { title: "Atenção", message: "Por favor, corrija o email antes de continuar." },
     success: { title: "Sucesso!", message: "Conta criada. Você será redirecionado." },
     emailInUse: { title: "Erro", message: "Este e-mail já está em uso." },
     genericError: { title: "Erro", message: "Ocorreu um erro ao criar a conta." },
   },
+};
+
+const showToast = (type: ToastType, text1: string, text2: string) => {
+  Toast.show({ type, text1, text2 });
 };
 
 type SignupFormProps = {
@@ -62,6 +74,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChecked, setChecked] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const { signup } = useAuth();
 
@@ -75,66 +88,72 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     setEmail(text);
   };
 
-  const handlePasswordChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
-    setPassword(e.nativeEvent.text);
-
-  const handleConfirmPasswordChange = (e: NativeSyntheticEvent<TextInputChangeEventData>) =>
-    setConfirmPassword(e.nativeEvent.text);
-
   const handleSubmit = async () => {
-    const { alerts } = signupFormTexts;
-
+    const { toasts } = signupFormTexts;
     if (!name || !email || !password || !confirmPassword) {
-      Toast.show({ type: 'error', text1: alerts.emptyFields.title, text2: alerts.emptyFields.message });
+      showToast("error", toasts.emptyFields.title, toasts.emptyFields.message);
+      return;
+    }
+    if (password.length < 8) {
+      showToast("error", toasts.passwordWeak.title, toasts.passwordWeak.message);
       return;
     }
     if (password !== confirmPassword) {
-      Toast.show({ type: 'error', text1: alerts.passwordMismatch.title, text2: alerts.passwordMismatch.message });
+      showToast("error", toasts.passwordMismatch.title, toasts.passwordMismatch.message);
       return;
     }
     if (!isChecked) {
-      Toast.show({ type: 'error', text1: alerts.termsNotAccepted.title, text2: alerts.termsNotAccepted.message });
+      showToast("error", toasts.termsNotAccepted.title, toasts.termsNotAccepted.message);
       return;
     }
     if (emailError) {
-      Toast.show({ type: 'error', text1: alerts.emailInvalid.title, text2: alerts.emailInvalid.message });
+      showToast("error", toasts.emailInvalid.title, toasts.emailInvalid.message);
       return;
     }
 
+    setIsLoading(true);
     try {
       await signup(email, password, name);
       onSignupSuccess?.(email);
-      Toast.show({ type: 'success', text1: alerts.success.title, text2: alerts.success.message });
+      showToast("success", toasts.success.title, toasts.success.message);
       router.replace(routes.dashboard);
-    } catch (error: any) {
-      if (error.code === "auth/email-already-in-use") {
-        Toast.show({ type: 'error', text1: alerts.emailInUse.title, text2: alerts.emailInUse.message });
-      } else {
-        Toast.show({ type: 'error', text1: alerts.genericError.title, text2: alerts.genericError.message });
+    } catch (error: unknown) {
+      let errorMessage = toasts.genericError.message;
+      let errorTitle = toasts.genericError.title;
+
+      if (error instanceof Error && (error as any).code === "auth/email-already-in-use") {
+        errorMessage = toasts.emailInUse.message;
+        errorTitle = toasts.emailInUse.title;
       }
+      showToast("error", errorTitle, errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const isFormInvalid = !name || !email || !password || !confirmPassword || !isChecked || isLoading;
+
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={styles.keyboardView}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        style={{ flex: 1, backgroundColor: tokens.byteBgDefault }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View
           style={styles.card}
           accessible
-          accessibilityLabel="Formulário de cadastro de conta corrente"
+          accessibilityLabel={signupFormTexts.accessibility.form}
         >
           <SignupIllustration
             width="100%"
             height={tokens.illustrationSignupHeight}
             style={styles.illustration}
-            accessibilityLabel="Ilustração de uma pessoa a interagir com um ecrã de portátil seguro"
+            accessibilityLabel={signupFormTexts.accessibility.illustration}
           />
 
           <Text style={styles.title} accessibilityRole="header">{signupFormTexts.title}</Text>
@@ -167,7 +186,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           <TextInput
             placeholder={signupFormTexts.placeholders.password}
             value={password}
-            onChange={handlePasswordChange}
+            onChangeText={setPassword}
             style={styles.input}
             secureTextEntry
             accessibilityLabel={signupFormTexts.fields.password}
@@ -178,7 +197,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           <TextInput
             placeholder={signupFormTexts.placeholders.confirmPassword}
             value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
+            onChangeText={setConfirmPassword}
             style={styles.input}
             secureTextEntry
             accessibilityLabel={signupFormTexts.fields.confirmPassword}
@@ -192,7 +211,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
               onValueChange={setChecked}
               color={isChecked ? tokens.byteColorGreen500 : undefined}
               accessibilityRole="checkbox"
-              accessibilityLabel={signupFormTexts.checkboxLabel}
+              accessibilityLabel={signupFormTexts.accessibility.checkbox}
               accessibilityState={{ checked: isChecked }}
             />
             <Text style={styles.checkboxLabel}>{signupFormTexts.checkboxLabel}</Text>
@@ -201,11 +220,17 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           {/* Botão Criar conta */}
           <Pressable
             onPress={handleSubmit}
-            style={[styles.button, styles.submitButton]}
+            style={[styles.button, styles.submitButton, isFormInvalid && styles.submitButtonDisabled]}
+            disabled={isFormInvalid}
             accessibilityRole="button"
             accessibilityLabel={signupFormTexts.buttons.submit}
+            accessibilityHint={signupFormTexts.accessibility.submitHint}
           >
-            <Text style={styles.buttonText}>{signupFormTexts.buttons.submit}</Text>
+            {isLoading ? (
+              <ActivityIndicator color={tokens.byteColorWhite} />
+            ) : (
+              <Text style={styles.buttonText}>{signupFormTexts.buttons.submit}</Text>
+            )}
           </Pressable>
 
           {/* Botão Voltar */}
@@ -214,6 +239,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             style={[styles.button, styles.backButton]}
             accessibilityRole="button"
             accessibilityLabel={signupFormTexts.buttons.back}
+            accessibilityHint={signupFormTexts.accessibility.backHint}
           >
             <Text style={styles.backText}>{signupFormTexts.buttons.back}</Text>
           </Pressable>
