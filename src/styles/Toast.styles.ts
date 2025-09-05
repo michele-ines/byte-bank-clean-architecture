@@ -12,10 +12,10 @@ type ToastStyles = {
 export const toastStyles = StyleSheet.create<ToastStyles>({
   baseToast: {
     borderLeftWidth: tokens.borderLeft0,
-    borderRadius:tokens.radiusSm,
-    width: '90%',
-    height:tokens.height80,
-    padding:tokens.spacingMd,
+    borderRadius: tokens.radiusSm,
+    width: tokens.width90Percent,
+    height: tokens.height80,
+    padding: tokens.spacingMd,
   },
   errorToast: {
     backgroundColor: tokens.byteColorError,
@@ -26,10 +26,10 @@ export const toastStyles = StyleSheet.create<ToastStyles>({
   text1: {
     fontSize: tokens.textBase,
     fontWeight: tokens.fontBold,
-    color: tokens.gradientTealTo, 
+    color: tokens.byteColorWhite,
   },
   text2: {
-    fontSize: 14,
-    color: tokens.gradientTealTo, 
+    fontSize: tokens.textSm,
+    color: tokens.byteColorWhite,
   },
 });

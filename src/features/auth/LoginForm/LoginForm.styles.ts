@@ -3,16 +3,15 @@ import { tokens } from "@/src/theme/tokens";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
- 
   keyboardView: {
     ...sharedStyles.keyboardView,
   },
   card: {
     ...sharedStyles.formContainer,
-    backgroundColor: tokens.byteColorGreen100, 
+    backgroundColor: tokens.byteColorGreen100,
   },
   illustration: {
-    width: '100%',
+    width: tokens.widthFull,
     marginBottom: tokens.spacingMd,
   },
   title: {
@@ -23,7 +22,7 @@ export const styles = StyleSheet.create({
   },
   input: {
     ...sharedStyles.input,
-    backgroundColor: tokens.byteColorGreen100, 
+    backgroundColor: tokens.byteColorGreen100,
   },
   button: {
     ...sharedStyles.button,
@@ -41,14 +40,14 @@ export const styles = StyleSheet.create({
     backgroundColor: tokens.byteColorOrange500,
   },
   alignButtons: {
-    alignItems: 'center',
+    alignItems: tokens.alignCenter,
   },
   forgot: {
     color: tokens.byteColorGreen500,
-    textAlign: "left",
+    textAlign: tokens.textAlignLeft,
     fontWeight: tokens.fontSemibold,
     marginTop: tokens.spacing2Xs,
     marginBottom: tokens.spacingMd,
-    textDecorationLine: 'underline',
+    textDecorationLine: tokens.textDecorationUnderline,
   },
 });

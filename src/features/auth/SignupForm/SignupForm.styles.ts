@@ -2,7 +2,6 @@ import { sharedStyles } from "@/src/styles/shared.styles";
 import { tokens } from "@/src/theme/tokens";
 import { StyleSheet } from "react-native";
 
-
 export const styles = StyleSheet.create({
   keyboardView: {
     ...sharedStyles.keyboardView,
@@ -19,7 +18,7 @@ export const styles = StyleSheet.create({
   },
   title: {
     ...sharedStyles.title,
-    fontSize: tokens.textLg, 
+    fontSize: tokens.textLg,
     lineHeight: tokens.lineHeightRelaxed,
   },
   label: {
@@ -32,7 +31,7 @@ export const styles = StyleSheet.create({
   button: {
     ...sharedStyles.button,
     paddingVertical: tokens.spacingSm,
-    width: '100%', 
+    width: tokens.widthFull,
   },
   buttonText: {
     ...sharedStyles.buttonText,
@@ -44,10 +43,10 @@ export const styles = StyleSheet.create({
 
   illustration: { 
     marginBottom: tokens.spacingSm,
-    alignSelf: 'center',
+    alignSelf: tokens.alignCenter,
   },
   inputError: { 
-    borderColor: tokens.byteColorError 
+    borderColor: tokens.byteColorError,
   },
   errorText: {
     color: tokens.byteColorError,
@@ -55,25 +54,25 @@ export const styles = StyleSheet.create({
     marginTop: tokens.spacing2Xs,
   },
   checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: tokens.flexRow,
+    alignItems: tokens.alignFlexStart,
     marginVertical: tokens.spacingSm,
   },
   checkbox: { 
-    marginRight: tokens.spacingXs, 
-    marginTop: tokens.spacing2Xs 
+    marginRight: tokens.spacingXs,
+    marginTop: tokens.spacing2Xs,
   },
   checkboxLabel: {
-    flex: 1,
+    flex: tokens.flex1,
     fontSize: tokens.textSm,
     color: tokens.byteGray600,
     lineHeight: tokens.lineHeightRelaxed,
   },
   submitButton: { 
-    backgroundColor: tokens.byteColorOrange500 
+    backgroundColor: tokens.byteColorOrange500,
   },
   backButton: {
-    borderWidth: 1,
+    borderWidth: tokens.borderWidthThin,
     borderColor: tokens.byteColorDash,
     backgroundColor: tokens.byteBgDefault,
   },
@@ -83,4 +82,3 @@ export const styles = StyleSheet.create({
     fontSize: tokens.textSm,
   },
 });
-
