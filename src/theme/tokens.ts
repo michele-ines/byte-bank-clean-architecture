@@ -39,6 +39,7 @@ export const tokens = {
 
   // 🖋️ Tipografia
   fontInter: "Inter, System",
+
   textXs: 12,
   textSm: 14,
   textBase: 16,
@@ -81,9 +82,22 @@ export const tokens = {
   logoWidth: 100,
   logoHeight: 28,
 
-  //border
-  borderLeft0:0,  
+  // 📐 Border
+  borderLeft0: 0,  
+  borderWidthThin: 1,
 
-  //height
-  height80:80
+  // 📐 Height
+  height80: 80,
+
+  // 📐 Layout & Dimensões
+  alignCenter: "center" as const,
+  alignFlexStart: "flex-start" as const,
+  flexRow: "row" as const,
+  flex1: 1,
+  widthFull: "100%" as const,
+  width90Percent: "90%" as const,
+
+  // 📄 Textos
+  textAlignLeft: "left" as const,
+  textDecorationUnderline: "underline" as const,
 };
