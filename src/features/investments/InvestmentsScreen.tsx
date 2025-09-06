@@ -1,4 +1,4 @@
-import { CardListExtract } from "@/src/components/cards/CardListExtract/CardListExtract";
+import { CardListExtract } from "@/src/shared/cards/CardListExtract/CardListExtract";
 import React from "react";
 import { View } from "react-native";
 import { styles } from "./InvestmentsScreen.styles";

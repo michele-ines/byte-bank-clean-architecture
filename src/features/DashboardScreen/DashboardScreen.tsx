@@ -1,6 +1,6 @@
-import Balance from "@/src/components/balance/BalanceComponent";
-import { CardListExtract } from "@/src/components/cards/CardListExtract/CardListExtract";
 import { NewTransactionForm } from "@/src/components/forms/NewTransactionForm/NewTransactionForm";
+import Balance from "@/src/shared/cards/balance/BalanceComponent";
+import { CardListExtract } from "@/src/shared/cards/CardListExtract/CardListExtract";
 import { UserInfo } from "firebase/auth";
 import React from "react";
 import { FlatList, View } from "react-native";
