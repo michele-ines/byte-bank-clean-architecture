@@ -1,4 +1,6 @@
-export const tokens = { 
+import { DimensionValue } from "react-native";
+
+export const tokens = {
   // 🎨 Cores Base
   byteBgDefault: "#ffffff",
   byteBgDashboard: "#e4ede3",
@@ -72,7 +74,7 @@ export const tokens = {
   spacingXs: 8,
   spacingSm: 12,
   spacingMd: 16,
-  spacingMl: 20,  
+  spacingMl: 20,
   spacingLg: 24,
   spacingXl: 32,
   spacingXxl: 40,
@@ -83,21 +85,86 @@ export const tokens = {
   logoHeight: 28,
 
   // 📐 Border
-  borderLeft0: 0,  
+  borderLeft0: 0,
   borderWidthThin: 1,
 
   // 📐 Height
   height80: 80,
+  heightModalMax: "85%" as DimensionValue,
 
   // 📐 Layout & Dimensões
   alignCenter: "center" as const,
   alignFlexStart: "flex-start" as const,
   flexRow: "row" as const,
   flex1: 1,
-  widthFull: "100%" as const,
-  width90Percent: "90%" as const,
+  widthFull: "100%" as DimensionValue,
+  width90Percent: "90%" as DimensionValue,
 
   // 📄 Textos
   textAlignLeft: "left" as const,
   textDecorationUnderline: "underline" as const,
+
+  // 📐 Justify
+  justifyBetween: "space-between" as const,
+  justifyEnd: "flex-end" as const,
+
+  // 🌑 Overlay
+  byteOverlay: "rgba(0,0,0,0.5)",
+
+  // 🎯 Ícones
+  iconXs: 12,
+  iconSm: 16,
+  iconMd: 20,
+  iconLg: 24,
+
+  // 📝 Textos do WidgetSettingsModal & PreferencesButton
+  textPersonalizarWidgets: "Personalizar Widgets",
+  textEscolhaWidgets: "Escolha quais widgets deseja exibir no painel",
+
+  textAlertaGastos: "Alerta de gastos",
+  textMetaEconomia: "Meta de economia",
+
+  textDescricaoGastos:
+    "Monitore seus gastos mensais e receba alertas quando se aproximar do limite definido.",
+  textDescricaoEconomia:
+    "Defina metas de economia e acompanhe seu progresso.",
+
+  textPreviewWidget: "Prévia do widget",
+  textPreviewGastos:
+    "Visualize seus gastos em tempo real e receba alertas quando atingir 80% do limite.",
+  textPreviewEconomia:
+    "Acompanhe o progresso com barra de progresso e celebre conquistas.",
+
+  textLimiteAtual: "Limite atual",
+  textGasto: "Gasto",
+  textMetaAtual: "Meta atual",
+  textEconomizado: "Economizado",
+
+  textCancelar: "Cancelar",
+  textConfirmar: "Confirmar",
+
+  // 🎯 Valores de preview
+  valorLimiteAtual: "R$ 2.000",
+  valorGasto: "R$ 0",
+  valorMetaAtual: "R$ 3.000",
+  valorEconomizado: "R$ 0",
+
+  // ♿ Labels de acessibilidade
+  a11ySpendingAlert: "Ativar ou desativar alerta de gastos",
+  a11yToggleSpendingAlert: "Alternar alerta de gastos",
+  a11ySavingsGoal: "Ativar ou desativar meta de economia",
+  a11yToggleSavingsGoal: "Alternar meta de economia",
+  a11yCancelar: "Cancelar personalização",
+  a11yConfirmar: "Confirmar personalização",
+  a11yAbrirWidgetPrefs: "Abrir personalização de widgets",
+
+  // 📝 Textos do SavingsGoalWidget
+  textProgresso: "Progresso:",
+  textParabens: "🎉 Parabéns! Você atingiu sua meta!",
+
+  // 📝 Textos do SpendingAlertWidget
+  textLimiteMensal: "Limite mensal",
+  textTotalGasto: "Total gasto",
+  textUltrapassouLimite: "⚠ Você ultrapassou o limite!",
+  textDentroLimite: "Gastos dentro do limite",
 };

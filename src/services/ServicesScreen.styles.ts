@@ -1,22 +1,8 @@
 import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 
-// Tipagem exata para cada chave
-type ServicesScreenStyles = {
-  container: ViewStyle;
-  title: TextStyle;
-};
-
-// StyleSheet tipado corretamente
-export const styles = StyleSheet.create<ServicesScreenStyles>({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: tokens.byteBgDashboard,
-  },
-  title: {
-    fontSize: tokens.textMd,
-    fontWeight: tokens.fontBold as TextStyle["fontWeight"],
-    color: tokens.byteColorDash,
-  },
+export const styles = StyleSheet.create({
+  container: { flex: tokens.flex1, backgroundColor: tokens.byteBgDefault },
+  content: { padding: tokens.spacingMd },
+  title: { fontSize: tokens.textLg, fontWeight: tokens.fontBold, marginBottom: tokens.spacingMd },
 });
