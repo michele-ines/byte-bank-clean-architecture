@@ -1,5 +1,5 @@
 import ConfirmModal from "@/src/components/common/ConfirmModal/ConfirmModal";
-import { apiToggleCardState, CardState } from "@/src/services/cards";
+import { apiToggleCardState, CardState } from "@/src/OtherServices/cards";
 import { tokens } from "@/src/theme/tokens";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";

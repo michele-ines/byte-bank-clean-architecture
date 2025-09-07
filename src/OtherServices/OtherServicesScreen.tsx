@@ -10,7 +10,7 @@ import { NewTransactionForm } from "../components/forms/NewTransactionForm/NewTr
 import SavingsGoalWidget from "../shared/components/SavingsGoalWidget/SavingsGoalWidget";
 import SpendingAlertWidget from "../shared/components/SpendingAlertWidget/SpendingAlertWidget";
 import WidgetPreferencesButton from "../shared/components/WidgetPreferencesButton/WidgetPreferencesButton";
-import { styles } from "./ServicesScreen.styles";
+import { styles } from "./OtherServicesScreen.styles";
 
 type Transaction = {
   tipo: "entrada" | "saida";

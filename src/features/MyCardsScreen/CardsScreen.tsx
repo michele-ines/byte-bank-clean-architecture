@@ -2,7 +2,7 @@ import PersonalCards from "@/src/components/cards/PersonalCards/PersonalCards";
 import { tokens } from "@/src/theme/tokens";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
-import { styles } from "./CardsScreen.styles";
+import { styles } from "./MyCardsScreen.styles";
 
 const CardsScreen: React.FC = () => {
   return (
