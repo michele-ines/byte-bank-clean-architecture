@@ -167,4 +167,21 @@ export const tokens = {
   textTotalGasto: "Total gasto",
   textUltrapassouLimite: "⚠ Você ultrapassou o limite!",
   textDentroLimite: "Gastos dentro do limite",
+
+    // 📊 Dados do FinancialChart
+  financialChartData: {
+    labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
+    datasets: [{ data: [1200, 2100, 800, 1600, 900, 1700] }],
+  },
+
+  // 📊 Configurações do gráfico
+  chartHeight: 220,
+  currencyPrefix: "R$ ",
+
+  // 📝 Textos do FinancialChart
+  textFinancialChart: "Gráfico Financeiro",
+
+  // ♿ Acessibilidade
+  a11yFinancialChart: "Gráfico financeiro de janeiro a junho",
+
 };
