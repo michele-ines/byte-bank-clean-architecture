@@ -6,64 +6,72 @@ import {
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
 } from "firebase/firestore";
-import {
-  getDownloadURL,
-  ref,
-  uploadBytes,
-} from "firebase/storage";
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { db, storage } from "../config/firebaseConfig";
+import { db } from "../config/firebaseConfig";
+import { useAuth } from "./AuthContext";
 
-interface Transaction extends DocumentData {
+export interface Transaction extends DocumentData {
   id?: string;
+  tipo: string;
+  valor: number;
   description: string;
-  amount: number;
-  date: Date;
-  receiptUrl?: string;
+  createdAt: Date;
+  updateAt: Date;
+  userId: string;
+  anexos: string[];
 }
 
 interface TransactionsContextData {
   transactions: Transaction[];
-  addTransaction: (transaction: Omit<Transaction, "id">, receiptFile?: Blob) => Promise<void>;
+  addTransaction: (transaction: { tipo: string; valor: number, description: string }) => Promise<void>;
+  loading: boolean;
 }
 
 const TransactionsContext = createContext<TransactionsContextData>({} as TransactionsContextData);
 
 export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, "transactions"), orderBy("date", "desc"));
+    if (!user) {
+      setTransactions([]);
+      setLoading(false);
+      return;
+    }
+
+    const q = query(collection(db, "transactions"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Transaction[];
+      const data = snapshot.docs
+        .map((doc) => ({ ...doc.data(), id: doc.id }))
+        .filter((t: any) => t.userId === user.uid) as Transaction[];
+      
       setTransactions(data);
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
-  const addTransaction = async (transaction: Omit<Transaction, "id">, receiptFile?: Blob) => {
-    let receiptUrl: string | undefined;
-
-    if (receiptFile) {
-      const storageRef = ref(storage, `receipts/${Date.now()}.jpg`);
-      const snapshot = await uploadBytes(storageRef, receiptFile);
-      receiptUrl = await getDownloadURL(snapshot.ref);
+  const addTransaction = async (transaction: { tipo: string; valor: number, description: string }) => {
+    if (!user) {
+      throw new Error("Usuário não autenticado.");
     }
 
     await addDoc(collection(db, "transactions"), {
       ...transaction,
-      receiptUrl,
-      date: transaction.date ?? new Date(),
+      userId: user.uid,
+      anexos: [],
+      createdAt: serverTimestamp(),
+      updateAt: serverTimestamp(),
     });
   };
 
   return (
-    <TransactionsContext.Provider value={{ transactions, addTransaction }}>
+    <TransactionsContext.Provider value={{ transactions, addTransaction, loading }}>
       {children}
     </TransactionsContext.Provider>
   );

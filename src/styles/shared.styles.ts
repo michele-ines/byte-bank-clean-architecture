@@ -13,6 +13,8 @@ type SharedStyles = {
   button: ViewStyle;
   buttonText: TextStyle;
   buttonDisabled: ViewStyle;
+  pixelsImage1: ViewStyle,
+  pixelsImage2: ViewStyle,
 };
 
 export const sharedStyles = StyleSheet.create<SharedStyles>({
@@ -73,4 +75,20 @@ export const sharedStyles = StyleSheet.create<SharedStyles>({
   buttonDisabled: {
     backgroundColor: tokens.byteGray400,
   },
+  pixelsImage1: {
+    position: 'absolute',
+    top:0,
+    left: 0,
+    width: '90%',
+    height: '100%',
+    opacity: 0.8,
+  },
+  pixelsImage2: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: '45%',
+    height: '50%',
+    opacity: 0.8,
+},
 });

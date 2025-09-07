@@ -1,45 +1,115 @@
+// src/components/NewTransactionForm.styles.ts
+
+import { sharedStyles } from "@/src/styles/shared.styles";
 import { tokens } from "@/src/theme/tokens";
 import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 
-type Styles = {
+type NewTransactionFormStyle = {
+  safeArea: ViewStyle;
   container: ViewStyle;
+  scrollContentContainer: ViewStyle;
   title: TextStyle;
+  pickerContainer: ViewStyle;
+  picker: TextStyle;
   label: TextStyle;
-  input: TextStyle; // 👈 corrigido aqui
-  receiptButton: ViewStyle;
-  receiptButtonText: TextStyle;
+  input: TextStyle;
   submitButton: ViewStyle;
   submitButtonText: TextStyle;
+  cardPixelsTop: ViewStyle;
+  cardPixelsBotton: ViewStyle;
+  illustration: ViewStyle;
+  bottomIllustrationsContainer: ViewStyle;
 };
 
-export const styles = StyleSheet.create<Styles>({
+export const styles = StyleSheet.create<NewTransactionFormStyle>({
+  safeArea: {
+    flex: tokens.flex1,
+    backgroundColor: tokens.byteGray,
+  },
   container: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 12,
-    gap: 12,
+    flex: tokens.flex1,
+    backgroundColor: tokens.byteGray,
   },
-  title: { fontSize: 18, fontWeight: "700", marginBottom: 8 },
-  label: { fontWeight: "600", marginTop: 8 },
+  scrollContentContainer: {
+    flexGrow: tokens.flex1,
+    justifyContent: tokens.alignCenter,
+    alignItems: tokens.stretch,
+    padding: tokens.spacingMl,
+  },
+  title: {
+    fontSize: tokens.textXl,
+    fontWeight: tokens.fontBold,
+    color: tokens.byteGray700,
+    marginBottom: tokens.spacingXxl,
+    textAlign: tokens.alignCenter,
+  },
+  pickerContainer: {
+    width: tokens.widthFull,
+    backgroundColor: tokens.byteColorWhite,
+    borderRadius: tokens.radiusSm,
+    borderWidth: tokens.borderWidthThin,
+    borderColor: tokens.byteGray300,
+    marginBottom: tokens.spacingMl,
+    height: tokens.height50,
+    justifyContent: tokens.alignCenter,
+  },
+  picker: {
+    color: tokens.byteGray700,
+  },
+  label: {
+    fontSize: tokens.textBase,
+    color: tokens.byteGray700,
+    marginBottom: tokens.spacingXs,
+    alignSelf: tokens.alignFlexStart,
+  },
   input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
+    width: tokens.widthFull,
+    height:tokens.height50,
+    backgroundColor: tokens.byteColorWhite,
+    borderRadius: tokens.radiusSm,
+    borderWidth: tokens.borderWidthThin,
+    borderColor: tokens.byteGray300,
+    paddingHorizontal: tokens.spacingMd,
+    fontSize: tokens.textBase,
+    color: tokens.byteGray700,
+    textAlign: tokens.alignCenter,
+    marginBottom: tokens.spacingMl,
   },
-  receiptButton: {
-    backgroundColor: tokens.byteColorDash,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  receiptButtonText: { color: "#fff", fontWeight: "600" },
   submitButton: {
-    backgroundColor: tokens.byteColorGreen500,
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
+    backgroundColor: tokens.byteColorDash,
+    paddingVertical: 15,
+    borderRadius: 25,
+    width: tokens.widthFull,
+    alignItems: tokens.alignCenter,
+    elevation: 3,
+    shadowColor: tokens.byteColorBlack,
+    shadowOffset: { width: tokens.width0, height: tokens.height2 },
+    shadowOpacity: tokens.opacitySm,
+    shadowRadius: tokens.radiusMini,
+    marginTop: tokens.spacingSm,
   },
-  submitButtonText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  submitButtonText: {
+    color: tokens.byteColorWhite,
+    fontSize: tokens.textBase,
+    fontWeight: tokens.fontBold,
+  },
+  cardPixelsTop: {
+    ...sharedStyles.pixelsImage1,
+  },
+  cardPixelsBotton:{
+    ...sharedStyles.pixelsImage2,
+  },
+  illustration: {
+    position:tokens.absolute,
+    opacity:tokens.opacityLg,
+    maxWidth:tokens.width220,
+    alignSelf: tokens.alignCenter,
+    zIndex: tokens.zIndex2,
+  },
+  bottomIllustrationsContainer: {
+    width: tokens.widthFull,
+    alignItems: tokens.alignCenter,
+    marginTop: tokens.spacingXxl,
+    minHeight: tokens.minHeight,
+  }
 });
