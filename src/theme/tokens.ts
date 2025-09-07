@@ -33,6 +33,7 @@ export const tokens = {
   byteGray700: "#374151",
   byteGray800: "#1f2937",
   byteGray900: "#111827",
+  byteGray: "#CBCBCB",
 
   // 🌈 Gradientes
   gradientGreen: ["#1ec88d", "#58fcb4"],
@@ -60,6 +61,7 @@ export const tokens = {
   lineHeightRelaxed: 24,
 
   // 📐 Radius
+  radiusMini:2,
   radiusSm: 8,
   radiusMd: 12,
   radiusLg: 16,
@@ -92,10 +94,18 @@ export const tokens = {
 
   // 📐 Height
   height80: 80,
+  height50:50,
+  height2:2,
+  minHeight:220,
   heightModalMax: "85%" as DimensionValue,
 
   // 📐 Modal
   modalTopPosition: "30%" as DimensionValue,
+
+  // Width
+  width220:220,
+  width0:0,
+
 
   // 📐 Layout & Dimensões
   flex1: 1,
@@ -249,4 +259,19 @@ export const tokens = {
 
   // 📝 Textos extras para CardsScreen
   textConfigCardsSubtitle: "Configure e bloqueie seus cartões por aqui.",
+
+  //opacity
+  opacitySm:0.2,
+  opacityLg:0.9,
+
+  //zIndex
+  zIndex1:1,
+  zIndex2:2,
+
+  //alignItens
+  stretch: 'stretch' as const,
+
+  //position
+  absolute: 'absolute' as const
+
 };
