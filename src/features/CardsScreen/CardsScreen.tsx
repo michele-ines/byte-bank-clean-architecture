@@ -1,13 +1,26 @@
+import PersonalCards from "@/src/components/cards/PersonalCards/PersonalCards";
+import { tokens } from "@/src/theme/tokens";
 import React from "react";
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { styles } from "./CardsScreen.styles";
 
 const CardsScreen: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Meus cartões</Text>
-      <Text>Configure e bloqueie seus cartões por aqui.</Text>
-    </View>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.headerWrapper}>
+        <Text style={styles.title} accessibilityRole="header">
+          {tokens.textMeusCartoes}
+        </Text>
+        <Text style={styles.subtitle}>{tokens.textConfigCardsSubtitle}</Text>
+      </View>
+
+      <PersonalCards />
+    </ScrollView>
   );
 };
 

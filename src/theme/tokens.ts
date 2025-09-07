@@ -63,6 +63,7 @@ export const tokens = {
   radiusSm: 8,
   radiusMd: 12,
   radiusLg: 16,
+  radiusXl: 999, 
 
   // 👤 Avatar
   avatarSm: 40,
@@ -87,26 +88,38 @@ export const tokens = {
   // 📐 Border
   borderLeft0: 0,
   borderWidthThin: 1,
+  borderWidthThick: 1.5,
 
   // 📐 Height
   height80: 80,
   heightModalMax: "85%" as DimensionValue,
 
+  // 📐 Modal
+  modalTopPosition: "30%" as DimensionValue,
+
   // 📐 Layout & Dimensões
+  flex1: 1,
+  flexRow: "row" as const,
+  flexColumn: "column" as const,
+
+  positionAbsolute: "absolute" as const,
+  positionRelative: "relative" as const,
+
   alignCenter: "center" as const,
   alignFlexStart: "flex-start" as const,
-  flexRow: "row" as const,
-  flex1: 1,
+  alignFlexEnd: "flex-end" as const,
+
+  justifyCenter: "center" as const,
+  justifyBetween: "space-between" as const,
+  justifyEnd: "flex-end" as const,
+
   widthFull: "100%" as DimensionValue,
   width90Percent: "90%" as DimensionValue,
 
   // 📄 Textos
+  textAlignCenter: "center" as const,
   textAlignLeft: "left" as const,
   textDecorationUnderline: "underline" as const,
-
-  // 📐 Justify
-  justifyBetween: "space-between" as const,
-  justifyEnd: "flex-end" as const,
 
   // 🌑 Overlay
   byteOverlay: "rgba(0,0,0,0.5)",
@@ -116,6 +129,36 @@ export const tokens = {
   iconSm: 16,
   iconMd: 20,
   iconLg: 24,
+
+  // 📱 Breakpoints
+  breakpointLg: 1024,
+
+  // 🖼️ Imagens de cartão
+  cardImageWidth: 327,
+  cardImageHeight: 164,
+  cardImageSmallWidth: 280,
+  cardImageSmallHeight: 148,
+
+  // 🔘 Botões
+  buttonHeight: 48,
+  buttonMaxWidth: 320,
+  buttonMinWidth: 140,
+
+  // 🌑 Sombra (painéis)
+  shadowColor: "#000000",
+  shadowOpacity: 0.06,
+  shadowOffset: { width: 0, height: 2 },
+  shadowRadius: 6,
+  shadowElevation: 2,
+
+  // 📐 Content
+  contentPaddingBottom: 24, 
+
+  // 🎯 Badge
+  badgeActiveBg: "#E7F6EE",
+  badgeActiveBorder: "#A5D6BD",
+  badgeActiveText: "#256B45",
+  badgeBlockedBg: "#FDEAEA",
 
   // 📝 Textos do WidgetSettingsModal & PreferencesButton
   textPersonalizarWidgets: "Personalizar Widgets",
@@ -157,6 +200,8 @@ export const tokens = {
   a11yCancelar: "Cancelar personalização",
   a11yConfirmar: "Confirmar personalização",
   a11yAbrirWidgetPrefs: "Abrir personalização de widgets",
+  a11yMeusCartoes: "Meus cartões",
+  a11yConfigurar: "Configurar cartão",
 
   // 📝 Textos do SavingsGoalWidget
   textProgresso: "Progresso:",
@@ -168,7 +213,7 @@ export const tokens = {
   textUltrapassouLimite: "⚠ Você ultrapassou o limite!",
   textDentroLimite: "Gastos dentro do limite",
 
-    // 📊 Dados do FinancialChart
+  // 📊 Dados do FinancialChart
   financialChartData: {
     labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
     datasets: [{ data: [1200, 2100, 800, 1600, 900, 1700] }],
@@ -184,4 +229,24 @@ export const tokens = {
   // ♿ Acessibilidade
   a11yFinancialChart: "Gráfico financeiro de janeiro a junho",
 
+  // 📝 Textos dos Cartões (PersonalCards)
+  textMeusCartoes: "Meus cartões",
+  textCartaoFisico: "Cartão físico",
+  textCartaoDigital: "Cartão digital",
+  textFuncaoFisico: "Função: Débito/Crédito",
+  textFuncaoDigital: "Função: Débito",
+  textConfigurar: "Configurar",
+  textBloquear: "Bloquear",
+  textDesbloquear: "Desbloquear",
+  textAtivo: "Ativo",
+  textBloqueado: "Bloqueado",
+  textBloquearCartao: "Bloquear cartão",
+  textDesbloquearCartao: "Desbloquear cartão",
+  textMsgBloqueio:
+    "Você confirma o bloqueio imediato deste cartão? Compras serão recusadas até o desbloqueio.",
+  textMsgDesbloqueio:
+    "Deseja desbloquear este cartão e voltar a usá-lo normalmente?",
+
+  // 📝 Textos extras para CardsScreen
+  textConfigCardsSubtitle: "Configure e bloqueie seus cartões por aqui.",
 };

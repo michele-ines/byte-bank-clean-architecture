@@ -1,19 +1,28 @@
 import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 
-type CardsScreenStyles = {
-  container: ViewStyle;
-  title: TextStyle;
-};
-
-export const styles = StyleSheet.create<CardsScreenStyles>({
-  container: { 
-    flex: 1, 
-    padding: 16, 
-    backgroundColor: tokens.byteBgDashboard 
+export const styles = StyleSheet.create({
+  container: {
+    flex: tokens.flex1,
+    backgroundColor: tokens.byteBgDefault,
+    padding: tokens.spacingLg,
   },
-  title: { 
-    fontSize: 20, 
-    fontWeight: "700" 
+  contentContainer: {
+    paddingBottom: tokens.contentPaddingBottom, // 👈 novo token
+  },
+  headerWrapper: {
+    gap: tokens.spacingXs,
+  },
+  title: {
+    fontSize: tokens.textXl,
+    fontWeight: tokens.fontBold,
+    color: tokens.byteColorBlack,
+    textAlign: tokens.textAlignCenter,
+  },
+  subtitle: {
+    fontSize: tokens.textSm,
+    color: tokens.byteTextMediumGray,
+    textAlign: tokens.textAlignCenter,
+    marginBottom: tokens.spacingMd,
   },
 });
