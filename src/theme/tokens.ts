@@ -261,4 +261,8 @@ export const tokens = {
       },
     },
   },
+
+  // 🆕 Textos utilitários de saldo
+  hiddenBalanceMask: "••••••", 
+  loadingText: "Carregando...", 
 };

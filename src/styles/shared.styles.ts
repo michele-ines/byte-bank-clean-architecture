@@ -1,7 +1,6 @@
 import { tokens } from "@/src/theme/tokens";
 import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 
-// Tipagem para os estilos partilhados
 type SharedStyles = {
   keyboardView: ViewStyle;
   scrollView: ViewStyle;
