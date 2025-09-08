@@ -94,10 +94,10 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
     fontWeight: tokens.fontBold,
   },
   cardPixelsTop: {
-    ...sharedStyles.pixelsImage1,
+    ...sharedStyles.backgroundPixelsTop,
   },
   cardPixelsBotton:{
-    ...sharedStyles.pixelsImage2,
+    ...sharedStyles.backgroundPixelsBottom,
   },
   illustration: {
     position:tokens.absolute,

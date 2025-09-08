@@ -97,9 +97,12 @@ export const tokens = {
   height2:2,
   minHeight:220,
   heightModalMax: "85%" as DimensionValue,
+  height50Percent: "50%" as DimensionValue,
 
   // Width
   width220:220,
+  width150:150,
+  width45Percent: "45%" as DimensionValue,
   width0:0,
 
 
@@ -198,6 +201,7 @@ export const tokens = {
   //opacity
   opacitySm:0.2,
   opacityMd:0.6,
+  opacityImage: 0.8,
   opacityLg:0.9,
 
   //zIndex

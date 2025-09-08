@@ -13,33 +13,31 @@ type SharedStyles = {
   button: ViewStyle;
   buttonText: TextStyle;
   buttonDisabled: ViewStyle;
-  pixelsImage1: ViewStyle,
-  pixelsImage2: ViewStyle,
+  backgroundPixelsTop : ViewStyle;
+  backgroundPixelsBottom: ViewStyle;
 };
 
 export const sharedStyles = StyleSheet.create<SharedStyles>({
-  // Layouts
   keyboardView: {
-    flex: 1,
+    flex: tokens.flex1,
   },
   scrollView: {
-    flex: 1,
+    flex: tokens.flex1,
     backgroundColor: tokens.byteBgDefault,
   },
   scrollViewContent: {
-    flexGrow: 1,
+    flexGrow: tokens.flex1,
   },
   formContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    flex: tokens.flex1,
+    justifyContent: tokens.alignCenter,
     padding: tokens.spacingLg,
     gap: tokens.spacingSm,
   },
-  // Elementos de Formulário
   title: {
     fontSize: tokens.textXl,
     fontWeight: tokens.fontBold,
-    textAlign: 'center',
+    textAlign: tokens.alignCenter,
     color: tokens.byteGray800,
     marginBottom: tokens.spacingMd,
   },
@@ -50,7 +48,7 @@ export const sharedStyles = StyleSheet.create<SharedStyles>({
     marginBottom: tokens.spacing2Xs,
   },
   input: {
-    borderWidth: 1,
+    borderWidth: tokens.borderWidthThin,
     borderColor: tokens.byteGray300,
     borderRadius: tokens.radiusSm,
     paddingHorizontal: tokens.spacingSm,
@@ -61,11 +59,11 @@ export const sharedStyles = StyleSheet.create<SharedStyles>({
   },
   // Botões
   button: {
-    paddingVertical: 14,
+    paddingVertical:tokens.spacingMd, 
     borderRadius: tokens.radiusSm,
-    alignItems: 'center',
+    alignItems: tokens.alignCenter,
     marginTop: tokens.spacingXs,
-    width: 150,
+    width: tokens.width150,
   },
   buttonText: {
     color: tokens.byteColorWhite,
@@ -75,20 +73,20 @@ export const sharedStyles = StyleSheet.create<SharedStyles>({
   buttonDisabled: {
     backgroundColor: tokens.byteGray400,
   },
-  pixelsImage1: {
-    position: 'absolute',
-    top:0,
-    left: 0,
-    width: '90%',
-    height: '100%',
-    opacity: 0.8,
+  backgroundPixelsTop : {
+    position: tokens.absolute,
+    top: tokens.width0,
+    left: tokens.width0,
+    width: tokens.width90Percent,
+    height: tokens.widthFull,
+    opacity: tokens.opacityImage, 
   },
-  pixelsImage2: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: '45%',
-    height: '50%',
-    opacity: 0.8,
-},
+  backgroundPixelsBottom: {
+    position: tokens.absolute,
+    bottom: tokens.width0,
+    right: tokens.width0,
+    width: tokens.width45Percent, 
+    height: tokens.height50Percent, 
+    opacity: tokens.opacityImage, 
+  },
 });
