@@ -217,6 +217,7 @@ export const tokens = {
 
   //elevation
   elevation0:0,
+  elevation1:1,
   elevation:3,
 
   //bar style

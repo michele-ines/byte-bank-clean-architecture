@@ -52,6 +52,8 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
     marginBottom: tokens.spacingMl,
     height: tokens.height50,
     justifyContent: tokens.alignCenter,
+    zIndex: tokens.zIndex1,
+    elevation:tokens.elevation1
   },
 
   label: {
