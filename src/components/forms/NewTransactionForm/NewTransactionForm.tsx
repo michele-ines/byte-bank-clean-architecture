@@ -6,7 +6,7 @@ import TransactionIllustration from '@/assets/images/dash-card-new-transacao/Ilu
 import { useTransactions } from "@/src/contexts/TransactionsContext";
 import { ITransaction } from "@/src/interfaces/ITransaction";
 import { tokens } from "@/src/theme/tokens";
-import { TransactionType, transactionTypeItems } from "@/src/types/types";
+import { TransactionType, TransactionTypeItems } from "@/src/types/types";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -31,7 +31,7 @@ export const NewTransactionForm: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState(transactionTypeItems)
+  const [items, setItems] = useState(TransactionTypeItems)
   const handleSubmit = async () => {
   if (!transactionType || numericAmount <= 0) {
     showToast(
