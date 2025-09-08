@@ -42,26 +42,22 @@ export const tokens = {
 
   // 🖋️ Tipografia
   fontInter: "Inter, System",
-
   textXs: 12,
   textSm: 14,
   textBase: 16,
   textMd: 18,
   textLg: 20,
   textXl: 24,
-
   fontNormal: "400" as const,
   fontMedium: "500" as const,
   fontSemibold: "600" as const,
   fontBold: "700" as const,
-
-  // 📏 Line Heights
   lineHeightTight: 16,
   lineHeightNormal: 20,
   lineHeightRelaxed: 24,
 
   // 📐 Radius
-  radiusMini:2,
+  radiusMini: 2,
   radiusSm: 8,
   radiusMd: 12,
   radiusLg: 16,
@@ -93,18 +89,17 @@ export const tokens = {
 
   // 📐 Height
   height80: 80,
-  height50:50,
-  height2:2,
-  minHeight:220,
+  height50: 50,
+  height2: 2,
+  minHeight: 220,
   heightModalMax: "85%" as DimensionValue,
   height50Percent: "50%" as DimensionValue,
 
-  // Width
-  width220:220,
-  width150:150,
+  // 📐 Width
+  width220: 220,
+  width150: 150,
   width45Percent: "45%" as DimensionValue,
-  width0:0,
-
+  width0: 0,
 
   // 📐 Layout & Dimensões
   alignCenter: "center" as const,
@@ -131,29 +126,29 @@ export const tokens = {
   iconMd: 20,
   iconLg: 24,
 
+  // 📐 Sombra / Indicator
+  heightIndicator: 20,
+  shadowOffsetWidth: 0,
+  shadowOffsetHeight: 2,
+
   // 📝 Textos do WidgetSettingsModal & PreferencesButton
   textPersonalizarWidgets: "Personalizar Widgets",
   textEscolhaWidgets: "Escolha quais widgets deseja exibir no painel",
-
   textAlertaGastos: "Alerta de gastos",
   textMetaEconomia: "Meta de economia",
-
   textDescricaoGastos:
     "Monitore seus gastos mensais e receba alertas quando se aproximar do limite definido.",
   textDescricaoEconomia:
     "Defina metas de economia e acompanhe seu progresso.",
-
   textPreviewWidget: "Prévia do widget",
   textPreviewGastos:
     "Visualize seus gastos em tempo real e receba alertas quando atingir 80% do limite.",
   textPreviewEconomia:
     "Acompanhe o progresso com barra de progresso e celebre conquistas.",
-
   textLimiteAtual: "Limite atual",
   textGasto: "Gasto",
   textMetaAtual: "Meta atual",
   textEconomizado: "Economizado",
-
   textCancelar: "Cancelar",
   textConfirmar: "Confirmar",
 
@@ -182,7 +177,7 @@ export const tokens = {
   textUltrapassouLimite: "⚠ Você ultrapassou o limite!",
   textDentroLimite: "Gastos dentro do limite",
 
-    // 📊 Dados do FinancialChart
+  // 📊 Dados do FinancialChart
   financialChartData: {
     labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
     datasets: [{ data: [1200, 2100, 800, 1600, 900, 1700] }],
@@ -191,39 +186,79 @@ export const tokens = {
   // 📊 Configurações do gráfico
   chartHeight: 220,
   currencyPrefix: "R$ ",
-
-  // 📝 Textos do FinancialChart
   textFinancialChart: "Gráfico Financeiro",
 
-  // ♿ Acessibilidade
+  // ♿ Acessibilidade do gráfico
   a11yFinancialChart: "Gráfico financeiro de janeiro a junho",
 
   //opacity
-  opacity0:0,
-  opacitySm:0.2,
-  opacityMd:0.6,
+  opacity0: 0,
+  opacitySm: 0.2,
+  opacityMd: 0.6,
   opacityImage: 0.8,
-  opacityLg:0.9,
+  opacityLg: 0.9,
 
   //zIndex
-  zIndex1:1,
-  zIndex2:2,
+  zIndex1: 1,
+  zIndex2: 2,
 
   //alignItens
-  stretch: 'stretch' as const,
+  stretch: "stretch" as const,
 
   //position
-  absolute: 'absolute' as const,
+  absolute: "absolute" as const,
 
   //elevation
-  elevation0:0,
-  elevation1:1,
-  elevation:3,
+  elevation0: 0,
+  elevation1: 1,
+  elevation: 3,
 
   //bar style
-  barStyle:"dark-content" as const,
+  barStyle: "dark-content" as const,
 
   //maxLenght
-  maxLenght:15,
+  maxLenght: 15,
 
+  // 📝 Textos do NewTransactionForm
+  newTransactionForm: {
+    title: "Nova transação",
+    labels: {
+      transactionType: "Tipo de transação",
+      amount: "Valor",
+    },
+    placeholders: {
+      transactionType: "Selecione o tipo de transação",
+      amount: "R$ 0,00",
+    },
+    buttons: {
+      submit: "CONCLUIR TRANSAÇÃO",
+    },
+    accessibility: {
+      form: "Formulário de nova transação",
+      cardTopIllustration: "Ilustração decorativa superior com pixels",
+      transactionTypeInput: "Seletor de tipo de transação",
+      amountInput: "Campo de entrada de valor da transação",
+      amountHint: "Digite o valor numérico da transação",
+      submitButton: "Concluir e salvar nova transação",
+      submitButtonLoading: "Salvando transação, por favor aguarde.",
+      mainIllustration: "Ilustração de uma pessoa com um cartão de crédito",
+      cardBottomIllustration: "Ilustração decorativa inferior com pixels",
+      transactionTypeHint: "Toque para abrir a lista de tipos de transação",
+      loading: "Carregando transação",
+    },
+    toasts: {
+      emptyFields: {
+        title: "Atenção",
+        message: "Selecione o tipo e informe o valor.",
+      },
+      success: {
+        title: "Sucesso!",
+        message: "Transação adicionada com sucesso.",
+      },
+      error: {
+        title: "Erro",
+        message: "Não foi possível adicionar a transação.",
+      },
+    },
+  },
 };
