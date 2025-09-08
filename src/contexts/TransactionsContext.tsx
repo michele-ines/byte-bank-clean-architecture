@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { db } from "../config/firebaseConfig";
+import { ITransaction } from "../interfaces/ITransaction";
 import { useAuth } from "./AuthContext";
 
 export interface Transaction extends DocumentData {
@@ -48,7 +49,6 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       const data = snapshot.docs
         .map((doc) => ({ ...doc.data(), id: doc.id }))
         .filter((t: any) => t.userId === user.uid) as Transaction[];
-      
       setTransactions(data);
       setLoading(false);
     });
@@ -56,7 +56,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     return () => unsubscribe();
   }, [user]);
 
-  const addTransaction = async (transaction: { tipo: string; valor: number, description: string }) => {
+  const addTransaction = async (transaction: ITransaction) => {
     if (!user) {
       throw new Error("Usuário não autenticado.");
     }

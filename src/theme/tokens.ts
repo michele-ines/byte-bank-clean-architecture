@@ -65,6 +65,7 @@ export const tokens = {
   radiusSm: 8,
   radiusMd: 12,
   radiusLg: 16,
+  radiusX1: 25,
 
   // 👤 Avatar
   avatarSm: 40,
@@ -196,6 +197,7 @@ export const tokens = {
 
   //opacity
   opacitySm:0.2,
+  opacityMd:0.6,
   opacityLg:0.9,
 
   //zIndex
@@ -206,6 +208,12 @@ export const tokens = {
   stretch: 'stretch' as const,
 
   //position
-  absolute: 'absolute' as const
+  absolute: 'absolute' as const,
+
+  //elevation
+  elevation:3,
+
+  //bar style
+  barStyle:"dark-content" as const,
 
 };
