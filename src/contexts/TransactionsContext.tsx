@@ -1,5 +1,3 @@
-// src/contexts/TransactionsContext.tsx
-
 import {
   addDoc,
   collection,
@@ -8,7 +6,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
-  Timestamp, // Importa o tipo Timestamp do Firestore
+  Timestamp,
 } from "firebase/firestore";
 import React, {
   createContext,
@@ -20,26 +18,20 @@ import React, {
 import { db } from "../config/firebaseConfig";
 import { useAuth } from "./AuthContext";
 
-// =================================================================
-// 📌 Tipagem Avançada
-// =================================================================
 
-// Define os tipos de transação permitidos para maior segurança de tipo.
 export type TransactionType = "deposito" | "cambio" | "transferencia";
 
-// Interface explícita para uma transação, sem depender de `DocumentData`.
 export interface ITransaction {
   id: string;
   tipo: TransactionType;
   valor: number;
   description: string;
-  createdAt: Timestamp | null; // Tipado para aceitar Timestamp do Firestore ou null
+  createdAt: Timestamp | null;
   updateAt: Timestamp | null;
   userId: string;
   anexos: string[];
 }
 
-// Tipo para os dados de entrada de uma nova transação.
 export interface INewTransactionInput {
   tipo: TransactionType;
   valor: number;

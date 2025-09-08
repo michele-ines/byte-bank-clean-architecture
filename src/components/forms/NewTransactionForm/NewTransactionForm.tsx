@@ -1,4 +1,4 @@
-// src/components/NewTransactionForm/NewTransactionForm.tsx
+// src/components/NewTransactionForm.tsx
 
 import CardPixelsTop from "@/assets/images/dash-card-new-transacao/card-pixels-3.svg";
 import CardPixelBotton from '@/assets/images/dash-card-new-transacao/card-pixels-4.svg';
@@ -6,8 +6,7 @@ import TransactionIllustration from '@/assets/images/dash-card-new-transacao/Ilu
 import { useTransactions } from "@/src/contexts/TransactionsContext";
 import { ITransaction } from "@/src/interfaces/ITransaction";
 import { tokens } from "@/src/theme/tokens";
-import { TransactionType } from "@/src/types/types";
-import { Picker } from "@react-native-picker/picker";
+import { TransactionType, transactionTypeItems } from "@/src/types/types";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -20,6 +19,7 @@ import {
   Text,
   View
 } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 import { MaskedTextInput } from "react-native-mask-text";
 import { styles } from "./NewTransactionForm.styles";
 import { formatTransactionDescription, formTexts, showToast } from "./NewTransactionForm.texts";
@@ -30,15 +30,20 @@ export const NewTransactionForm: React.FC = () => {
   const [unmaskedAmount, setUnmaskedAmount] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState(transactionTypeItems)
   const handleSubmit = async () => {
-    if (!transactionType || !unmaskedAmount) {
-      showToast("error", formTexts.toasts.emptyFields.title, formTexts.toasts.emptyFields.message);
-      return;
-    }
+  if (!transactionType || numericAmount <= 0) {
+    showToast(
+      "error",
+      formTexts.toasts.emptyFields.title,
+      formTexts.toasts.emptyFields.message
+    );
+    return;
+  }
     setIsLoading(true);
     try {
       const numericAmount = parseFloat(unmaskedAmount) / 100;
-      
       const description = formatTransactionDescription(transactionType, numericAmount);
 
       await addTransaction({
@@ -57,8 +62,12 @@ export const NewTransactionForm: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-  const isFormInvalid = !transactionType || !unmaskedAmount || isLoading;
+  const numericAmount = unmaskedAmount ? parseFloat(unmaskedAmount) / 100 : 0;
+  const isFormInvalid =
+    !transactionType ||
+    !unmaskedAmount ||
+    numericAmount <= 0 ||
+    isLoading;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -83,21 +92,26 @@ export const NewTransactionForm: React.FC = () => {
           >
             <Text style={styles.title} accessibilityRole="header">{formTexts.title}</Text>
 
-            {/* ✅ Acessibilidade: Adicionado accessibilityRole="text" */}
             <Text style={styles.label} accessibilityRole="text">{formTexts.labels.transactionType}</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={transactionType}
-                onValueChange={(itemValue) => setTransactionType(itemValue)}
-                style={styles.picker}
-                accessibilityLabel={formTexts.accessibility.transactionTypeInput}
-                accessibilityRole="combobox"
-              >
-                <Picker.Item label={formTexts.placeholders.transactionType} value={undefined} enabled={false} />
-                <Picker.Item label="Depósito" value="deposito" />
-                <Picker.Item label="Câmbio" value="cambio" />
-                <Picker.Item label="Transferência" value="transferencia" />
-              </Picker>
+              <View style={[styles.pickerContainer]}>
+                <DropDownPicker
+                  open={open}
+                  value={transactionType ?? null}
+                  items={items}
+                  setOpen={setOpen}
+                  setItems={setItems}
+                  setValue={(getValue) => {
+                    const v = getValue(transactionType ?? null) as TransactionType | null;
+                    setTransactionType(v ?? undefined);
+                  }}
+                  placeholder={formTexts.placeholders.transactionType}
+                  disabled={isLoading}
+                  modalTitle={formTexts.labels.transactionType}
+                  style={
+                    styles.dropdownPicker
+                  }
+             
+                />
             </View>
 
             <Text style={styles.label} accessibilityRole="text">{formTexts.labels.amount}</Text>
@@ -111,9 +125,10 @@ export const NewTransactionForm: React.FC = () => {
               }}
               value={unmaskedAmount}
               onChangeText={(_, rawText) => {
-                setUnmaskedAmount(rawText);
-              }}
+                  setUnmaskedAmount(rawText);
+                }}
               style={styles.input}
+              maxLength={tokens.maxLenght}
               keyboardType="decimal-pad"
               placeholder={formTexts.placeholders.amount}
               accessibilityLabel={formTexts.accessibility.amountInput}
@@ -129,7 +144,6 @@ export const NewTransactionForm: React.FC = () => {
               accessibilityHint={isLoading ? formTexts.accessibility.submitButtonLoading : ""}
             >
               {isLoading ? (
-                // ✅ Acessibilidade: Adicionado accessibilityLabel
                 <ActivityIndicator color={tokens.byteColorWhite} accessibilityLabel="Carregando transação"/>
               ) : (
                 <Text style={styles.submitButtonText}>{formTexts.buttons.submit}</Text>

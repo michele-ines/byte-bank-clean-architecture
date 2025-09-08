@@ -10,7 +10,6 @@ type NewTransactionFormStyle = {
   scrollContentContainer: ViewStyle;
   title: TextStyle;
   pickerContainer: ViewStyle;
-  picker: TextStyle;
   label: TextStyle;
   input: TextStyle;
   submitButton: ViewStyle;
@@ -19,6 +18,7 @@ type NewTransactionFormStyle = {
   cardPixelsBotton: ViewStyle;
   illustration: ViewStyle;
   bottomIllustrationsContainer: ViewStyle;
+  dropdownPicker:ViewStyle;
 };
 
 export const styles = StyleSheet.create<NewTransactionFormStyle>({
@@ -53,9 +53,7 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
     height: tokens.height50,
     justifyContent: tokens.alignCenter,
   },
-  picker: {
-    color: tokens.byteGray700,
-  },
+
   label: {
     fontSize: tokens.textBase,
     color: tokens.byteGray700,
@@ -111,5 +109,11 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
     alignItems: tokens.alignCenter,
     marginTop: tokens.spacingXxl,
     minHeight: tokens.minHeight,
+  },
+  dropdownPicker:{
+    borderWidth: tokens.borderLeft0,
+    elevation: tokens.elevation0, 
+    shadowOpacity: tokens.opacity0, 
+    backgroundColor: tokens.byteColorWhite, 
   }
 });

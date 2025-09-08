@@ -199,6 +199,7 @@ export const tokens = {
   a11yFinancialChart: "Gráfico financeiro de janeiro a junho",
 
   //opacity
+  opacity0:0,
   opacitySm:0.2,
   opacityMd:0.6,
   opacityImage: 0.8,
@@ -215,9 +216,13 @@ export const tokens = {
   absolute: 'absolute' as const,
 
   //elevation
+  elevation0:0,
   elevation:3,
 
   //bar style
   barStyle:"dark-content" as const,
+
+  //maxLenght
+  maxLenght:15,
 
 };
