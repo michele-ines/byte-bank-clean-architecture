@@ -24,6 +24,7 @@ export const formTexts = {
     submitButtonLoading: "Salvando transação, por favor aguarde.",
     mainIllustration: "Ilustração de uma pessoa com um cartão de crédito",
     cardBottomIllustration: "Ilustração decorativa inferior com pixels",
+    transactionTypeHint: "Toque para abrir a lista de tipos de transação",
   },
   toasts: {
     emptyFields: { title: "Atenção", message: "Selecione o tipo e informe o valor." },

@@ -93,7 +93,11 @@ export const NewTransactionForm: React.FC = () => {
             <Text style={styles.title} accessibilityRole="header">{formTexts.title}</Text>
 
             <Text style={styles.label} accessibilityRole="text">{formTexts.labels.transactionType}</Text>
-              <View style={[styles.pickerContainer]}>
+              <View style={[styles.pickerContainer]}     
+                accessible
+                accessibilityRole="combobox"
+                accessibilityLabel={formTexts.accessibility.transactionTypeInput}
+                accessibilityHint={formTexts.accessibility.transactionTypeHint}>
                 <DropDownPicker
                   open={open}
                   value={transactionType ?? null}
@@ -110,7 +114,6 @@ export const NewTransactionForm: React.FC = () => {
                   style={
                     styles.dropdownPicker
                   }
-             
                 />
             </View>
 
