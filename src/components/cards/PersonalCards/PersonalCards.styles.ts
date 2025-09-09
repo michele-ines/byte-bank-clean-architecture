@@ -12,19 +12,22 @@ export const styles = StyleSheet.create({
     fontSize: tokens.textMd,
     fontWeight: tokens.fontBold,
     color: tokens.byteColorBlack,
-    textAlign: "center",
+    textAlign: tokens.textAlignCenter,
     marginBottom: tokens.spacingSm,
   },
+
   list: {
-    flexDirection: "column",
+    flexDirection: tokens.flexColumn,
     gap: tokens.spacingSm,
     width: tokens.widthFull,
   },
+
   sectionHeading: {
-    textAlign: "center",
+    textAlign: tokens.textAlignCenter,
     color: tokens.byteTextMediumGray,
     marginBottom: tokens.spacing2Xs,
   },
+
   panel: {
     width: tokens.widthFull,
     backgroundColor: tokens.byteGray100,
@@ -40,20 +43,29 @@ export const styles = StyleSheet.create({
     shadowRadius: tokens.shadowRadius,
     elevation: tokens.shadowElevation,
   },
-  row: { flexDirection: "row", justifyContent: "flex-start" },
-  column: { flexDirection: "column" },
+
+  row: {
+    flexDirection: tokens.flexRow,
+    justifyContent: tokens.justifyStart,
+  },
+
+  column: { flexDirection: tokens.flexColumn },
+
   cardCol: { gap: tokens.spacingXs, alignItems: tokens.alignCenter },
+
   cardImageSmall: {
     maxWidth: tokens.cardImageSmallWidth,
     maxHeight: tokens.cardImageSmallHeight,
     alignSelf: tokens.alignCenter,
   },
+
   actions: {
-    flex: 1,
+    flex: tokens.flex1,
     alignItems: tokens.alignCenter,
     gap: tokens.spacingSm,
     width: tokens.widthFull,
   },
+
   btn: {
     width: tokens.widthFull,
     maxWidth: tokens.buttonMaxWidth,
@@ -62,45 +74,61 @@ export const styles = StyleSheet.create({
     alignItems: tokens.alignCenter,
     justifyContent: tokens.alignCenter,
   },
-  pressed: { opacity: 0.9 },
-  disabled: { opacity: 0.6 },
+
+  pressed: { opacity: tokens.opacityPressed },
+
+  disabled: { opacity: tokens.opacityMd },
+
   btnTextBase: { fontWeight: tokens.fontBold, fontSize: tokens.textBase },
+
   btnPrimary: { backgroundColor: tokens.byteColorOrange500 },
+
   btnPrimaryText: { color: tokens.byteColorWhite },
+
   btnOutlinedDanger: {
-    backgroundColor: "transparent",
+    backgroundColor: tokens.colorTransparent,
     borderWidth: tokens.borderWidthThick,
     borderColor: tokens.byteColorRed500,
   },
+
   btnOutlinedDangerText: { color: tokens.byteColorRed500 },
+
   btnOutlinedNeutral: {
-    backgroundColor: "transparent",
+    backgroundColor: tokens.colorTransparent,
     borderWidth: tokens.borderWidthThick,
     borderColor: tokens.byteGray400,
   },
+
   btnOutlinedNeutralText: { color: tokens.byteGray800 },
+
   functionText: {
     color: tokens.byteTextMediumGray,
     fontSize: tokens.textSm,
-    textAlign: "center",
+    textAlign: tokens.textAlignCenter,
   },
+
   badge: {
     paddingHorizontal: tokens.spacingSm,
     paddingVertical: tokens.spacing2Xs,
     borderRadius: tokens.radiusXl,
     alignSelf: tokens.alignCenter,
   },
+
   badgeActive: {
     backgroundColor: tokens.badgeActiveBg,
     borderWidth: tokens.borderWidthThin,
     borderColor: tokens.badgeActiveBorder,
   },
+
   badgeBlocked: {
     backgroundColor: tokens.badgeBlockedBg,
     borderWidth: tokens.borderWidthThin,
     borderColor: tokens.byteColorRed500,
   },
+
   badgeText: { fontSize: tokens.textXs, fontWeight: tokens.fontBold },
+
   badgeTextActive: { color: tokens.badgeActiveText },
+
   badgeTextBlocked: { color: tokens.byteColorRed500 },
 });

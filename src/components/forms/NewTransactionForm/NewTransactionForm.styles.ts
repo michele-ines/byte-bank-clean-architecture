@@ -1,5 +1,3 @@
-// src/components/NewTransactionForm.styles.ts
-
 import { sharedStyles } from "@/src/styles/shared.styles";
 import { tokens } from "@/src/theme/tokens";
 import { StyleSheet, TextStyle, ViewStyle } from "react-native";
@@ -7,10 +5,10 @@ import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 type NewTransactionFormStyle = {
   safeArea: ViewStyle;
   container: ViewStyle;
+  keyboardAvoiding: ViewStyle;
   scrollContentContainer: ViewStyle;
   title: TextStyle;
   pickerContainer: ViewStyle;
-  picker: TextStyle;
   label: TextStyle;
   input: TextStyle;
   submitButton: ViewStyle;
@@ -19,6 +17,7 @@ type NewTransactionFormStyle = {
   cardPixelsBotton: ViewStyle;
   illustration: ViewStyle;
   bottomIllustrationsContainer: ViewStyle;
+  dropdownPicker: ViewStyle;
 };
 
 export const styles = StyleSheet.create<NewTransactionFormStyle>({
@@ -29,6 +28,9 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
   container: {
     flex: tokens.flex1,
     backgroundColor: tokens.byteGray,
+  },
+  keyboardAvoiding: {
+    flex: tokens.flex1, // 👈 antes estava inline
   },
   scrollContentContainer: {
     flexGrow: tokens.flex1,
@@ -52,9 +54,8 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
     marginBottom: tokens.spacingMl,
     height: tokens.height50,
     justifyContent: tokens.alignCenter,
-  },
-  picker: {
-    color: tokens.byteGray700,
+    zIndex: tokens.zIndex1,
+    elevation: tokens.elevation1,
   },
   label: {
     fontSize: tokens.textBase,
@@ -64,7 +65,7 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
   },
   input: {
     width: tokens.widthFull,
-    height:tokens.height50,
+    height: tokens.height50,
     backgroundColor: tokens.byteColorWhite,
     borderRadius: tokens.radiusSm,
     borderWidth: tokens.borderWidthThin,
@@ -77,13 +78,16 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
   },
   submitButton: {
     backgroundColor: tokens.byteColorDash,
-    paddingVertical: 15,
-    borderRadius: 25,
+    paddingVertical: tokens.spacingMd,
+    borderRadius: tokens.radiusX1,
     width: tokens.widthFull,
     alignItems: tokens.alignCenter,
-    elevation: 3,
+    elevation: tokens.elevation,
     shadowColor: tokens.byteColorBlack,
-    shadowOffset: { width: tokens.width0, height: tokens.height2 },
+    shadowOffset: {
+      width: tokens.shadowOffsetWidth,
+      height: tokens.shadowOffsetHeight,
+    },
     shadowOpacity: tokens.opacitySm,
     shadowRadius: tokens.radiusMini,
     marginTop: tokens.spacingSm,
@@ -94,15 +98,15 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
     fontWeight: tokens.fontBold,
   },
   cardPixelsTop: {
-    ...sharedStyles.pixelsImage1,
+    ...sharedStyles.backgroundPixelsTop,
   },
-  cardPixelsBotton:{
-    ...sharedStyles.pixelsImage2,
+  cardPixelsBotton: {
+    ...sharedStyles.backgroundPixelsBottom,
   },
   illustration: {
-    position:tokens.absolute,
-    opacity:tokens.opacityLg,
-    maxWidth:tokens.width220,
+    position: tokens.absolute,
+    opacity: tokens.opacityLg,
+    maxWidth: tokens.width220,
     alignSelf: tokens.alignCenter,
     zIndex: tokens.zIndex2,
   },
@@ -111,5 +115,11 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
     alignItems: tokens.alignCenter,
     marginTop: tokens.spacingXxl,
     minHeight: tokens.minHeight,
-  }
+  },
+  dropdownPicker: {
+    borderWidth: tokens.borderLeft0,
+    elevation: tokens.elevation0,
+    shadowOpacity: tokens.opacity0,
+    backgroundColor: tokens.byteColorWhite,
+  },
 });

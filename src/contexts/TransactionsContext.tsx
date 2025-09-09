@@ -1,4 +1,3 @@
-// src/contexts/TransactionsContext.tsx
 import {
   addDoc,
   collection,
@@ -7,36 +6,57 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  Timestamp,
 } from "firebase/firestore";
-import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { db } from "../config/firebaseConfig";
 import { useAuth } from "./AuthContext";
 
-export interface Transaction extends DocumentData {
-  id?: string;
-  tipo: string;
+
+export type TransactionType = "deposito" | "cambio" | "transferencia";
+
+export interface ITransaction {
+  id: string;
+  tipo: TransactionType;
   valor: number;
   description: string;
-  createdAt: Date;
-  updateAt: Date;
+  createdAt: Timestamp | null;
+  updateAt: Timestamp | null;
   userId: string;
   anexos: string[];
 }
 
-interface TransactionsContextData {
-  transactions: Transaction[];
-  addTransaction: (transaction: { tipo: string; valor: number, description: string }) => Promise<void>;
+export interface INewTransactionInput {
+  tipo: TransactionType;
+  valor: number;
+  description: string;
+}
+
+interface ITransactionsContextData {
+  transactions: ITransaction[];
+  addTransaction: (transaction: INewTransactionInput) => Promise<void>;
   loading: boolean;
 }
 
-const TransactionsContext = createContext<TransactionsContextData>({} as TransactionsContextData);
+const TransactionsContext = createContext<ITransactionsContextData>(
+  {} as ITransactionsContextData
+);
 
-export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true); 
     if (!user) {
       setTransactions([]);
       setLoading(false);
@@ -45,43 +65,55 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
     const q = query(collection(db, "transactions"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs
-        .map((doc) => ({ ...doc.data(), id: doc.id }))
-        .filter((t: any) => t.userId === user.uid) as Transaction[];
-      
-      setTransactions(data);
+      const data = snapshot.docs.map((doc) => {
+        const docData = doc.data() as DocumentData;
+        return {
+          ...docData,
+          id: doc.id,
+        } as ITransaction;
+      });
+      const userTransactions = data.filter(
+        (t): t is ITransaction => t.userId === user.uid
+      );
+
+      setTransactions(userTransactions);
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [user]);
 
-  const addTransaction = async (transaction: { tipo: string; valor: number, description: string }) => {
+  const addTransaction = async (transaction: INewTransactionInput) => {
     if (!user) {
+      console.error("Tentativa de adicionar transação sem usuário autenticado.");
       throw new Error("Usuário não autenticado.");
     }
 
     await addDoc(collection(db, "transactions"), {
       ...transaction,
       userId: user.uid,
-      anexos: [],
+      anexos: [], 
       createdAt: serverTimestamp(),
       updateAt: serverTimestamp(),
     });
   };
 
   return (
-    <TransactionsContext.Provider value={{ transactions, addTransaction, loading }}>
+    <TransactionsContext.Provider
+      value={{ transactions, addTransaction, loading }}
+    >
       {children}
     </TransactionsContext.Provider>
   );
 };
 
-export function useTransactions(): TransactionsContextData {
+export function useTransactions(): ITransactionsContextData {
   const context = useContext(TransactionsContext);
 
   if (!context) {
-    throw new Error("useTransactions deve ser usado dentro de um TransactionsProvider");
+    throw new Error(
+      "useTransactions deve ser usado dentro de um TransactionsProvider"
+    );
   }
 
   return context;
