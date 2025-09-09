@@ -4,7 +4,6 @@ import React from "react";
 import { ScrollView, Text, View } from "react-native";
 
 import Balance from "@/src/shared/cards/balance/BalanceComponent";
-import { CardListExtract } from "@/src/shared/cards/CardListExtract/CardListExtract"; // 👈 importa aqui
 import { UserInfo } from "firebase/auth";
 import { NewTransactionForm } from "../components/forms/NewTransactionForm/NewTransactionForm";
 import SavingsGoalWidget from "../shared/components/SavingsGoalWidget/SavingsGoalWidget";
@@ -50,7 +49,7 @@ const ServicesScreen: React.FC = () => {
 
       {/* CardListExtract */}
       <View style={{ marginBottom: 16 }}>
-        <CardListExtract title="Extrato" />
+        {/* <CardListExtract title="Extrato" /> */}
       </View>
 
       <FinancialChart />
