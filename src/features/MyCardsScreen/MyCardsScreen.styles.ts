@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
     flex: tokens.flex1,
     backgroundColor: tokens.byteBgDefault,
     padding: tokens.spacingLg,
+    marginTop: tokens.spacingMd,
   },
   contentContainer: {
     paddingBottom: tokens.contentPaddingBottom, // 👈 novo token

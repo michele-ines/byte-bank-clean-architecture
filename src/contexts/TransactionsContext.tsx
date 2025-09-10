@@ -2,10 +2,13 @@ import {
   addDoc,
   collection,
   DocumentData,
+  getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  startAfter,
   Timestamp,
 } from "firebase/firestore";
 import React, {
@@ -17,19 +20,17 @@ import React, {
 } from "react";
 import { db } from "../config/firebaseConfig";
 import { useAuth } from "./AuthContext";
-
-
 export type TransactionType = "deposito" | "cambio" | "transferencia";
-
-export interface ITransaction {
-  id: string;
-  tipo: TransactionType;
-  valor: number;
+export interface ITransaction extends DocumentData {
+  id?: string;
   description: string;
-  createdAt: Timestamp | null;
-  updateAt: Timestamp | null;
+  valor: number;
+  receiptUrl?: string;
+  anexos: Array<any>;
+  tipo: string;
   userId: string;
-  anexos: string[];
+  createdAt: string;
+  updateAt: string;
 }
 
 export interface INewTransactionInput {
@@ -38,10 +39,15 @@ export interface INewTransactionInput {
   description: string;
 }
 
+const PAGE_SIZE = 5;
+
 interface ITransactionsContextData {
   transactions: ITransaction[];
   addTransaction: (transaction: INewTransactionInput) => Promise<void>;
   loading: boolean;
+  loadingMore: boolean;
+  hasMore: boolean;
+  loadMoreTransactions: () => Promise<void>;
 }
 
 const TransactionsContext = createContext<ITransactionsContextData>(
@@ -53,31 +59,56 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [lastVisible, setLastVisible] = useState<any>(null);
 
   useEffect(() => {
-    setLoading(true); 
+    setLoading(true);
     if (!user) {
       setTransactions([]);
       setLoading(false);
       return;
     }
 
-    const q = query(collection(db, "transactions"), orderBy("createdAt", "desc"));
+    const q = query(
+      collection(db, "transactions"), 
+      orderBy("createdAt", "desc"), 
+      limit(PAGE_SIZE)
+    );
+    
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((doc) => {
-        const docData = doc.data() as DocumentData;
+        const docData = doc.data();
+        const createdAtTimestamp = docData.createdAt as Timestamp; 
+        const updatedAtTimestamp = docData.updateAt as Timestamp;
+        const convertedCreatedAt = createdAtTimestamp 
+          ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR") 
+          : new Date().toLocaleDateString("pt-BR");
+        const convertedUpdateddAt = updatedAtTimestamp 
+          ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR") 
+          : new Date().toLocaleDateString("pt-BR");
+        
         return {
-          ...docData,
           id: doc.id,
-        } as ITransaction;
-      });
-      const userTransactions = data.filter(
-        (t): t is ITransaction => t.userId === user.uid
-      );
-
+          ...doc.data(),
+          createdAt: convertedCreatedAt,
+          tipo: docData.tipo,
+          updateAt: convertedUpdateddAt
+        };
+      }) as ITransaction[];
+      
+      const userTransactions = data.filter(t => t.userId === user.uid);
+      
       setTransactions(userTransactions);
       setLoading(false);
+      
+      if (snapshot.docs.length > 0) {
+        setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
+      }
+      
+      setHasMore(snapshot.docs.length >= PAGE_SIZE);
     });
 
     return () => unsubscribe();
@@ -98,9 +129,85 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
 
+  const canLoadMore = (): boolean => {
+    return hasMore && !loadingMore && lastVisible !== null;
+  };
+
+  const transformDocumentToTransaction = (doc: any): ITransaction => {
+    const docData = doc.data();
+    const createdAtTimestamp = docData.createdAt as Timestamp;
+    const updatedAtTimestamp = docData.updateAt as Timestamp;
+    const convertedCreatedAt = createdAtTimestamp 
+      ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR") 
+      : new Date().toLocaleDateString("pt-BR");
+    const convertedUpdateddAt = updatedAtTimestamp 
+      ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR") 
+      : new Date().toLocaleDateString("pt-BR");
+
+    return {
+      id: doc.id,
+      ...docData,
+      createdAt: convertedCreatedAt,
+      updateAt: convertedUpdateddAt
+    } as ITransaction;
+  };
+
+  const fetchNextPage = async () => {
+    const nextPageQuery = query(
+      collection(db, "transactions"),
+      orderBy("createdAt", "desc"),
+      startAfter(lastVisible),
+      limit(PAGE_SIZE)
+    );
+
+    const snapshot = await getDocs(nextPageQuery);
+    return snapshot;
+  };
+
+  const updateTransactionsState = (newTransactions: ITransaction[], snapshot: any) => {
+    const userTransactions = newTransactions.filter(t => t.userId === user?.uid);
+    
+    setTransactions(prev => [...prev, ...userTransactions]);
+    
+    if (snapshot.docs.length > 0) {
+      setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
+    }
+    
+    setHasMore(snapshot.docs.length >= PAGE_SIZE);
+  };
+
+  const loadMoreTransactions = async (): Promise<void> => {
+    if (!canLoadMore()) return;
+
+    setLoadingMore(true);
+
+    try {
+      const snapshot = await fetchNextPage();
+      
+      if (!snapshot.empty) {
+        const newTransactions = snapshot.docs.map(transformDocumentToTransaction);
+        updateTransactionsState(newTransactions, snapshot);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar mais transações:", error);
+      setHasMore(false);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   return (
     <TransactionsContext.Provider
-      value={{ transactions, addTransaction, loading }}
+      value={{ 
+        transactions, 
+        addTransaction, 
+        loading, 
+        loadingMore, 
+        hasMore, 
+        loadMoreTransactions 
+      }}
     >
       {children}
     </TransactionsContext.Provider>

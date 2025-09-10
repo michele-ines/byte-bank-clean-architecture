@@ -1,16 +1,16 @@
-import { CardListExtract } from "@/src/shared/cards/CardListExtract/CardListExtract";
+import { ScreenWrapper } from "@/src/components/common/ScreenWrapper/ScreenWrapper";
 import React from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { styles } from "./InvestmentsScreen.styles";
 
 const InvestmentsScreen: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <CardListExtract
-        title="Investimentos"
-        filterFn={(t) => t.description.toLowerCase().includes("investimento")}
-      />
-    </View>
+    <ScreenWrapper>
+      <View style={styles.container}>
+        <Text>Investimentos</Text>
+      </View>
+    </ScreenWrapper>
+
   );
 };
 

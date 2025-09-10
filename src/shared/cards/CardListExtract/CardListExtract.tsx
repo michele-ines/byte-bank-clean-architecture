@@ -1,17 +1,18 @@
-import { Transaction, useTransactions } from "@/src/hooks/useTransactions";
+import { ITransaction, useTransactions } from "@/src/contexts/TransactionsContext";
 import React from "react";
 import { FlatList, Linking, Pressable, Text, View } from "react-native";
 import { styles } from "./CardListExtract.styles";
 
 type CardListExtractProps = {
-  filterFn?: (transaction: Transaction) => boolean;
+  filterFn?: (transaction: ITransaction) => boolean;
   title?: string;
 };
 
 export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, title }) => {
-  const { transactions, loading } = useTransactions();
+  const { transactions, loading, loadingMore, hasMore, loadMoreTransactions } = useTransactions();
 
   const filtered = filterFn ? transactions.filter(filterFn) : transactions;
+
 
   const handleOpenReceipt = async (url: string) => {
     const supported = await Linking.canOpenURL(url);
@@ -20,6 +21,21 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
     } else {
       console.warn("Não foi possível abrir o recibo:", url);
     }
+  };
+
+  const handleLoadMore = () => {
+    if (hasMore && !loadingMore) {
+      loadMoreTransactions();
+    }
+  };
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return (
+      <View style={styles.loadingFooter}>
+        <Text style={styles.loadingText}>Carregando mais transações...</Text>
+      </View>
+    );
   };
 
   return (
@@ -32,15 +48,14 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.row}>
-              <Text style={styles.description}>{item.description}</Text>
+              <Text style={styles.description}>{item.tipo}</Text>
               <Text style={styles.amount}>
-                {item.amount >= 0 ? `+ R$ ${item.amount.toFixed(2)}` : `- R$ ${Math.abs(item.amount).toFixed(2)}`}
+                {item.valor >= 0 ? `+ R$ ${item.valor.toFixed(2)}` : `- R$ ${Math.abs(item.valor).toFixed(2)}`}
               </Text>
             </View>
             <Text style={styles.date}>
-              {new Date(item.date).toLocaleDateString("pt-BR")}
+              {item.createdAt}
             </Text>
-
             {item.receiptUrl && (
               <Pressable
                 onPress={() => handleOpenReceipt(item.receiptUrl!)}
@@ -54,6 +69,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
         ListEmptyComponent={
           !loading ? <Text style={styles.empty}>Nenhuma transação encontrada.</Text> : null
         }
+        ListFooterComponent={renderFooter}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.1}
       />
     </View>
   );
