@@ -62,6 +62,7 @@ export const tokens = {
   radiusSm: 8,
   radiusMd: 12,
   radiusLg: 16,
+  radiusX: 70,
   radiusXl: 999,
 
   // 👤 Avatar
@@ -93,6 +94,7 @@ export const tokens = {
   height80: 80,
   height50: 50,
   height2: 2,
+  height12: 12,
   minHeight: 220,
   heightModalMax: "85%" as DimensionValue,
   height50Percent: "50%" as DimensionValue,
@@ -105,6 +107,8 @@ export const tokens = {
   width220: 220,
   width150: 150,
   width0: 0,
+  width12: 12,
+  width20: 20,
 
   // 📐 Layout & Dimensões
   flex1: 1,
