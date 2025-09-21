@@ -12,37 +12,56 @@ type Styles = {
   empty: TextStyle;
   receiptButton: ViewStyle;
   receiptButtonText: TextStyle;
+  loadingFooter: ViewStyle;
+  loadingText: TextStyle;
 };
 
 export const styles = StyleSheet.create<Styles>({
-  container: { flex: 1, gap: 8 },
-  title: { fontSize: 18, fontWeight: "700", marginBottom: 8 },
-  card: {
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-    gap: 6,
+  container: { 
+    flex: tokens.flex1, 
+    gap: tokens.spacingXs, 
+    backgroundColor: 
+    tokens.byteColorWhite, 
+    borderRadius: tokens.spacing2Sm,
+    padding: tokens.textMd,
+    paddingRight: tokens.height50
   },
-  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 4 },
-  description: { fontSize: 16, fontWeight: "500", color: tokens.byteColorDash },
-  amount: { fontSize: 16, fontWeight: "700", color: tokens.byteColorGreen500 },
-  date: { fontSize: 12, color: "#777" },
-  empty: { fontSize: 14, color: "#aaa", textAlign: "center", marginTop: 20 },
+  title: { fontSize: tokens.textXl, fontWeight: tokens.fontBold, marginBottom: tokens.spacingXs },
+  card: {
+    shadowColor: tokens.byteColorBlack,
+    shadowRadius: tokens.spacing2Xs,
+    gap: tokens.shadowRadius,
+    borderBottomWidth: tokens.borderWidthThin,
+    borderBottomColor: tokens.byteColorGreen500,
+    marginBottom: tokens.textXs
+
+  },
+  row: { flexDirection: tokens.flexRow, justifyContent: tokens.justifyBetween, marginBottom: tokens.spacing2Xs },
+  description: { fontSize: tokens.textBase, fontWeight: tokens.fontMedium, color: tokens.byteColorDash },
+  amount: { fontSize: tokens.textBase, fontWeight: tokens.fontBold, color: tokens.byteColorGreen500 },
+  date: { fontSize: tokens.textXs, color: tokens.byteGray450, marginBottom: tokens.spacing2Sm },
+  empty: { fontSize: tokens.textSm, color: tokens.byteGray350, textAlign: tokens.alignCenter, marginTop: tokens.spacingMl },
   receiptButton: {
-    marginTop: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    marginTop: tokens.spacingXs,
+    paddingVertical: tokens.shadowRadius,
+    paddingHorizontal: tokens.spacing2Sm,
     backgroundColor: tokens.byteColorGreen500,
-    borderRadius: 8,
-    alignSelf: "flex-start",
+    borderRadius: tokens.spacingXs,
+    alignSelf: tokens.alignFlexStart,
   },
   receiptButtonText: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 14,
+    color: tokens.byteColorWhite,
+    fontWeight: tokens.fontSemibold,
+    fontSize: tokens.textSm,
+  },
+  loadingFooter: {
+    paddingVertical: tokens.spacingMl,
+    alignItems: tokens.alignCenter,
+    justifyContent: tokens.alignCenter,
+  },
+  loadingText: {
+    fontSize: tokens.textSm,
+    color: tokens.byteColorGreen500,
+    fontWeight: tokens.fontMedium,
   },
 });

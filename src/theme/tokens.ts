@@ -7,6 +7,7 @@ export const tokens = {
   byteTextMediumGray: "#767676",
   byteColorBlack: "#000000",
   byteColorDash: "#004d61",
+  byteColorDash2: "#0a4956",
   byteColorNeutral600: "#8b8b8b",
   byteColorGreen50: "rgba(71, 161, 56, 0.5)",
 
@@ -17,6 +18,7 @@ export const tokens = {
   byteColorOrange300: "#f1823d",
   byteColorGreen500: "#47a138",
   byteColorGreen100: "#f8f8f8",
+  byteColorBlue100: "#b6dde5",
   byteColorBlue500: "#2567f9",
   byteColorPurple500: "#8f3cff",
   byteColorMagenta500: "#ff3c82",
@@ -25,11 +27,16 @@ export const tokens = {
 
   // ⚪ Escala de Cinza
   byteGray50: "#f9fafb",
+
   byteGray100: "#f3f4f6",
   byteGray200: "#e5e7eb",
+  
   byteGray300: "#d1d5db",
+  byteGray350: "#aaa",
   byteGray400: "#9ca3af",
+  byteGray450: "#777",
   byteGray500: "#6b7280",
+
   byteGray600: "#4b5563",
   byteGray700: "#374151",
   byteGray800: "#1f2937",
@@ -53,6 +60,7 @@ export const tokens = {
   fontMedium: "500" as const,
   fontSemibold: "600" as const,
   fontBold: "700" as const,
+  fontExtraBold: "800" as const,
   lineHeightTight: 16,
   lineHeightNormal: 20,
   lineHeightRelaxed: 24,
@@ -73,6 +81,7 @@ export const tokens = {
   // 📏 Spacing
   spacing2Xs: 4,
   spacingXs: 8,
+  spacing2Sm: 10,
   spacingSm: 12,
   spacingMd: 16,
   spacingMl: 20,

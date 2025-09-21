@@ -1,11 +1,10 @@
 import FinancialChart from "@/src/components/FinancialChart/FinancialChart";
 import { useWidgetPreferences } from "@/src/contexts/WidgetPreferencesContext";
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
-import Balance from "@/src/shared/cards/balance/BalanceComponent";
+import { ScreenWrapper } from "@/src/components/common/ScreenWrapper/ScreenWrapper";
 import { UserInfo } from "firebase/auth";
-import { NewTransactionForm } from "../components/forms/NewTransactionForm/NewTransactionForm";
 import SavingsGoalWidget from "../shared/components/SavingsGoalWidget/SavingsGoalWidget";
 import SpendingAlertWidget from "../shared/components/SpendingAlertWidget/SpendingAlertWidget";
 import WidgetPreferencesButton from "../shared/components/WidgetPreferencesButton/WidgetPreferencesButton";
@@ -32,36 +31,31 @@ const ServicesScreen: React.FC = () => {
   const { preferences } = useWidgetPreferences();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title} accessibilityRole="header">
-        Outros serviços
-      </Text>
 
-      {/* Botão de preferências */}
-      <WidgetPreferencesButton />
 
-      {/* Balance */}
-      <View style={{ marginVertical: 16 }}>
-        <Balance balance={balance} user={user} />
-        <NewTransactionForm />
-        
-      </View>
 
-      {/* CardListExtract */}
-      <View style={{ marginBottom: 16 }}>
-        {/* <CardListExtract title="Extrato" /> */}
-      </View>
+      <ScreenWrapper>
+        <View style={styles.container} >
+            <Text style={styles.title} accessibilityRole="header">
+              Outros serviços
+            </Text>
 
-      <FinancialChart />
+            {/* Botão de preferências */}
+            <WidgetPreferencesButton />
 
-      {preferences.spendingAlert && (
-        <SpendingAlertWidget limit={400} transactions={transactions} />
-      )}
+            <FinancialChart />
 
-      {preferences.savingsGoal && (
-        <SavingsGoalWidget goal={1000} transactions={transactions} />
-      )}
-    </ScrollView>
+            {preferences.spendingAlert && (
+              <SpendingAlertWidget limit={400} transactions={transactions} />
+            )}
+
+            {preferences.savingsGoal && (
+              <SavingsGoalWidget goal={1000} transactions={transactions} />
+            )}
+        </View>
+      </ScreenWrapper>
+
+
   );
 };
 
