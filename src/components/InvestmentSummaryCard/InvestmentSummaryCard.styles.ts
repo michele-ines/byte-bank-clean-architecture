@@ -19,6 +19,7 @@ type Styles = {
   container: ViewStyle;
   cardPixelsTop: ViewStyle;
   cardPixelsBotton: ViewStyle;
+  content:ViewStyle;
 };
 
 export const styles = StyleSheet.create<Styles>({
@@ -28,6 +29,7 @@ export const styles = StyleSheet.create<Styles>({
     backgroundColor: tokens.byteGray,
     padding: tokens.spacingMd,
   },
+  content: { padding: tokens.spacingMd },
   headerTitle: {
     fontSize: tokens.textXl,
     fontWeight: tokens.fontBold,

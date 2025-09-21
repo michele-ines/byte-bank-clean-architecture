@@ -2,6 +2,7 @@ import CardPixelsTop from "@/assets/images/dash-card-new-transacao/card-pixels-3
 import { tokens } from "@/src/theme/tokens";
 import React from "react";
 import { Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { DonutChart } from "../DonutChart/DonutChart";
 import { investmentSummaryTexts } from "./InvestmentSumaryCard.texts";
 import { styles } from "./InvestmentSummaryCard.styles";
@@ -34,6 +35,11 @@ export const InvestmentSummaryCard: React.FC = () => {
         accessible
         accessibilityLabel={t.accessibility.cardTopIllustration}
       />
+       <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+        accessibilityLabel={t.accessibility.container}
+      >
       <Text
         style={styles.headerTitle}
         accessibilityRole="header"
@@ -81,6 +87,7 @@ export const InvestmentSummaryCard: React.FC = () => {
           ))}
         </View>
       </View>
+      </ScrollView>
     </View>
   );
 };
