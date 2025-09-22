@@ -3,7 +3,8 @@ import { tokens } from "@/src/theme/tokens";
 import React from "react";
 import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { DonutChart } from "../DonutChart/DonutChart";
+
+import { DonutChart } from "../../DonutChart/DonutChart";
 import { investmentSummaryTexts } from "./InvestmentSumaryCard.texts";
 import { styles } from "./InvestmentSummaryCard.styles";
 

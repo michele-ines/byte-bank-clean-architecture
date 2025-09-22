@@ -31,31 +31,26 @@ const ServicesScreen: React.FC = () => {
   const { preferences } = useWidgetPreferences();
 
   return (
+    <ScreenWrapper>
+      {/* Botão de preferências */}
+      <WidgetPreferencesButton style={styles.widgetButton} />
 
+      <View style={styles.container} >
+        <Text style={styles.title} accessibilityRole="header">
+          Outros serviços
+        </Text>
 
+        <FinancialChart />
 
-      <ScreenWrapper>
-        <View style={styles.container} >
-            <Text style={styles.title} accessibilityRole="header">
-              Outros serviços
-            </Text>
+        {preferences.spendingAlert && (
+          <SpendingAlertWidget limit={400} transactions={transactions} />
+        )}
 
-            {/* Botão de preferências */}
-            <WidgetPreferencesButton />
-
-            <FinancialChart />
-
-            {preferences.spendingAlert && (
-              <SpendingAlertWidget limit={400} transactions={transactions} />
-            )}
-
-            {preferences.savingsGoal && (
-              <SavingsGoalWidget goal={1000} transactions={transactions} />
-            )}
-        </View>
-      </ScreenWrapper>
-
-
+        {preferences.savingsGoal && (
+          <SavingsGoalWidget goal={1000} transactions={transactions} />
+        )}
+      </View>
+    </ScreenWrapper>
   );
 };
 
