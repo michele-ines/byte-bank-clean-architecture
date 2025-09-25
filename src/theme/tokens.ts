@@ -330,4 +330,12 @@ export const tokens = {
   // 🆕 Textos utilitários de saldo
   hiddenBalanceMask: "••••••",
   loadingText: "Carregando...",
+
+
+  //acessbilidade
+  liveRegionPolite:'polite' as const,
+
+
+  //textTransform
+  textTransformCapitalize: 'capitalize' as const
 };

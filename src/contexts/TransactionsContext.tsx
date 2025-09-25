@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  doc,
   DocumentData,
   getDocs,
   limit,
@@ -10,6 +11,7 @@ import {
   serverTimestamp,
   startAfter,
   Timestamp,
+  updateDoc
 } from "firebase/firestore";
 import React, {
   createContext,
@@ -44,6 +46,7 @@ const PAGE_SIZE = 5;
 interface ITransactionsContextData {
   transactions: ITransaction[];
   addTransaction: (transaction: INewTransactionInput) => Promise<void>;
+  updateTransaction: (id: string, updatedData: { valor: number }) => Promise<void>;
   loading: boolean;
   loadingMore: boolean;
   hasMore: boolean;
@@ -129,6 +132,38 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
 
+   const updateTransaction = async (id: string, updatedData: { valor: number }) => {
+    if (!user) {
+      console.error("Tentativa de atualizar transação sem usuário autenticado.");
+      throw new Error("Usuário não autenticado.");
+    }
+    
+    const transactionDocRef = doc(db, "transactions", id);
+
+    try {
+      await updateDoc(transactionDocRef, {
+        ...updatedData,
+        updateAt: serverTimestamp(),
+      });
+      console.log("Transação atualizada com sucesso!", id);
+       setTransactions(prevTransactions => 
+      prevTransactions.map(transaction => {
+        if (transaction.id === id) {
+          return {
+            ...transaction, 
+            ...updatedData,
+            updateAt: new Date().toLocaleDateString("pt-BR"),
+          };
+        }
+        return transaction;
+      })
+    );
+    } catch (error) {
+      console.error("Erro ao atualizar a transação:", error);
+      throw new Error("Não foi possível atualizar a transação.");
+    }
+  };
+
   const canLoadMore = (): boolean => {
     return hasMore && !loadingMore && lastVisible !== null;
   };
@@ -203,6 +238,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       value={{ 
         transactions, 
         addTransaction, 
+        updateTransaction,
         loading, 
         loadingMore, 
         hasMore, 

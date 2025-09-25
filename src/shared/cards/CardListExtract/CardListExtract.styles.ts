@@ -3,7 +3,6 @@ import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 
 type Styles = {
   container: ViewStyle;
-  title: TextStyle;
   card: ViewStyle;
   row: ViewStyle;
   description: TextStyle;
@@ -12,56 +11,70 @@ type Styles = {
   empty: TextStyle;
   receiptButton: ViewStyle;
   receiptButtonText: TextStyle;
-  loadingFooter: ViewStyle;
-  loadingText: TextStyle;
+  input: TextStyle;
 };
 
 export const styles = StyleSheet.create<Styles>({
-  container: { 
-    flex: tokens.flex1, 
-    gap: tokens.spacingXs, 
-    backgroundColor: 
-    tokens.byteColorWhite, 
-    borderRadius: tokens.spacing2Sm,
-    padding: tokens.textMd,
-    paddingRight: tokens.height50
+  container: {
+    flex: tokens.flex1,
+    gap: tokens.spacingXs,
+    backgroundColor: tokens.byteColorWhite,
+    borderRadius: tokens.radiusMd,
+    padding: tokens.spacingMd,
   },
-  title: { fontSize: tokens.textXl, fontWeight: tokens.fontBold, marginBottom: tokens.spacingXs },
+  input: {
+    borderColor: tokens.byteColorDash,
+    borderWidth: tokens.borderWidthThin,   
+    borderRadius: tokens.spacing2Xs,      
+    paddingHorizontal: tokens.spacingXs,  
+    paddingVertical: tokens.spacing2Xs,   
+    textAlign: tokens.textAlignRight,     
+    minWidth: tokens.logoWidth,           
+  },
   card: {
-    shadowColor: tokens.byteColorBlack,
-    shadowRadius: tokens.spacing2Xs,
-    gap: tokens.shadowRadius,
+    paddingVertical: tokens.spacingSm,
     borderBottomWidth: tokens.borderWidthThin,
-    borderBottomColor: tokens.byteColorGreen500,
-    marginBottom: tokens.textXs
-
+    borderBottomColor: tokens.byteGray200,
+    marginBottom: tokens.spacingSm,
   },
-  row: { flexDirection: tokens.flexRow, justifyContent: tokens.justifyBetween, marginBottom: tokens.spacing2Xs },
-  description: { fontSize: tokens.textBase, fontWeight: tokens.fontMedium, color: tokens.byteColorDash },
-  amount: { fontSize: tokens.textBase, fontWeight: tokens.fontBold, color: tokens.byteColorGreen500 },
-  date: { fontSize: tokens.textXs, color: tokens.byteGray450, marginBottom: tokens.spacing2Sm },
-  empty: { fontSize: tokens.textSm, color: tokens.byteGray350, textAlign: tokens.alignCenter, marginTop: tokens.spacingMl },
+  row: {
+    flexDirection: tokens.flexRow,
+    justifyContent: tokens.justifyBetween,
+    marginBottom: tokens.spacing2Xs,
+  },
+  description: {
+    fontSize: tokens.textBase,
+    fontWeight: tokens.fontMedium,
+    color: tokens.byteColorDash,
+    textTransform:tokens.textTransformCapitalize,
+  },
+  amount: {
+    fontSize: tokens.textBase,
+    fontWeight: tokens.fontBold,
+    color: tokens.byteColorGreen500,
+  },
+  date: {
+    fontSize: tokens.textXs,
+    color: tokens.byteGray500,
+    marginBottom: tokens.spacingSm,
+  },
+  empty: {
+    fontSize: tokens.textSm,
+    color: tokens.byteGray400,
+    textAlign: tokens.textAlignCenter,
+    marginTop: tokens.spacingMl,
+  },
   receiptButton: {
     marginTop: tokens.spacingXs,
-    paddingVertical: tokens.shadowRadius,
-    paddingHorizontal: tokens.spacing2Sm,
+    paddingVertical: tokens.spacing2Xs,
+    paddingHorizontal: tokens.spacingSm,
     backgroundColor: tokens.byteColorGreen500,
-    borderRadius: tokens.spacingXs,
+    borderRadius: tokens.radiusSm,
     alignSelf: tokens.alignFlexStart,
   },
   receiptButtonText: {
     color: tokens.byteColorWhite,
-    fontWeight: tokens.fontSemibold,
+    fontWeight: tokens.fontSemibold, 
     fontSize: tokens.textSm,
-  },
-  loadingFooter: {
-    paddingVertical: tokens.spacingMl,
-    alignItems: tokens.alignCenter,
-    justifyContent: tokens.alignCenter,
-  },
-  loadingText: {
-    fontSize: tokens.textSm,
-    color: tokens.byteColorGreen500,
-    fontWeight: tokens.fontMedium,
   },
 });
