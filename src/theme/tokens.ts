@@ -102,6 +102,7 @@ export const tokens = {
   // 📐 Height
   height80: 80,
   height50: 50,
+  height36:36,
   height2: 2,
   height12: 12,
   minHeight: 220,
@@ -118,6 +119,7 @@ export const tokens = {
   width0: 0,
   width12: 12,
   width20: 20,
+  width36: 36,
 
   // 📐 Layout & Dimensões
   flex1: 1,

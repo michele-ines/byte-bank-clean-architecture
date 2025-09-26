@@ -25,9 +25,9 @@ export const styles = StyleSheet.create<Styles>({
     gap: tokens.spacingMd,
   },
   iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: tokens.width36,
+    height: tokens.height36,
+    borderRadius: tokens.radiusLg,
     backgroundColor: tokens.byteColorDash,
     justifyContent: tokens.justifyCenter,
     alignItems: tokens.alignCenter,

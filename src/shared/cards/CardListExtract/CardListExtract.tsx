@@ -65,21 +65,31 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
     setEditedValues({});
   };
 
-  const handleSaveClick = async () => {
-    const updatePromises = Object.entries(editedValues).map(async ([id, rawTextCentavos]) => {
+const handleSaveClick = async () => {
+    const transacoesAlteradas = Object.entries(editedValues).filter(([id, rawTextCentavos]) => {
       const transacaoOriginal = transactions.find(t => t.id === id);
       const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
 
-      if (!isNaN(novoValorNumerico) && transacaoOriginal && transacaoOriginal.valor !== novoValorNumerico) {
-        return updateTransaction(id, { valor: novoValorNumerico });
-      }
-      return Promise.resolve();
+      return !isNaN(novoValorNumerico) && transacaoOriginal && transacaoOriginal.valor !== novoValorNumerico;
+    });
+
+
+    if (transacoesAlteradas.length === 0) {
+      setIsEditing(false);
+      setEditedValues({});
+      return;
+    }
+
+    const updatePromises = transacoesAlteradas.map(async ([id, rawTextCentavos]) => {
+      const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
+      return updateTransaction(id, { valor: novoValorNumerico });
     });
 
     try {
       await Promise.all(updatePromises);
       showToast("success", cardListTexts.toasts.saveSuccess.title, cardListTexts.toasts.saveSuccess.message);
     } catch (error) {
+      console.error("Ocorreu um erro ao atualizar as transações:", error);
       showToast("error", cardListTexts.toasts.saveError.title, cardListTexts.toasts.saveError.message);
     } finally {
       setIsEditing(false);
