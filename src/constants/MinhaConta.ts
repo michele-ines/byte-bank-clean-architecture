@@ -23,9 +23,25 @@ export const formTexts = {
         title: "Erro",
         message: "Não foi possível atualizar o nome.",
       },
+      nameRequired: {
+        title: "Erro",
+        message: "O nome é obrigatório.",
+      },
+      nameTooShort: {
+        title: "Erro",
+        message: "O nome deve ter pelo menos 2 caracteres.",
+      },
+      nameInvalid: {
+        title: "Erro",
+        message: "O nome deve conter apenas letras.",
+      },
       email: {
         title: "Erro",
         message: "Não foi possível atualizar o e-mail.",
+      },
+      emailRequired: {
+        title: "Erro",
+        message: "O e-mail é obrigatório.",
       },
       emailInUse: {
         title: "Erro",
@@ -39,6 +55,10 @@ export const formTexts = {
         title: "Erro",
         message: "Não foi possível alterar a senha.",
       },
+      passwordRequired: {
+        title: "Erro",
+        message: "A senha é obrigatória.",
+      },
       reauthWrongPassword: {
         title: "Senha incorreta",
         message: "Senha atual incorreta. Tente novamente.",
@@ -47,6 +67,10 @@ export const formTexts = {
         title: "Senha necessária",
         message:
           "Por questões de segurança, é necessário que digite sua senha atual.",
+      },
+      weakPassword: {
+        title: "Erro",
+        message: "A nova senha deve ter pelo menos 8 caracteres.",
       },
       generic: {
         title: "Erro",

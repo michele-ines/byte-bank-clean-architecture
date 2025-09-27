@@ -17,6 +17,7 @@ type EditFieldModalStyles = {
   saveButton: ViewStyle;
   saveButtonText: TextStyle;
   inputWrapper: ViewStyle;
+  errorText: TextStyle;
 };
 
 export const styles = StyleSheet.create<EditFieldModalStyles>({
@@ -43,6 +44,7 @@ export const styles = StyleSheet.create<EditFieldModalStyles>({
   input: {
     flex: tokens.flex1,
     height: tokens.buttonHeight,
+    maxWidth: tokens.width90Percent,
     fontSize: tokens.textBase,
     color: tokens.byteTextMediumGray,
   },
@@ -109,5 +111,10 @@ export const styles = StyleSheet.create<EditFieldModalStyles>({
   saveButtonText: {
     fontSize: tokens.textSm,
     color: tokens.byteColorWhite,
+  },
+  errorText: {
+    color: tokens.byteColorError,
+    fontSize: tokens.textXs,
+    marginTop: tokens.spacing2Xs,
   },
 });

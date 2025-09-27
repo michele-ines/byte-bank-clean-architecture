@@ -35,6 +35,7 @@ export const styles = StyleSheet.create<CardMinhaContaStyles>({
     height: tokens.buttonHeight,
     fontSize: tokens.textBase,
     color: tokens.byteTextMediumGray,
+    maxWidth: tokens.width90Percent,
   },
   inputEditing: {
     borderColor: tokens.byteColorGreen500,

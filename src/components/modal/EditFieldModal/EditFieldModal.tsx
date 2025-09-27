@@ -1,18 +1,6 @@
-import { db } from "@/src/config/firebaseConfig";
-import { formTexts } from "@/src/constants/MinhaConta";
-import { useAuth } from "@/src/contexts/AuthContext";
-import { showToast } from "@/src/utils/toast";
+import { useEditField } from "@/src/hooks/useEditField";
 import { MaterialIcons } from "@expo/vector-icons";
-import { FirebaseError } from "firebase/app";
-import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updatePassword,
-  updateProfile,
-  verifyBeforeUpdateEmail,
-} from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -39,21 +27,34 @@ export function EditFieldModal({
   initialValue,
   onClose,
 }: Readonly<EditFieldModalProps>) {
-  const { user } = useAuth();
-  const [value, setValue] = useState(initialValue);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const {
+    value,
+    setValue,
+    currentPassword,
+    setCurrentPassword,
+    showCurrentPassword,
+    setShowCurrentPassword,
+    showNewPassword,
+    setShowNewPassword,
+    loading,
+    setLoading,
+    error,
+    setError,
+    updateEmail,
+    updateName,
+    updateUserPassword,
+  } = useEditField(field, initialValue, onClose);
+
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (visible) {
       setValue(initialValue);
       setCurrentPassword("");
+      setError({ field: "", message: "" });
       setTimeout(() => inputRef.current?.focus(), 200);
     }
-  }, [visible, initialValue]);
+  }, [visible, initialValue, setValue, setCurrentPassword, setError]);
 
   if (!field) return null;
 
@@ -66,160 +67,6 @@ export function EditFieldModal({
 
   const isPasswordField = field === "password";
   const requiresCurrentPassword = field === "email" || isPasswordField;
-
-  const updateUserDataInFirestore = async (name?: string, email?: string) => {
-    if (!user) return;
-    try {
-      await updateDoc(doc(db, "users", user.uid), {
-        ...(name && { name }),
-        ...(email && { email }),
-        updatedAt: new Date(),
-      });
-    } catch (error: any) {
-      showToast(
-        "error",
-        formTexts.toasts.error.generic.title,
-        error?.message || formTexts.toasts.error.generic.message
-      );
-    }
-  };
-  const reauthenticate = async () => {
-    if (!user?.email) {
-      showToast(
-        "error",
-        formTexts.toasts.error.reauth.title,
-        formTexts.toasts.error.reauth.message
-      );
-      throw new Error(formTexts.toasts.error.reauth.message);
-    }
-
-    if (!currentPassword) {
-      showToast(
-        "error",
-        formTexts.toasts.error.reauth.title,
-        formTexts.toasts.error.reauth.message
-      );
-      throw new Error(formTexts.toasts.error.reauth.message);
-    }
-
-    try {
-      const credential = EmailAuthProvider.credential(
-        user.email,
-        currentPassword
-      );
-      await reauthenticateWithCredential(user, credential);
-    } catch (error) {
-      let message = formTexts.toasts.error.password.message;
-      let title = formTexts.toasts.error.password.title;
-
-      if (error instanceof FirebaseError) {
-        if (error.code === "auth/wrong-password") {
-          title = formTexts.toasts.error.reauthWrongPassword.title;
-          message = formTexts.toasts.error.reauthWrongPassword.message;
-        }
-
-        showToast("error", title, message);
-      }
-    }
-  };
-
-  const updateName = async (name: string) => {
-    if (!user) return;
-    try {
-      await updateProfile(user, { displayName: name });
-      await updateUserDataInFirestore(name);
-      showToast(
-        "success",
-        formTexts.toasts.success.name.title,
-        formTexts.toasts.success.name.message
-      );
-      onClose();
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : formTexts.toasts.error.name.message;
-      showToast("error", formTexts.toasts.error.name.title, message);
-    }
-  };
-
-  const updateEmail = async (email: string) => {
-    if (!user) return;
-
-    if (!currentPassword) {
-      showToast(
-        "error",
-        formTexts.toasts.error.reauth.title,
-        formTexts.toasts.error.reauth.message
-      );
-      return;
-    }
-
-    try {
-      await reauthenticate();
-      await verifyBeforeUpdateEmail(user, email);
-      await updateUserDataInFirestore(undefined, email);
-      showToast(
-        "success",
-        formTexts.toasts.success.email.title,
-        formTexts.toasts.success.email.message
-      );
-      onClose();
-    } catch (error) {
-      let message = formTexts.toasts.error.email.message;
-
-      if (error instanceof FirebaseError) {
-        switch (error.code) {
-          case "auth/email-already-in-use":
-            message = formTexts.toasts.error.emailInUse.message;
-            break;
-          case "auth/invalid-email":
-            message = formTexts.toasts.error.invalidEmail.message;
-            break;
-        }
-      }
-      showToast("error", formTexts.toasts.error.email.title, message);
-    }
-  };
-
-  const updateUserPassword = async (password: string) => {
-    if (!user) return;
-
-    if (!currentPassword) {
-      showToast(
-        "error",
-        formTexts.toasts.error.reauth.title,
-        formTexts.toasts.error.reauth.message
-      );
-      return;
-    }
-    try {
-      await reauthenticate();
-      await updatePassword(user, password);
-      showToast(
-        "success",
-        formTexts.toasts.success.password.title,
-        formTexts.toasts.success.password.message
-      );
-      onClose();
-    } catch (error) {
-      let message = formTexts.toasts.error.password.message;
-      let title = formTexts.toasts.error.password.title;
-
-      if (error instanceof Error) {
-        if (error.message.includes("auth/wrong-password")) {
-          title = formTexts.toasts.error.reauth.title;
-          message = formTexts.toasts.error.reauth.message;
-        } else if (error.message.includes("auth/weak-password")) {
-          message = "A nova senha é muito fraca. Tente uma mais segura.";
-        } else {
-          message = error.message;
-        }
-      }
-
-      showToast("error", title, message);
-    }
-  };
 
   const handleSave = async () => {
     setLoading(true);
@@ -268,6 +115,18 @@ export function EditFieldModal({
       );
     }
 
+    const handleChange = (v: string) => {
+      setFieldValue(v);
+      if (error.field) setError({ field: "", message: "" });
+    };
+
+    let fieldKey = "";
+    if (isPasswordField && label === "Nova senha") fieldKey = "newPassword";
+    else if (requiresCurrentPassword && label === "Senha atual")
+      fieldKey = "currentPassword";
+    else if (field === "email" && label === "Novo e-mail") fieldKey = "email";
+    else if (field === "name" && label === "Novo nome") fieldKey = "name";
+
     return (
       <View style={styles.field}>
         <Text style={styles.label}>{label}</Text>
@@ -277,7 +136,8 @@ export function EditFieldModal({
             style={styles.input}
             value={fieldValue}
             placeholderTextColor={styles.input.color}
-            onChangeText={setFieldValue}
+            maxLength={50}
+            onChangeText={handleChange}
             secureTextEntry={secureText}
             placeholder={label}
             autoCapitalize="none"
@@ -285,6 +145,9 @@ export function EditFieldModal({
           />
           {passwordToggle}
         </View>
+        {error.field === fieldKey ? (
+          <Text style={styles.errorText}>{error.message}</Text>
+        ) : null}
       </View>
     );
   };
@@ -318,11 +181,15 @@ export function EditFieldModal({
             } else {
               fieldLabel = "Novo nome";
             }
-            return renderField(
-              fieldLabel,
-              value,
-              setValue,
-              isPasswordField && !showNewPassword
+            return (
+              <>
+                {renderField(
+                  fieldLabel,
+                  value,
+                  setValue,
+                  isPasswordField && !showNewPassword
+                )}
+              </>
             );
           })()}
 
