@@ -22,6 +22,7 @@ const drawerIcons = {
   cards: "credit-card",
   invest: "trending-up",
   services: "apps",
+  account: "person",
   logout: "logout",
 } as const;
 
@@ -128,6 +129,20 @@ export default function AppLayout(): JSX.Element {
                 size={size}
                 color={color}
                 accessibilityLabel="Abrir seção Outros Serviços"
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="minha-conta"
+          options={{
+            drawerLabel: "Minha conta",
+            drawerIcon: ({ color, size }) => (
+              <MaterialIcons
+                name={drawerIcons.account}
+                size={size}
+                color={color}
+                accessibilityLabel="Abrir seção minha conta"
               />
             ),
           }}

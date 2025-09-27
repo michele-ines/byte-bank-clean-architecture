@@ -6,6 +6,7 @@ export const tokens = {
   byteBgDashboard: "#e4ede3",
   byteTextMediumGray: "#767676",
   byteColorBlack: "#000000",
+  byteColorOverlay: "rgba(0,0,0,0.5)",
   byteColorDash: "#004d61",
   byteColorDash2: "#0a4956",
   byteColorNeutral600: "#8b8b8b",
@@ -30,7 +31,7 @@ export const tokens = {
 
   byteGray100: "#f3f4f6",
   byteGray200: "#e5e7eb",
-  
+
   byteGray300: "#d1d5db",
   byteGray350: "#aaa",
   byteGray400: "#9ca3af",
@@ -107,6 +108,7 @@ export const tokens = {
   minHeight: 220,
   heightModalMax: "85%" as DimensionValue,
   height50Percent: "50%" as DimensionValue,
+  height100Percent: "100%" as DimensionValue,
 
   // 📐 Modal
   modalTopPosition: "30%" as DimensionValue,
@@ -196,8 +198,7 @@ export const tokens = {
   textMetaEconomia: "Meta de economia",
   textDescricaoGastos:
     "Monitore seus gastos mensais e receba alertas quando se aproximar do limite definido.",
-  textDescricaoEconomia:
-    "Defina metas de economia e acompanhe seu progresso.",
+  textDescricaoEconomia: "Defina metas de economia e acompanhe seu progresso.",
   textPreviewWidget: "Prévia do widget",
   textPreviewGastos:
     "Visualize seus gastos em tempo real e receba alertas quando atingir 80% do limite.",
@@ -305,7 +306,10 @@ export const tokens = {
   newTransactionForm: {
     title: "Nova transação",
     labels: { transactionType: "Tipo de transação", amount: "Valor" },
-    placeholders: { transactionType: "Selecione o tipo de transação", amount: "R$ 0,00" },
+    placeholders: {
+      transactionType: "Selecione o tipo de transação",
+      amount: "R$ 0,00",
+    },
     buttons: { submit: "CONCLUIR TRANSAÇÃO" },
     accessibility: {
       form: "Formulário de nova transação",
@@ -321,9 +325,18 @@ export const tokens = {
       loading: "Carregando transação",
     },
     toasts: {
-      emptyFields: { title: "Atenção", message: "Selecione o tipo e informe o valor." },
-      success: { title: "Sucesso!", message: "Transação adicionada com sucesso." },
-      error: { title: "Erro", message: "Não foi possível adicionar a transação." },
+      emptyFields: {
+        title: "Atenção",
+        message: "Selecione o tipo e informe o valor.",
+      },
+      success: {
+        title: "Sucesso!",
+        message: "Transação adicionada com sucesso.",
+      },
+      error: {
+        title: "Erro",
+        message: "Não foi possível adicionar a transação.",
+      },
     },
   },
 
