@@ -30,8 +30,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
   const [editedValues, setEditedValues] = useState<EditedValuesMap>({});
 
  
-  const filtered = filterFn ? transactions.filter(filterFn) : transactions;
-
+  const filtered = transactions;
   const handleOpenReceipt = async (url: string) => {
     const supported = await Linking.canOpenURL(url);
     if (supported) {
@@ -129,7 +128,7 @@ const handleSaveClick = async () => {
             accessible={true}
             accessibilityLabel={
               !isEditing 
-              ? cardListTexts.item.accessibility.cardLabel(item.tipo, item.valor, item.updateAt) 
+              ? cardListTexts.item.accessibility.cardLabel(item.tipo, item.valor,'1') 
               : cardListTexts.item.accessibility.editingCardLabel(item.tipo)
             }
           >
@@ -161,7 +160,7 @@ const handleSaveClick = async () => {
                 </Text>
               )}
             </View>
-            <Text style={styles.date} accessibilityElementsHidden={true}>{item.updateAt}</Text>
+            <Text style={styles.date} accessibilityElementsHidden={true}></Text>
             {item.receiptUrl && (
               <Pressable
                 onPress={() => handleOpenReceipt(item.receiptUrl!)}
