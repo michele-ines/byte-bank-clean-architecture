@@ -1,32 +1,16 @@
-import { tokens } from "@/src/theme/tokens";
+import { ConfirmModalProps } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { colors } from "@/src/theme/colors";
+import { texts } from "@/src/theme/texts";
 import React from "react";
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
 import { styles } from "./ConfirmModal.styles";
-
-type ConfirmModalProps = {
-  visible: boolean;
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  isDestructive?: boolean;
-  loading?: boolean;
-  onConfirm: () => void;
-  onCancel: () => void;
-};
 
 export default function ConfirmModal({
   visible,
   title,
   message,
-  confirmText = tokens.textConfirmar,
-  cancelText = tokens.textCancelar,
+  confirmText = texts.textConfirmar,
+  cancelText = texts.textCancelar,
   isDestructive,
   loading,
   onConfirm,
@@ -62,7 +46,7 @@ export default function ConfirmModal({
             ]}
             accessibilityRole="button"
             accessibilityLabel={cancelText}
-            accessibilityHint={tokens.a11yCancelar}
+            accessibilityHint={texts.a11yCancelar}
             onPress={onCancel}
             disabled={loading}
           >
@@ -79,12 +63,12 @@ export default function ConfirmModal({
             ]}
             accessibilityRole="button"
             accessibilityLabel={confirmText}
-            accessibilityHint={tokens.a11yConfirmar}
+            accessibilityHint={texts.a11yConfirmar}
             onPress={onConfirm}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={tokens.byteColorWhite} />
+              <ActivityIndicator color={colors.byteColorWhite} />
             ) : (
               <Text style={styles.btnText}>{confirmText}</Text>
             )}

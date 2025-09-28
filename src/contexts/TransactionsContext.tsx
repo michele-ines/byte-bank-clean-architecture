@@ -1,7 +1,6 @@
 import {
   addDoc,
   collection,
-  DocumentData,
   getDocs,
   limit,
   onSnapshot,
@@ -9,7 +8,7 @@ import {
   query,
   serverTimestamp,
   startAfter,
-  Timestamp,
+  Timestamp
 } from "firebase/firestore";
 import React, {
   createContext,
@@ -19,20 +18,11 @@ import React, {
   useState,
 } from "react";
 import { db } from "../config/firebaseConfig";
+import { ITransaction, ITransactionsContextData } from "../shared/interfaces/auth.interfaces";
 import { useAuth } from "./AuthContext";
-export type TransactionType = "deposito" | "cambio" | "transferencia";
-export interface ITransaction extends DocumentData {
-  id?: string;
-  description: string;
-  valor: number;
-  receiptUrl?: string;
-  anexos: Array<any>;
-  tipo: string;
-  userId: string;
-  createdAt: string;
-  updateAt: string;
-}
 
+
+export type TransactionType = "deposito" | "cambio" | "transferencia";
 export interface INewTransactionInput {
   tipo: TransactionType;
   valor: number;
@@ -40,15 +30,6 @@ export interface INewTransactionInput {
 }
 
 const PAGE_SIZE = 5;
-
-interface ITransactionsContextData {
-  transactions: ITransaction[];
-  addTransaction: (transaction: INewTransactionInput) => Promise<void>;
-  loading: boolean;
-  loadingMore: boolean;
-  hasMore: boolean;
-  loadMoreTransactions: () => Promise<void>;
-}
 
 const TransactionsContext = createContext<ITransactionsContextData>(
   {} as ITransactionsContextData

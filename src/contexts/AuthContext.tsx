@@ -1,12 +1,12 @@
+import { AuthContextData, UserData } from "@/src/shared/interfaces/auth.interfaces";
 import { router } from "expo-router";
 import {
   User,
-  UserCredential,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signOut,
+  signOut
 } from "firebase/auth";
 import {
   doc,
@@ -31,25 +31,6 @@ const AUTH_ROUTES = {
 const AUTH_MESSAGES = {
   logoutError: "Erro ao fazer logout",
 } as const;
-
-interface UserData {
-  uuid: string; 
-  name: string;
-  email: string;
-  photoURL?: string | null;
-  createdAt?: any;
-}
-
-interface AuthContextData {
-  user: User | null;
-  userData: UserData | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-  signup: (email: string, password: string, name: string) => Promise<UserCredential>;
-  login: (email: string, password: string) => Promise<UserCredential>;
-  resetPassword: (email: string) => Promise<void>;
-  signOut: () => void;
-}
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 

@@ -1,134 +1,144 @@
-import { tokens } from "@/src/theme/tokens";
+import { border } from "@/src/theme/border";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { radius } from "@/src/theme/radius";
+import { shadows } from "@/src/theme/shadows";
+import { sizes } from "@/src/theme/sizes";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   wrapper: {
-    width: tokens.widthFull,
-    padding: tokens.spacingLg,
-    backgroundColor: tokens.byteBgDashboard,
-    borderRadius: tokens.radiusMd,
+    width: layout.widthFull,
+    padding: spacing.lg,
+    backgroundColor: colors.byteBgDashboard,
+    borderRadius: radius.md,
   },
   title: {
-    fontSize: tokens.textMd,
-    fontWeight: tokens.fontBold,
-    color: tokens.byteColorBlack,
-    textAlign: tokens.textAlignCenter,
-    marginBottom: tokens.spacingSm,
+    fontSize: typography.textMd,
+    fontWeight: typography.fontBold,
+    color: colors.byteColorBlack,
+    textAlign: typography.textAlignCenter,
+    marginBottom: spacing.sm,
   },
 
   list: {
-    flexDirection: tokens.flexColumn,
-    gap: tokens.spacingSm,
-    width: tokens.widthFull,
+    flexDirection: layout.flexColumn,
+    gap: spacing.sm,
+    width: layout.widthFull,
   },
 
   sectionHeading: {
-    textAlign: tokens.textAlignCenter,
-    color: tokens.byteTextMediumGray,
-    marginBottom: tokens.spacing2Xs,
+    textAlign: typography.textAlignCenter,
+    color: colors.byteTextMediumGray,
+    marginBottom: spacing.xs2,
   },
 
   panel: {
-    width: tokens.widthFull,
-    backgroundColor: tokens.byteGray100,
-    borderWidth: tokens.borderWidthThin,
-    borderColor: tokens.byteGray300,
-    borderRadius: tokens.radiusMd,
-    padding: tokens.spacingMd,
-    alignItems: tokens.alignCenter,
-    gap: tokens.spacingMd,
-    shadowColor: tokens.shadowColor,
-    shadowOpacity: tokens.shadowOpacity,
-    shadowOffset: tokens.shadowOffset,
-    shadowRadius: tokens.shadowRadius,
-    elevation: tokens.shadowElevation,
+    width: layout.widthFull,
+    backgroundColor: colors.byteGray100,
+    borderWidth: border.widthThin,
+    borderColor: colors.byteGray300,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    alignItems: typography.alignCenter,
+    gap: spacing.md,
+    shadowColor: colors.shadowColor,
+    shadowOpacity: shadows.opacity,
+    shadowOffset: shadows.offset,
+    shadowRadius: shadows.radius,
+    elevation: shadows.elevation,
   },
 
   row: {
-    flexDirection: tokens.flexRow,
-    justifyContent: tokens.justifyStart,
+    flexDirection: layout.flexRow,
+    justifyContent: typography.alignFlexStart,
   },
 
-  column: { flexDirection: tokens.flexColumn },
+  column: { flexDirection: layout.flexColumn },
 
-  cardCol: { gap: tokens.spacingXs, alignItems: tokens.alignCenter },
+  cardCol: { gap: spacing.xs, alignItems: typography.alignCenter },
 
   cardImageSmall: {
-    maxWidth: tokens.cardImageSmallWidth,
-    maxHeight: tokens.cardImageSmallHeight,
-    alignSelf: tokens.alignCenter,
+    maxWidth: sizes.cardImageSmallWidth,
+    maxHeight: sizes.cardImageSmallHeight,
+    alignSelf: typography.alignCenter,
   },
 
   actions: {
-    flex: tokens.flex1,
-    alignItems: tokens.alignCenter,
-    gap: tokens.spacingSm,
-    width: tokens.widthFull,
+    flex: layout.one,
+    alignItems: typography.alignCenter,
+    gap: spacing.sm,
+    width: layout.widthFull,
   },
 
   btn: {
-    width: tokens.widthFull,
-    maxWidth: tokens.buttonMaxWidth,
-    height: tokens.buttonHeight,
-    borderRadius: tokens.radiusSm,
-    alignItems: tokens.alignCenter,
-    justifyContent: tokens.alignCenter,
+    width: layout.widthFull,
+    maxWidth: sizes.buttonMaxWidth,
+    height: sizes.buttonHeight,
+    borderRadius: radius.sm,
+    alignItems: typography.alignCenter,
+    justifyContent: typography.alignCenter,
   },
 
-  pressed: { opacity: tokens.opacityPressed },
+  pressed: { opacity: layout.opacityPressed },
 
-  disabled: { opacity: tokens.opacityMd },
+  disabled: { opacity: layout.opacityMd },
 
-  btnTextBase: { fontWeight: tokens.fontBold, fontSize: tokens.textBase },
+  btnTextBase: {
+    fontWeight: typography.fontBold,
+    fontSize: typography.textBase,
+  },
 
-  btnPrimary: { backgroundColor: tokens.byteColorOrange500 },
+  btnPrimary: { backgroundColor: colors.byteColorOrange500 },
 
-  btnPrimaryText: { color: tokens.byteColorWhite },
+  btnPrimaryText: { color: colors.byteColorWhite },
 
   btnOutlinedDanger: {
-    backgroundColor: tokens.colorTransparent,
-    borderWidth: tokens.borderWidthThick,
-    borderColor: tokens.byteColorRed500,
+    backgroundColor: colors.colorTransparent,
+    borderWidth: border.widthThick,
+    borderColor: colors.byteColorRed500,
   },
 
-  btnOutlinedDangerText: { color: tokens.byteColorRed500 },
+  btnOutlinedDangerText: { color: colors.byteColorRed500 },
 
   btnOutlinedNeutral: {
-    backgroundColor: tokens.colorTransparent,
-    borderWidth: tokens.borderWidthThick,
-    borderColor: tokens.byteGray400,
+    backgroundColor: colors.colorTransparent,
+    borderWidth: border.widthThick,
+    borderColor: colors.byteGray400,
   },
 
-  btnOutlinedNeutralText: { color: tokens.byteGray800 },
+  btnOutlinedNeutralText: { color: colors.byteGray800 },
 
   functionText: {
-    color: tokens.byteTextMediumGray,
-    fontSize: tokens.textSm,
-    textAlign: tokens.textAlignCenter,
+    color: colors.byteTextMediumGray,
+    fontSize: typography.textSm,
+    textAlign: typography.textAlignCenter,
   },
 
   badge: {
-    paddingHorizontal: tokens.spacingSm,
-    paddingVertical: tokens.spacing2Xs,
-    borderRadius: tokens.radiusXl,
-    alignSelf: tokens.alignCenter,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs2,
+    borderRadius: radius.xl,
+    alignSelf: typography.alignCenter,
   },
 
   badgeActive: {
-    backgroundColor: tokens.badgeActiveBg,
-    borderWidth: tokens.borderWidthThin,
-    borderColor: tokens.badgeActiveBorder,
+    backgroundColor: colors.badgeActiveBg,
+    borderWidth: border.widthThin,
+    borderColor: colors.badgeActiveBorder,
   },
 
   badgeBlocked: {
-    backgroundColor: tokens.badgeBlockedBg,
-    borderWidth: tokens.borderWidthThin,
-    borderColor: tokens.byteColorRed500,
+    backgroundColor: colors.badgeBlockedBg,
+    borderWidth: border.widthThin,
+    borderColor: colors.byteColorRed500,
   },
 
-  badgeText: { fontSize: tokens.textXs, fontWeight: tokens.fontBold },
+  badgeText: { fontSize: typography.textXs, fontWeight: typography.fontBold },
 
-  badgeTextActive: { color: tokens.badgeActiveText },
+  badgeTextActive: { color: colors.badgeActiveText },
 
-  badgeTextBlocked: { color: tokens.byteColorRed500 },
+  badgeTextBlocked: { color: colors.byteColorRed500 },
 });

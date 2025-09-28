@@ -1,6 +1,5 @@
 import ConfirmModal from "@/src/components/common/ConfirmModal/ConfirmModal";
 import { apiToggleCardState, CardState } from "@/src/OtherServices/cards";
-import { tokens } from "@/src/theme/tokens";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
 import {
@@ -13,15 +12,22 @@ import {
 
 import CartaoDigitalImg from "@/assets/images/dash-card-my-cards/cartao-digital.svg";
 import CartaoFisicoImg from "@/assets/images/dash-card-my-cards/cartao-fisico.svg";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { sizes } from "@/src/theme/sizes";
+import { texts } from "@/src/theme/texts";
 import { styles } from "./PersonalCards.styles";
 
 export default function PersonalCards() {
   const { width } = useWindowDimensions();
-  const isLg = width >= tokens.breakpointLg;
+  const isLg = width >= layout.breakpointLg;
 
   const [fisicoState, setFisicoState] = useState<CardState>("active");
   const [digitalState, setDigitalState] = useState<CardState>("active");
-  const [loading, setLoading] = useState<{ fisico?: boolean; digital?: boolean }>({});
+  const [loading, setLoading] = useState<{
+    fisico?: boolean;
+    digital?: boolean;
+  }>({});
   const [modal, setModal] = useState<
     | { visible: true; kind: "fisico" | "digital"; willBlock: boolean }
     | { visible: false }
@@ -81,7 +87,7 @@ export default function PersonalCards() {
     loading,
   }: CardPanelProps) => {
     const btnToggleTitle =
-      state === "active" ? tokens.textBloquear : tokens.textDesbloquear;
+      state === "active" ? texts.textBloquear : texts.textDesbloquear;
 
     const btnToggleStyle =
       state === "active" ? styles.btnOutlinedDanger : styles.btnOutlinedNeutral;
@@ -108,14 +114,14 @@ export default function PersonalCards() {
         >
           <View style={styles.cardCol}>
             <ImageCmp
-              width={tokens.cardImageWidth}
-              height={tokens.cardImageHeight}
+              width={sizes.cardImageWidth}
+              height={sizes.cardImageHeight}
               accessibilityLabel={title}
               style={!isLg ? styles.cardImageSmall : undefined}
             />
             <View style={[styles.badge, badgeStyle]}>
               <Text style={[styles.badgeText, badgeTextStyle]}>
-                {state === "active" ? tokens.textAtivo : tokens.textBloqueado}
+                {state === "active" ? texts.textAtivo : texts.textBloqueado}
               </Text>
             </View>
           </View>
@@ -125,7 +131,7 @@ export default function PersonalCards() {
             <Pressable
               onPress={onConfigure}
               accessibilityRole="button"
-              accessibilityLabel={`${tokens.a11yConfigurar} ${title}`}
+              accessibilityLabel={`${texts.a11yConfigurar} ${title}`}
               style={({ pressed }) => [
                 styles.btn,
                 styles.btnPrimary,
@@ -133,7 +139,7 @@ export default function PersonalCards() {
               ]}
             >
               <Text style={[styles.btnTextBase, styles.btnPrimaryText]}>
-                {tokens.textConfigurar}
+                {texts.textConfigurar}
               </Text>
             </Pressable>
 
@@ -151,7 +157,7 @@ export default function PersonalCards() {
               ]}
             >
               {loading ? (
-                <ActivityIndicator color={tokens.byteColorDash} />
+                <ActivityIndicator color={colors.byteColorDash} />
               ) : (
                 <Text style={[styles.btnTextBase, btnToggleTextStyle]}>
                   {btnToggleTitle}
@@ -168,38 +174,40 @@ export default function PersonalCards() {
 
   const modalTitle = useMemo(() => {
     if (!modal.visible) return "";
-    return modal.willBlock ? tokens.textBloquearCartao : tokens.textDesbloquearCartao;
+    return modal.willBlock
+      ? texts.textBloquearCartao
+      : texts.textDesbloquearCartao;
   }, [modal]);
 
   const modalMessage = useMemo(() => {
     if (!modal.visible) return "";
-    return modal.willBlock ? tokens.textMsgBloqueio : tokens.textMsgDesbloqueio;
+    return modal.willBlock ? texts.textMsgBloqueio : texts.textMsgDesbloqueio;
   }, [modal]);
 
   return (
     <View
       accessible
       accessibilityRole="summary"
-      accessibilityLabel={tokens.a11yMeusCartoes}
+      accessibilityLabel={texts.a11yMeusCartoes}
       style={styles.wrapper}
     >
       <View style={styles.list}>
         <CardPanel
-          title={tokens.textCartaoFisico}
+          title={texts.textCartaoFisico}
           state={fisicoState}
           image={CartaoFisicoImg}
-          functionText={tokens.textFuncaoFisico}
-          onConfigure={() => { }}
+          functionText={texts.textFuncaoFisico}
+          onConfigure={() => {}}
           onToggle={() => openConfirm("fisico")}
           loading={loading.fisico}
         />
 
         <CardPanel
-          title={tokens.textCartaoDigital}
+          title={texts.textCartaoDigital}
           state={digitalState}
           image={CartaoDigitalImg}
-          functionText={tokens.textFuncaoDigital}
-          onConfigure={() => { }}
+          functionText={texts.textFuncaoDigital}
+          onConfigure={() => {}}
           onToggle={() => openConfirm("digital")}
           loading={loading.digital}
         />
@@ -211,8 +219,8 @@ export default function PersonalCards() {
         message={modalMessage}
         confirmText={
           modal.visible && modal.willBlock
-            ? tokens.textBloquear
-            : tokens.textDesbloquear
+            ? texts.textBloquear
+            : texts.textDesbloquear
         }
         isDestructive={modal.visible && modal.willBlock}
         loading={(modal.visible && loading[modal.kind]) || false}

@@ -1,14 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-
-export type WidgetPreferences = {
-  spendingAlert: boolean;
-  savingsGoal: boolean;
-};
-
-type WidgetPreferencesContextType = {
-  preferences: WidgetPreferences;
-  updatePreferences: (newPrefs: WidgetPreferences) => void;
-};
+import { WidgetPreferences, WidgetPreferencesContextType } from "../shared/ProfileStyles/profile.styles.types";
 
 const WidgetPreferencesContext = createContext<WidgetPreferencesContextType | undefined>(undefined);
 

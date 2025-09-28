@@ -1,101 +1,85 @@
+import { DashboardStyles } from "@/src/shared/ProfileStyles/profile.styles.types";
 import { sharedStyles } from "@/src/styles/shared.styles";
-import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { radius } from "@/src/theme/radius";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
+import { StyleSheet } from "react-native";
 
-type Styles = {
-  headerTitle: TextStyle;
-  totalValue: TextStyle;
-  summaryContainer: ViewStyle;
-  summaryCard: ViewStyle;
-  summaryCardTitle: TextStyle;
-  summaryCardValue: TextStyle;
-  statsTitle: TextStyle;
-  statsCard: ViewStyle;
-  chartContainer: ViewStyle;
-  legendContainer: ViewStyle;
-  legendItem: ViewStyle;
-  legendDot: ViewStyle;
-  legendText: TextStyle;
-  container: ViewStyle;
-  cardPixelsTop: ViewStyle;
-  cardPixelsBotton: ViewStyle;
-  content:ViewStyle;
-};
-
-export const styles = StyleSheet.create<Styles>({
-
+export const styles = StyleSheet.create<DashboardStyles>({
   container: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteGray,
-    padding: tokens.spacingMd,
+    flex: layout.one,
+    backgroundColor: colors.byteGray,
+    padding: spacing.md,
   },
-  content: { padding: tokens.spacingMd },
+  content: { padding: spacing.md },
   headerTitle: {
-    fontSize: tokens.textXl,
-    fontWeight: tokens.fontBold,
-    textAlign: tokens.textAlignCenter,
-    color: tokens.byteGray800,
-    marginBottom: tokens.spacingSm,
+    fontSize: typography.textXl,
+    fontWeight: typography.fontBold,
+    textAlign: typography.textAlignCenter,
+    color: colors.byteGray800,
+    marginBottom: spacing.sm,
   },
   totalValue: {
-    fontSize: tokens.textLg,
-    fontWeight: tokens.fontSemibold,
-    textAlign: tokens.textAlignCenter,
-    color: tokens.byteColorDash,
-    marginBottom: tokens.spacingLg,
+    fontSize: typography.textLg,
+    fontWeight: typography.fontSemibold,
+    textAlign: typography.textAlignCenter,
+    color: colors.byteColorDash,
+    marginBottom: spacing.lg,
   },
   summaryContainer: {
-    gap: tokens.spacingMd,
+    gap: spacing.md,
   },
   summaryCard: {
-    backgroundColor: tokens.byteColorDash,
-    borderRadius: tokens.radiusMd,
-    padding: tokens.spacingMd,
-    alignItems: tokens.alignCenter,
+    backgroundColor: colors.byteColorDash,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    alignItems: typography.alignCenter,
   },
   summaryCardTitle: {
-    fontSize: tokens.textBase,
-    color: tokens.byteGray200,
+    fontSize: typography.textBase,
+    color: colors.byteGray200,
   },
   summaryCardValue: {
-    fontSize: tokens.textLg,
-    fontWeight: tokens.fontBold,
-    color: tokens.byteColorWhite,
-    marginTop: tokens.spacing2Xs,
+    fontSize: typography.textLg,
+    fontWeight: typography.fontBold,
+    color: colors.byteColorWhite,
+    marginTop: spacing.xs2,
   },
   statsTitle: {
-    fontSize: tokens.textLg,
-    fontWeight: tokens.fontSemibold,
-    textAlign: tokens.textAlignCenter,
-    color: tokens.byteGray700,
-    marginVertical: tokens.spacingXl,
+    fontSize: typography.textLg,
+    fontWeight: typography.fontSemibold,
+    textAlign: typography.textAlignCenter,
+    color: colors.byteGray700,
+    marginVertical: spacing.xl,
   },
   statsCard: {
-    backgroundColor: tokens.byteColorDash,
-    borderRadius: tokens.radiusMd,
-    padding: tokens.spacingLg,
-    alignItems:tokens.alignCenter,
+    backgroundColor: colors.byteColorDash,
+    borderRadius: radius.md,
+    padding: spacing.lg,
+    alignItems: typography.alignCenter,
   },
   chartContainer: {
-    marginBottom: tokens.spacingLg,
+    marginBottom: spacing.lg,
   },
   legendContainer: {
-    alignSelf: tokens.stretch,
-    gap: tokens.spacingSm,
+    alignSelf: layout.stretch,
+    gap: spacing.sm,
   },
   legendItem: {
-    flexDirection: tokens.flexRow,
-    alignItems: tokens.alignCenter,
-    gap: tokens.spacingSm,
+    flexDirection: layout.flexRow,
+    alignItems: typography.alignCenter,
+    gap: spacing.sm,
   },
   legendDot: {
-    width: tokens.width12,
-    height: tokens.height12,
-    borderRadius: tokens.radiusSm,
+    width: layout.width12,
+    height: layout.height12,
+    borderRadius: radius.sm,
   },
   legendText: {
-    fontSize: tokens.textBase,
-    color: tokens.byteColorWhite,
+    fontSize: typography.textBase,
+    color: colors.byteColorWhite,
   },
 
   cardPixelsTop: {

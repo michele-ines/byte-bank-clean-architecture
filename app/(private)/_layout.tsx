@@ -4,18 +4,20 @@ import React, { JSX } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
-  TextStyle,
-  View,
-  ViewStyle,
+  View
 } from "react-native";
 
 import { CustomDrawerContent } from "@/src/components/CustomDrawerContent/CustomDrawerContent";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { Header } from "@/src/shared/Header/Header";
-import { tokens } from "@/src/theme/tokens";
+import { AppLayoutStyles } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { colors } from "@/src/theme/colors";
+import { radius } from "@/src/theme/radius";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
 import { MaterialIcons } from "@expo/vector-icons";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { SafeAreaView } from "react-native-safe-area-context"; // ✅ importado
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const drawerIcons = {
   home: "home",
@@ -24,13 +26,6 @@ const drawerIcons = {
   services: "apps",
   logout: "logout",
 } as const;
-
-type Styles = {
-  loaderContainer: ViewStyle;
-  drawerStyle: ViewStyle;
-  drawerLabel: TextStyle;
-  drawerItem: ViewStyle;
-};
 
 export default function AppLayout(): JSX.Element {
   const { isAuthenticated, loading, signOut } = useAuth();
@@ -45,7 +40,7 @@ export default function AppLayout(): JSX.Element {
       >
         <ActivityIndicator
           size="large"
-          color={tokens.byteColorGreen500}
+          color={colors.byteColorGreen500}
           accessibilityElementsHidden={false}
         />
       </View>
@@ -71,8 +66,8 @@ export default function AppLayout(): JSX.Element {
           ),
           drawerStyle: styles.drawerStyle,
           drawerLabelStyle: styles.drawerLabel,
-          drawerActiveTintColor: tokens.byteColorGreen500,
-          drawerInactiveTintColor: tokens.byteGray100,
+          drawerActiveTintColor: colors.byteColorGreen500,
+          drawerInactiveTintColor: colors.byteGray100,
           drawerItemStyle: styles.drawerItem,
         }}
       >
@@ -158,24 +153,24 @@ export default function AppLayout(): JSX.Element {
   );
 }
 
-const styles = StyleSheet.create<Styles>({
+const styles = StyleSheet.create<AppLayoutStyles>({
   loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: tokens.byteBgDefault,
+    backgroundColor: colors.byteBgDefault,
   },
   drawerStyle: {
-    backgroundColor: tokens.byteColorDash,
+    backgroundColor: colors.byteColorDash,
   },
   drawerLabel: {
-    color: tokens.byteGray50,
-    fontSize: tokens.textSm,
-    fontWeight: tokens.fontMedium,
+    color: colors.byteGray50,
+    fontSize: typography.textSm,
+    fontWeight: typography.fontMedium,
   },
   drawerItem: {
-    borderRadius: tokens.radiusMd,
-    marginHorizontal: tokens.spacingSm,
-    paddingVertical: tokens.spacingXs,
+    borderRadius: radius.md,
+    marginHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
 });

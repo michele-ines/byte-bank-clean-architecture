@@ -1,101 +1,90 @@
+import { NewTransactionFormStyle } from "@/src/shared/ProfileStyles/profile.styles.types";
 import { sharedStyles } from "@/src/styles/shared.styles";
-import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
-
-type NewTransactionFormStyle = {
-  safeArea: ViewStyle;
-  container: ViewStyle;
-  keyboardAvoiding: ViewStyle;
-  scrollContentContainer: ViewStyle;
-  title: TextStyle;
-  pickerContainer: ViewStyle;
-  label: TextStyle;
-  input: TextStyle;
-  submitButton: ViewStyle;
-  submitButtonText: TextStyle;
-  cardPixelsTop: ViewStyle;
-  cardPixelsBotton: ViewStyle;
-  illustration: ViewStyle;
-  bottomIllustrationsContainer: ViewStyle;
-  dropdownPicker: ViewStyle;
-};
+import { border } from "@/src/theme/border";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { radius } from "@/src/theme/radius";
+import { shadows } from "@/src/theme/shadows";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create<NewTransactionFormStyle>({
   safeArea: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteGray,
+    flex: layout.one,
+    backgroundColor: colors.byteGray,
   },
   container: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteGray,
+    flex: layout.one,
+    backgroundColor: colors.byteGray,
   },
   keyboardAvoiding: {
-    flex: tokens.flex1, // 👈 antes estava inline
+    flex: layout.one, 
   },
   scrollContentContainer: {
-    flexGrow: tokens.flex1,
-    justifyContent: tokens.alignCenter,
-    alignItems: tokens.stretch,
-    padding: tokens.spacingMl,
+    flexGrow: layout.one,
+    justifyContent: typography.alignCenter,
+    alignItems: layout.stretch,
+    padding: spacing.ml,
   },
   title: {
-    fontSize: tokens.textXl,
-    fontWeight: tokens.fontBold,
-    color: tokens.byteGray700,
-    marginBottom: tokens.spacingXxl,
-    textAlign: tokens.alignCenter,
+    fontSize: typography.textXl,
+    fontWeight: typography.fontBold,
+    color: colors.byteGray700,
+    marginBottom: spacing.xxl,
+    textAlign: typography.alignCenter,
   },
   pickerContainer: {
-    width: tokens.widthFull,
-    backgroundColor: tokens.byteColorWhite,
-    borderRadius: tokens.radiusSm,
-    borderWidth: tokens.borderWidthThin,
-    borderColor: tokens.byteGray300,
-    marginBottom: tokens.spacingMl,
-    height: tokens.height50,
-    justifyContent: tokens.alignCenter,
-    zIndex: tokens.zIndex1,
-    elevation: tokens.elevation1,
+    width: layout.widthFull,
+    backgroundColor: colors.byteColorWhite,
+    borderRadius: radius.sm,
+    borderWidth: border.widthThin,
+    borderColor: colors.byteGray300,
+    marginBottom: spacing.ml,
+    height: layout.height50,
+    justifyContent: typography.alignCenter,
+    zIndex: layout.zIndex1,
+    elevation: layout.elevation1,
   },
   label: {
-    fontSize: tokens.textBase,
-    color: tokens.byteGray700,
-    marginBottom: tokens.spacingXs,
-    alignSelf: tokens.alignFlexStart,
+    fontSize: typography.textBase,
+    color: colors.byteGray700,
+    marginBottom: spacing.xs,
+    alignSelf: typography.alignFlexStart,
   },
   input: {
-    width: tokens.widthFull,
-    height: tokens.height50,
-    backgroundColor: tokens.byteColorWhite,
-    borderRadius: tokens.radiusSm,
-    borderWidth: tokens.borderWidthThin,
-    borderColor: tokens.byteGray300,
-    paddingHorizontal: tokens.spacingMd,
-    fontSize: tokens.textBase,
-    color: tokens.byteGray700,
-    textAlign: tokens.alignCenter,
-    marginBottom: tokens.spacingMl,
+    width: layout.widthFull,
+    height: layout.height50,
+    backgroundColor: colors.byteColorWhite,
+    borderRadius: radius.sm,
+    borderWidth: border.widthThin,
+    borderColor: colors.byteGray300,
+    paddingHorizontal: spacing.md,
+    fontSize: typography.textBase,
+    color: colors.byteGray700,
+    textAlign: typography.alignCenter,
+    marginBottom: spacing.ml,
   },
   submitButton: {
-    backgroundColor: tokens.byteColorDash,
-    paddingVertical: tokens.spacingMd,
-    borderRadius: tokens.radiusX1,
-    width: tokens.widthFull,
-    alignItems: tokens.alignCenter,
-    elevation: tokens.elevation,
-    shadowColor: tokens.byteColorBlack,
+    backgroundColor: colors.byteColorDash,
+    paddingVertical: spacing.md,
+    borderRadius: radius.x1,
+    width: layout.widthFull,
+    alignItems: typography.alignCenter,
+    elevation: layout.elevation,
+    shadowColor: colors.byteColorBlack,
     shadowOffset: {
-      width: tokens.shadowOffsetWidth,
-      height: tokens.shadowOffsetHeight,
+      width: shadows.shadowOffsetWidth,
+      height: shadows.shadowOffsetHeight,
     },
-    shadowOpacity: tokens.opacitySm,
-    shadowRadius: tokens.radiusMini,
-    marginTop: tokens.spacingSm,
+    shadowOpacity: layout.opacitySm,
+    shadowRadius: radius.mini,
+    marginTop: spacing.sm,
   },
   submitButtonText: {
-    color: tokens.byteColorWhite,
-    fontSize: tokens.textBase,
-    fontWeight: tokens.fontBold,
+    color: colors.byteColorWhite,
+    fontSize: typography.textBase,
+    fontWeight: typography.fontBold,
   },
   cardPixelsTop: {
     ...sharedStyles.backgroundPixelsTop,
@@ -104,22 +93,22 @@ export const styles = StyleSheet.create<NewTransactionFormStyle>({
     ...sharedStyles.backgroundPixelsBottom,
   },
   illustration: {
-    position: tokens.absolute,
-    opacity: tokens.opacityLg,
-    maxWidth: tokens.width220,
-    alignSelf: tokens.alignCenter,
-    zIndex: tokens.zIndex2,
+    position: layout.positionAbsolute,
+    opacity: layout.opacityLg,
+    maxWidth: layout.width220,
+    alignSelf: typography.alignCenter,
+    zIndex: layout.zIndex2,
   },
   bottomIllustrationsContainer: {
-    width: tokens.widthFull,
-    alignItems: tokens.alignCenter,
-    marginTop: tokens.spacingXxl,
-    minHeight: tokens.minHeight,
+    width: layout.widthFull,
+    alignItems: typography.alignCenter,
+    marginTop: spacing.xxl,
+    minHeight: layout.minHeight,
   },
   dropdownPicker: {
-    borderWidth: tokens.borderLeft0,
-    elevation: tokens.elevation0,
-    shadowOpacity: tokens.opacity0,
-    backgroundColor: tokens.byteColorWhite,
+    borderWidth: border.left0,
+    elevation: layout.elevation0,
+    shadowOpacity: layout.opacity0,
+    backgroundColor: colors.byteColorWhite,
   },
 });

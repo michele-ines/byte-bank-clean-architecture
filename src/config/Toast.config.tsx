@@ -2,31 +2,38 @@ import { toastStyles } from "@/src/styles/Toast.styles";
 import { View, ViewStyle } from "react-native";
 import { BaseToast, BaseToastProps } from "react-native-toast-message";
 
-// Função auxiliar para criar uma etiqueta de acessibilidade clara
 const getAccessibilityLabel = (props: BaseToastProps) => {
   const { text1, text2 } = props;
-  return [text1, text2].filter(Boolean).join('. ');
+  return [text1, text2].filter(Boolean).join(". ");
 };
 
-type ToastVariant = 'success' | 'error';
+type ToastVariant = "success" | "error";
 
-const ToastVariants: Record<ToastVariant, { style: ViewStyle; accessibilityPrefix: string }> = {
+const ToastVariants: Record<
+  ToastVariant,
+  { style: ViewStyle; accessibilityPrefix: string }
+> = {
   success: {
     style: toastStyles.successToast,
-    accessibilityPrefix: 'Sucesso',
+    accessibilityPrefix: "Sucesso",
   },
   error: {
     style: toastStyles.errorToast,
-    accessibilityPrefix: 'Erro',
+    accessibilityPrefix: "Erro",
   },
 };
 
-const CustomToast = ({ variant, ...props }: BaseToastProps & { variant: ToastVariant }) => {
+const CustomToast = ({
+  variant,
+  ...props
+}: BaseToastProps & { variant: ToastVariant }) => {
   const variantConfig = ToastVariants[variant];
   return (
     <View
       accessible={true}
-      accessibilityLabel={`${variantConfig.accessibilityPrefix}: ${getAccessibilityLabel(props)}`}
+      accessibilityLabel={`${
+        variantConfig.accessibilityPrefix
+      }: ${getAccessibilityLabel(props)}`}
       accessibilityRole="alert"
     >
       <BaseToast
@@ -41,7 +48,8 @@ const CustomToast = ({ variant, ...props }: BaseToastProps & { variant: ToastVar
 };
 
 export const toastConfig = {
-  success: (props: BaseToastProps) => <CustomToast {...props} variant="success" />,
+  success: (props: BaseToastProps) => (
+    <CustomToast {...props} variant="success" />
+  ),
   error: (props: BaseToastProps) => <CustomToast {...props} variant="error" />,
 };
-

@@ -100,9 +100,9 @@ assets/                      # fontes, imagens (herdadas)
 Arquivo: `src/theme/tokens.ts` – espelha as variáveis fornecidas (cores base, utilitárias, tipografia, gradientes).  
 Use import direto:
 ```ts
-import { tokens } from "@/src/theme/tokens";
+import { colors } from "@/src/theme/colors";
 const styles = StyleSheet.create({
-  title: { color: tokens.byteColorDash, fontSize: tokens.textLg },
+  title: { color: colors.byteColorDash, fontSize: typography.textLg },
 });
 ```
 

@@ -1,16 +1,23 @@
-import { tokens } from "@/src/theme/tokens";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { radius } from "@/src/theme/radius";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   button: {
-    flexDirection: tokens.flexRow,
-    alignItems: tokens.alignCenter,
-    gap: tokens.spacingXs,
-    backgroundColor: tokens.byteColorDash,
-    paddingVertical: tokens.spacingSm,
-    paddingHorizontal: tokens.spacingMd,
-    borderRadius: tokens.radiusSm,
+    flexDirection: layout.flexRow,
+    alignItems: typography.alignCenter,
+    gap: spacing.xs,
+    backgroundColor: colors.byteColorDash,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.sm,
   },
-  buttonText: { color: tokens.byteColorWhite, fontWeight: tokens.fontSemibold },
-  icon: { color: tokens.byteColorWhite },
+  buttonText: {
+    color: colors.byteColorWhite,
+    fontWeight: typography.fontSemibold,
+  },
+  icon: { color: colors.byteColorWhite },
 });

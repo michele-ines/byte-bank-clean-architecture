@@ -1,12 +1,8 @@
-import { ITransaction, useTransactions } from "@/src/contexts/TransactionsContext";
+import { useTransactions } from "@/src/contexts/TransactionsContext";
 import React from "react";
 import { FlatList, Linking, Pressable, Text, View } from "react-native";
+import { CardListExtractProps } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./CardListExtract.styles";
-
-type CardListExtractProps = {
-  filterFn?: (transaction: ITransaction) => boolean;
-  title?: string;
-};
 
 export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, title }) => {
   const { transactions, loading, loadingMore, hasMore, loadMoreTransactions } = useTransactions();

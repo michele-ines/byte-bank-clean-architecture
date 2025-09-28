@@ -1,20 +1,23 @@
-import { tokens } from "@/src/theme/tokens";
 import { StyleSheet } from "react-native";
+import { colors } from "../theme/colors";
+import { layout } from "../theme/layout";
+import { spacing } from "../theme/spacing";
+import { typography } from "../theme/typography";
 
 export const styles = StyleSheet.create({
   container: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteBgDefault,
-    padding: tokens.spacingMd,
-    marginTop: tokens.spacingMd,
+    flex: layout.one,
+    backgroundColor: colors.byteBgDefault,
+    padding: spacing.md,
+    marginTop: spacing.md,
   },
-  content: { padding: tokens.spacingMd },
+  content: { padding: spacing.md },
   title: {
-    fontSize: tokens.textLg,
-    fontWeight: tokens.fontBold,
-    marginBottom: tokens.spacingMd,
+    fontSize: typography.textLg,
+    fontWeight: typography.fontBold,
+    marginBottom: spacing.md,
   },
   widgetButton: {
-    marginTop: tokens.spacingMd, 
+    marginTop: spacing.md, 
   },
 });

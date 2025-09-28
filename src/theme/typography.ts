@@ -1,0 +1,42 @@
+export const typography = {
+  fontInter: "Inter, System",
+  textXs: 12,
+  textSm: 14,
+  textBase: 16,
+  textMd: 18,
+  textLg: 20,
+  textXl: 24,
+  fontSize: 28,
+  fontNormal: "400" as const,
+  fontMedium: "500" as const,
+  fontSemibold: "600" as const,
+  fontBold: "700" as const,
+  fontExtraBold: "800" as const,
+  lineHeightTight: 16,
+  lineHeightNormal: 20,
+  lineHeightRelaxed: 24,
+  lineHeight: 32,
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+
+  padding: 16, 
+  
+  alignCenter: "center" as const,
+
+  alignFlexStart: "flex-start" as const,
+  alignFlexEnd: "flex-end" as const,
+
+  justifyCenter: "center" as const,
+  justifyBetween: "space-between" as const,
+  justifyEnd: "flex-end" as const,
+  overflow: "hidden" as const,
+  flexDirection: "column" as const,
+  // justifyStart: "flex-start" as const,
+
+  textAlignCenter: "center" as const,
+  textAlignLeft: "left" as const,
+  textAlignRight: "right" as const,
+  textDecorationUnderline: "underline" as const,
+};

@@ -1,8 +1,10 @@
 import LoginIllustration from "@/assets/images/login/ilustracao-login.svg";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { routes } from "@/src/routes";
-import { tokens } from "@/src/theme/tokens";
-import { ToastType } from "@/src/types/types";
+import { LoginFormProps } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { texts } from "@/src/theme";
+import { colors } from "@/src/theme/colors";
+import { showToast } from "@/src/utils/transactions.utils";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -15,52 +17,8 @@ import {
   View,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import Toast from "react-native-toast-message";
 import { styles } from "./LoginForm.styles";
 
-const formTexts = {
-  title: "Login",
-  labels: {
-    email: "Email",
-    password: "Senha",
-  },
-  placeholders: {
-    email: "Digite seu email",
-    password: "Digite sua senha",
-  },
-  buttons: {
-    submit: "ACESSAR",
-    create: "CRIAR CONTA",
-    forgot: "Esqueci a Senha!",
-  },
-  accessibility: {
-    form: "Formulário de login",
-    illustration: "Ilustração de uma pessoa interagindo com um celular gigante para fazer login.",
-    emailInput: "Campo de entrada de email",
-    passwordInput: "Campo de entrada de senha",
-    passwordHint: "A senha será escondida por segurança",
-    forgotLink: "Esqueci a senha! Toque para recuperar.",
-    submitButton: "Acessar conta",
-    submitHint: "Faz login na sua conta com as credenciais inseridas",
-    createButton: "Criar nova conta",
-    createHint: "Navega para a tela de criação de conta",
-  },
-  toasts: {
-    emptyFields: { title: "Atenção", message: "Informe e-mail e senha." },
-    loginError: { title: "Erro de Login", message: "Email ou senha inválidos." },
-    unexpectedError: { title: "Erro", message: "Ocorreu um erro inesperado." },
-  },
-};
-
-
-
-type LoginFormProps = {
-  onLoginSuccess?: (email: string) => void;
-};
-
-const showToast = (type: ToastType, text1: string, text2: string) => {
-  Toast.show({ type, text1, text2 });
-};
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState<string>("");
@@ -71,7 +29,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      showToast("error", formTexts.toasts.emptyFields.title, formTexts.toasts.emptyFields.message);
+      showToast(
+        "error",
+        texts.loginForm.toasts.emptyFields.title,
+        texts.loginForm.toasts.emptyFields.message
+      );
       return;
     }
     setIsLoading(true);
@@ -83,8 +45,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       console.error(error);
       const message =
         error instanceof Error
-          ? formTexts.toasts.loginError.message
-          : formTexts.toasts.unexpectedError.message;
+          ? texts.loginForm.toasts.loginError.message
+          : texts.loginForm.toasts.unexpectedError.message;
       showToast("error", "Erro de Login", message);
     } finally {
       setIsLoading(false);
@@ -105,61 +67,69 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       <ScrollView
         contentContainerStyle={styles.card}
         accessible
-        accessibilityLabel={formTexts.accessibility.form}
+        accessibilityLabel={texts.loginForm.accessibility.form}
       >
         <LoginIllustration
-          width={'100%'}
+          width={"100%"}
           style={styles.illustration}
           accessible
-          accessibilityLabel={formTexts.accessibility.illustration}
+          accessibilityLabel={texts.loginForm.accessibility.illustration}
         />
 
-        <Text style={styles.title} accessibilityRole="header">{formTexts.title}</Text>
+        <Text style={styles.title} accessibilityRole="header">
+          {texts.loginForm.title}
+        </Text>
 
-        <Text style={styles.label}>{formTexts.labels.email}</Text>
+        <Text style={styles.label}>{texts.loginForm.labels.email}</Text>
         <TextInput
-          placeholder={formTexts.placeholders.email}
+          placeholder={texts.loginForm.placeholders.email}
           value={email}
           onChangeText={setEmail}
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
-          accessibilityLabel={formTexts.accessibility.emailInput}
+          accessibilityLabel={texts.loginForm.accessibility.emailInput}
         />
 
-        <Text style={styles.label}>{formTexts.labels.password}</Text>
+        <Text style={styles.label}>{texts.loginForm.labels.password}</Text>
         <TextInput
-          placeholder={formTexts.placeholders.password}
+          placeholder={texts.loginForm.placeholders.password}
           value={password}
           onChangeText={setPassword}
           style={styles.input}
           secureTextEntry
-          accessibilityLabel={formTexts.accessibility.passwordInput}
-          accessibilityHint={formTexts.accessibility.passwordHint}
+          accessibilityLabel={texts.loginForm.accessibility.passwordInput}
+          accessibilityHint={texts.loginForm.accessibility.passwordHint}
         />
 
         <Link href={routes.forgotPassword} asChild>
           <Pressable
             accessibilityRole="link"
-            accessibilityLabel={formTexts.accessibility.forgotLink}
+            accessibilityLabel={texts.loginForm.accessibility.forgotLink}
           >
-            <Text style={styles.forgot}>{formTexts.buttons.forgot}</Text>
+            <Text style={styles.forgot}>{texts.loginForm.buttons.forgot}</Text>
           </Pressable>
         </Link>
 
         <View style={styles.alignButtons}>
           <Pressable
             onPress={handleLogin}
-            style={[styles.button, styles.submitButton, isFormInvalid && styles.submitButtonDisabled]}
+            style={[
+              styles.button,
+              styles.submitButton,
+              isFormInvalid && styles.submitButtonDisabled,
+            ]}
             disabled={isFormInvalid}
             accessibilityRole="button"
-            accessibilityLabel={formTexts.accessibility.submitButton}
-            accessibilityHint={formTexts.accessibility.submitHint}
+            accessibilityLabel={texts.loginForm.accessibility.submitButton}
+            accessibilityHint={texts.loginForm.accessibility.submitHint}
           >
             {isLoading ? (
-              <ActivityIndicator color={tokens.byteColorWhite} />
+              <ActivityIndicator color={colors.byteColorWhite} />
             ) : (
-              <Text style={styles.buttonText}>{formTexts.buttons.submit}</Text>
+              <Text style={styles.buttonText}>
+                {texts.loginForm.buttons.submit}
+              </Text>
             )}
           </Pressable>
 
@@ -167,14 +137,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             onPress={handleCreateAccount}
             style={[styles.button, styles.createButton]}
             accessibilityRole="button"
-            accessibilityLabel={formTexts.accessibility.createButton}
-            accessibilityHint={formTexts.accessibility.createHint}
+            accessibilityLabel={texts.loginForm.accessibility.createButton}
+            accessibilityHint={texts.loginForm.accessibility.createHint}
           >
-            <Text style={[styles.buttonText]}>{formTexts.buttons.create}</Text>
+            <Text style={[styles.buttonText]}>
+              {texts.loginForm.buttons.create}
+            </Text>
           </Pressable>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
-

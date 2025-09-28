@@ -1,16 +1,12 @@
-import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
-
-type InvestmentsScreenStyles = {
-  container: ViewStyle;
-  title: TextStyle;
-};
+import { InvestmentsScreenStyles } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { colors } from "@/src/theme/colors";
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create<InvestmentsScreenStyles>({
   container: { 
     flex: 1, 
     padding: 16, 
-    backgroundColor: tokens.byteBgDashboard 
+    backgroundColor: colors.byteBgDashboard 
   },
   title: { 
     fontSize: 20, 

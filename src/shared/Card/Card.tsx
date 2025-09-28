@@ -1,13 +1,8 @@
-import { tokens } from "@/src/theme/tokens";
-import React, { ReactNode } from "react";
+import { colors } from "@/src/theme/colors";
+import { typography } from "@/src/theme/typography";
+import React from "react";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
-
-type CardProps = {
-  title: string;
-  subtitle?: string;
-  children?: ReactNode;
-  variant?: "elevated" | "outlined"; // variações
-};
+import { CardProps } from "../ProfileStyles/profile.styles.types";
 
 export const Card: React.FC<CardProps> = ({
   title,
@@ -34,10 +29,10 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 12,
     padding: 16,
-    backgroundColor: tokens.byteBgDefault,
+    backgroundColor: colors.byteBgDefault,
   },
   elevated: {
-    shadowColor: tokens.byteGray900,
+    shadowColor: colors.byteGray900,
     shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
@@ -45,17 +40,17 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   outlined: {
     borderWidth: 1,
-    borderColor: tokens.byteGray200,
+    borderColor: colors.byteGray200,
   } as ViewStyle,
   title: {
-    fontSize: tokens.textMd,
+    fontSize: typography.textMd,
     fontWeight: "700",
-    color: tokens.byteGray800,
+    color: colors.byteGray800,
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: tokens.textSm,
-    color: tokens.byteGray500,
+    fontSize: typography.textSm,
+    color: colors.byteGray500,
     marginBottom: 12,
   },
   content: {

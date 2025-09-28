@@ -1,6 +1,6 @@
 import PersonalCards from "@/src/components/cards/PersonalCards/PersonalCards";
 import { ScreenWrapper } from "@/src/components/common/ScreenWrapper/ScreenWrapper";
-import { tokens } from "@/src/theme/tokens";
+import { texts } from "@/src/theme";
 import React from "react";
 import { Text, View } from "react-native";
 import { styles } from "./MyCardsScreen.styles";
@@ -13,9 +13,9 @@ const CardsScreen: React.FC = () => {
       >
         <View style={styles.headerWrapper}>
           <Text style={styles.title} accessibilityRole="header">
-            {tokens.textMeusCartoes}
+            {texts.textMeusCartoes}
           </Text>
-          <Text style={styles.subtitle}>{tokens.textConfigCardsSubtitle}</Text>
+          <Text style={styles.subtitle}>{texts.textConfigCardsSubtitle}</Text>
         </View>
 
         <PersonalCards />

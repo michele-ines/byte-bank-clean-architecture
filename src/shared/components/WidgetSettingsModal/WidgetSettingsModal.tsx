@@ -1,14 +1,10 @@
 import { useWidgetPreferences } from "@/src/contexts/WidgetPreferencesContext";
-import { tokens } from "@/src/theme/tokens";
+import { sizes, texts } from "@/src/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { WidgetSettingsModalProps } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./WidgetSettingsModal.styles";
-
-type WidgetSettingsModalProps = {
-  open: boolean;
-  onClose: () => void;
-};
 
 export default function WidgetSettingsModal({
   open,
@@ -35,46 +31,53 @@ export default function WidgetSettingsModal({
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <Text style={styles.title} accessibilityRole="header">
-            {tokens.textPersonalizarWidgets}
+            {texts.textPersonalizarWidgets}
           </Text>
-          <Text style={styles.description}>{tokens.textEscolhaWidgets}</Text>
+          <Text style={styles.description}>{texts.textEscolhaWidgets}</Text>
 
           <ScrollView>
             {/* CARD: Alerta de Gastos */}
             <Pressable
-              style={[styles.card, tempPrefs.spendingAlert && styles.cardSelected]}
+              style={[
+                styles.card,
+                tempPrefs.spendingAlert && styles.cardSelected,
+              ]}
               onPress={() => toggleTemp("spendingAlert")}
               accessibilityRole="button"
-              accessibilityLabel={tokens.a11ySpendingAlert}
+              accessibilityLabel={texts.a11ySpendingAlert}
             >
               <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{tokens.textAlertaGastos}</Text>
+                <Text style={styles.cardTitle}>{texts.textAlertaGastos}</Text>
                 <Switch
                   value={tempPrefs.spendingAlert}
                   onValueChange={() => toggleTemp("spendingAlert")}
-                  accessibilityLabel={tokens.a11yToggleSpendingAlert}
+                  accessibilityLabel={texts.a11yToggleSpendingAlert}
                 />
               </View>
-              <Text style={styles.cardText}>{tokens.textDescricaoGastos}</Text>
+              <Text style={styles.cardText}>{texts.textDescricaoGastos}</Text>
 
               <View style={styles.previewBox}>
                 <View style={styles.previewHeader}>
                   <MaterialIcons
                     name="bar-chart"
-                    size={tokens.iconSm}
+                    size={sizes.iconSm}
                     color={styles.icon.color}
                   />
-                  <Text style={styles.previewTitle}>{tokens.textPreviewWidget}</Text>
+                  <Text style={styles.previewTitle}>
+                    {texts.textPreviewWidget}
+                  </Text>
                 </View>
-                <Text style={styles.previewText}>{tokens.textPreviewGastos}</Text>
+                <Text style={styles.previewText}>
+                  {texts.textPreviewGastos}
+                </Text>
                 <View style={styles.previewFooter}>
                   <Text style={styles.previewFooterText}>
-                    {tokens.textLimiteAtual}:{" "}
-                    <Text style={styles.bold}>{tokens.valorLimiteAtual}</Text>
+                    {texts.textLimiteAtual}:{" "}
+                    <Text style={styles.bold}>{texts.valorLimiteAtual}</Text>
                   </Text>
                   <Text style={styles.previewFooterText}>
-                    {tokens.textGasto}:{" "}
-                    <Text style={styles.dangerText}>{tokens.valorGasto}</Text>
+                    {texts.textGasto}:{" "}
+                    <Text style={styles.dangerText}>{texts.valorGasto}</Text>
                   </Text>
                 </View>
               </View>
@@ -82,39 +85,48 @@ export default function WidgetSettingsModal({
 
             {/* CARD: Meta de Economia */}
             <Pressable
-              style={[styles.card, tempPrefs.savingsGoal && styles.cardSelected]}
+              style={[
+                styles.card,
+                tempPrefs.savingsGoal && styles.cardSelected,
+              ]}
               onPress={() => toggleTemp("savingsGoal")}
               accessibilityRole="button"
-              accessibilityLabel={tokens.a11ySavingsGoal}
+              accessibilityLabel={texts.a11ySavingsGoal}
             >
               <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{tokens.textMetaEconomia}</Text>
+                <Text style={styles.cardTitle}>{texts.textMetaEconomia}</Text>
                 <Switch
                   value={tempPrefs.savingsGoal}
                   onValueChange={() => toggleTemp("savingsGoal")}
-                  accessibilityLabel={tokens.a11yToggleSavingsGoal}
+                  accessibilityLabel={texts.a11yToggleSavingsGoal}
                 />
               </View>
-              <Text style={styles.cardText}>{tokens.textDescricaoEconomia}</Text>
+              <Text style={styles.cardText}>{texts.textDescricaoEconomia}</Text>
 
               <View style={styles.previewBox}>
                 <View style={styles.previewHeader}>
                   <MaterialIcons
                     name="savings"
-                    size={tokens.iconSm}
+                    size={sizes.iconSm}
                     color={styles.icon.color}
                   />
-                  <Text style={styles.previewTitle}>{tokens.textPreviewWidget}</Text>
+                  <Text style={styles.previewTitle}>
+                    {texts.textPreviewWidget}
+                  </Text>
                 </View>
-                <Text style={styles.previewText}>{tokens.textPreviewEconomia}</Text>
+                <Text style={styles.previewText}>
+                  {texts.textPreviewEconomia}
+                </Text>
                 <View style={styles.previewFooter}>
                   <Text style={styles.previewFooterText}>
-                    {tokens.textMetaAtual}:{" "}
-                    <Text style={styles.bold}>{tokens.valorMetaAtual}</Text>
+                    {texts.textMetaAtual}:{" "}
+                    <Text style={styles.bold}>{texts.valorMetaAtual}</Text>
                   </Text>
                   <Text style={styles.previewFooterText}>
-                    {tokens.textEconomizado}:{" "}
-                    <Text style={styles.successText}>{tokens.valorEconomizado}</Text>
+                    {texts.textEconomizado}:{" "}
+                    <Text style={styles.successText}>
+                      {texts.valorEconomizado}
+                    </Text>
                   </Text>
                 </View>
               </View>
@@ -127,17 +139,17 @@ export default function WidgetSettingsModal({
               style={styles.cancelButton}
               onPress={onClose}
               accessibilityRole="button"
-              accessibilityLabel={tokens.a11yCancelar}
+              accessibilityLabel={texts.a11yCancelar}
             >
-              <Text style={styles.cancelText}>{tokens.textCancelar}</Text>
+              <Text style={styles.cancelText}>{texts.textCancelar}</Text>
             </Pressable>
             <Pressable
               style={styles.confirmButton}
               onPress={handleConfirm}
               accessibilityRole="button"
-              accessibilityLabel={tokens.a11yConfirmar}
+              accessibilityLabel={texts.a11yConfirmar}
             >
-              <Text style={styles.confirmText}>{tokens.textConfirmar}</Text>
+              <Text style={styles.confirmText}>{texts.textConfirmar}</Text>
             </Pressable>
           </View>
         </View>

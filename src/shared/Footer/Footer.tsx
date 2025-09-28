@@ -1,13 +1,12 @@
-import { tokens } from "@/src/theme/tokens";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { styles } from "./Footer.styles";
 
-// ✅ SVGs
 import InstaSvg from "@/assets/images/footer/ft-instagram.svg";
 import LogoSvg from "@/assets/images/footer/ft-logo.svg";
 import WaSvg from "@/assets/images/footer/ft-whatsapp.svg";
 import YtSvg from "@/assets/images/footer/ft-youtube.svg";
+import { sizes, spacing } from "@/src/theme";
 
 export const Footer: React.FC = () => {
   return (
@@ -51,9 +50,9 @@ export const Footer: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.title}>Desenvolvido por Front-End</Text>
         <LogoSvg
-          width={tokens.logoWidth}
-          height={tokens.logoHeight}
-          style={{ marginTop: tokens.spacing2Xs }}
+          width={sizes.logoWidth}
+          height={sizes.logoHeight}
+          style={{ marginTop: spacing.xs2 }}
           accessibilityLabel="Logo da Bytebank"
         />
         <View style={styles.social}>

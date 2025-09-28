@@ -1,4 +1,7 @@
-import { tokens } from "@/src/theme/tokens";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { spacing } from "@/src/theme/spacing";
+import { texts } from "@/src/theme/texts";
 import React from "react";
 import { Dimensions, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
@@ -10,20 +13,20 @@ export default function FinancialChart() {
       style={styles.container}
       accessible
       accessibilityRole="summary"
-      accessibilityLabel={tokens.a11yFinancialChart}
+      accessibilityLabel={texts.a11yFinancialChart}
     >
-      <Text style={styles.title}>{tokens.textFinancialChart}</Text>
+      <Text style={styles.title}>{texts.textFinancialChart}</Text>
 
       <LineChart
-        data={tokens.financialChartData} 
-        width={Dimensions.get("window").width - tokens.spacingXl}
-        height={tokens.chartHeight}
-        yAxisLabel={tokens.currencyPrefix}
+        data={texts.financialChartData}
+        width={Dimensions.get("window").width - spacing.xl}
+        height={layout.chartHeight}
+        yAxisLabel={texts.currencyPrefix}
         chartConfig={{
-          backgroundGradientFrom: tokens.byteColorWhite,
-          backgroundGradientTo: tokens.byteColorWhite,
-          color: () => tokens.byteColorGreen500,
-          labelColor: () => tokens.byteGray700, 
+          backgroundGradientFrom: colors.byteColorWhite,
+          backgroundGradientTo: colors.byteColorWhite,
+          color: () => colors.byteColorGreen500,
+          labelColor: () => colors.byteGray700,
         }}
         bezier
         style={styles.chart}

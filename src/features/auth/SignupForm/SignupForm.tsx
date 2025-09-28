@@ -14,58 +14,13 @@ import {
   View,
 } from "react-native";
 
-import { tokens } from "@/src/theme/tokens";
-import { ToastType } from "@/src/types/types";
+import { SignupFormProps } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { colors } from "@/src/theme/colors";
+import { sizes } from "@/src/theme/sizes";
+import { texts } from "@/src/theme/texts";
+import { showToast } from "@/src/utils/transactions.utils";
 import ExpoCheckbox from "expo-checkbox";
-import Toast from "react-native-toast-message";
 import { styles } from "./SignupForm.styles";
-
-const signupFormTexts = {
-  title: "Preencha os campos para criar sua conta!",
-  fields: {
-    name: "Nome",
-    email: "Email",
-    password: "Senha",
-    confirmPassword: "Confirmar Senha",
-  },
-  placeholders: {
-    name: "Digite seu nome completo",
-    email: "Digite seu email",
-    password: "Mínimo 8 caracteres",
-    confirmPassword: "Confirme sua senha",
-  },
-  checkboxLabel:
-    "Li e estou ciente quanto às condições de tratamento dos meus dados conforme descrito na Política de Privacidade do banco.",
-  buttons: {
-    submit: "CRIAR CONTA",
-    back: "VOLTAR AO LOGIN",
-  },
-  accessibility: {
-    form: "Formulário de cadastro de conta corrente",
-    illustration: "Ilustração de uma pessoa interagindo com um ecrã de portátil seguro.",
-    checkbox: "Checkbox para aceitar os termos de privacidade.",
-    submitHint: "Cria uma nova conta e redireciona para o dashboard.",
-    backHint: "Volta para a tela de login sem salvar as alterações.",
-  },
-  toasts: {
-    emptyFields: { title: "Atenção", message: "Por favor, preencha todos os campos." },
-    passwordMismatch: { title: "Atenção", message: "As senhas não coincidem." },
-    passwordWeak: { title: "Senha Fraca", message: "A senha deve ter no mínimo 8 caracteres." },
-    termsNotAccepted: { title: "Atenção", message: "Você precisa aceitar os termos e condições." },
-    emailInvalid: { title: "Atenção", message: "Por favor, corrija o email antes de continuar." },
-    success: { title: "Sucesso!", message: "Conta criada. Você será redirecionado." },
-    emailInUse: { title: "Erro", message: "Este e-mail já está em uso." },
-    genericError: { title: "Erro", message: "Ocorreu um erro ao criar a conta." },
-  },
-};
-
-const showToast = (type: ToastType, text1: string, text2: string) => {
-  Toast.show({ type, text1, text2 });
-};
-
-type SignupFormProps = {
-  onSignupSuccess?: (email: string) => void;
-};
 
 export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   const [name, setName] = useState("");
@@ -89,7 +44,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   };
 
   const handleSubmit = async () => {
-    const { toasts } = signupFormTexts;
+    const { toasts } = texts.signupForm;
     if (!name || !email || !password || !confirmPassword) {
       showToast("error", toasts.emptyFields.title, toasts.emptyFields.message);
       return;
@@ -131,7 +86,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     }
   };
 
-  const isFormInvalid = !name || !email || !password || !confirmPassword || !isChecked || isLoading;
+  const isFormInvalid =
+    !name || !email || !password || !confirmPassword || !isChecked || isLoading;
 
   return (
     <KeyboardAvoidingView
@@ -147,60 +103,68 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
         <View
           style={styles.card}
           accessible
-          accessibilityLabel={signupFormTexts.accessibility.form}
+          accessibilityLabel={texts.signupForm.accessibility.form}
         >
           <SignupIllustration
             width="100%"
-            height={tokens.illustrationSignupHeight}
+            height={sizes.illustrationSignupHeight}
             style={styles.illustration}
-            accessibilityLabel={signupFormTexts.accessibility.illustration}
+            accessibilityLabel={texts.signupForm.accessibility.illustration}
           />
 
-          <Text style={styles.title} accessibilityRole="header">{signupFormTexts.title}</Text>
+          <Text style={styles.title} accessibilityRole="header">
+            {texts.signupForm.title}
+          </Text>
 
           {/* Nome */}
-          <Text style={styles.label}>{signupFormTexts.fields.name}</Text>
+          <Text style={styles.label}>{texts.signupForm.fields.name}</Text>
           <TextInput
-            placeholder={signupFormTexts.placeholders.name}
+            placeholder={texts.signupForm.placeholders.name}
             value={name}
             onChangeText={setName}
             style={styles.input}
-            accessibilityLabel={signupFormTexts.fields.name}
+            accessibilityLabel={texts.signupForm.fields.name}
           />
 
           {/* Email */}
-          <Text style={styles.label}>{signupFormTexts.fields.email}</Text>
+          <Text style={styles.label}>{texts.signupForm.fields.email}</Text>
           <TextInput
-            placeholder={signupFormTexts.placeholders.email}
+            placeholder={texts.signupForm.placeholders.email}
             value={email}
             onChangeText={validateEmail}
             style={[styles.input, emailError ? styles.inputError : null]}
             keyboardType="email-address"
             autoCapitalize="none"
-            accessibilityLabel={signupFormTexts.fields.email}
+            accessibilityLabel={texts.signupForm.fields.email}
           />
-          {emailError ? <Text style={styles.errorText} accessibilityLiveRegion="polite">{emailError}</Text> : null}
+          {emailError ? (
+            <Text style={styles.errorText} accessibilityLiveRegion="polite">
+              {emailError}
+            </Text>
+          ) : null}
 
           {/* Senha */}
-          <Text style={styles.label}>{signupFormTexts.fields.password}</Text>
+          <Text style={styles.label}>{texts.signupForm.fields.password}</Text>
           <TextInput
-            placeholder={signupFormTexts.placeholders.password}
+            placeholder={texts.signupForm.placeholders.password}
             value={password}
             onChangeText={setPassword}
             style={styles.input}
             secureTextEntry
-            accessibilityLabel={signupFormTexts.fields.password}
+            accessibilityLabel={texts.signupForm.fields.password}
           />
 
           {/* Confirmar Senha */}
-          <Text style={styles.label}>{signupFormTexts.fields.confirmPassword}</Text>
+          <Text style={styles.label}>
+            {texts.signupForm.fields.confirmPassword}
+          </Text>
           <TextInput
-            placeholder={signupFormTexts.placeholders.confirmPassword}
+            placeholder={texts.signupForm.placeholders.confirmPassword}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             style={styles.input}
             secureTextEntry
-            accessibilityLabel={signupFormTexts.fields.confirmPassword}
+            accessibilityLabel={texts.signupForm.fields.confirmPassword}
           />
 
           {/* Checkbox */}
@@ -209,27 +173,35 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
               style={styles.checkbox}
               value={isChecked}
               onValueChange={setChecked}
-              color={isChecked ? tokens.byteColorGreen500 : undefined}
+              color={isChecked ? colors.byteColorGreen500 : undefined}
               accessibilityRole="checkbox"
-              accessibilityLabel={signupFormTexts.accessibility.checkbox}
+              accessibilityLabel={texts.signupForm.accessibility.checkbox}
               accessibilityState={{ checked: isChecked }}
             />
-            <Text style={styles.checkboxLabel}>{signupFormTexts.checkboxLabel}</Text>
+            <Text style={styles.checkboxLabel}>
+              {texts.signupForm.checkboxLabel}
+            </Text>
           </View>
 
           {/* Botão Criar conta */}
           <Pressable
             onPress={handleSubmit}
-            style={[styles.button, styles.submitButton, isFormInvalid && styles.submitButtonDisabled]}
+            style={[
+              styles.button,
+              styles.submitButton,
+              isFormInvalid && styles.submitButtonDisabled,
+            ]}
             disabled={isFormInvalid}
             accessibilityRole="button"
-            accessibilityLabel={signupFormTexts.buttons.submit}
-            accessibilityHint={signupFormTexts.accessibility.submitHint}
+            accessibilityLabel={texts.signupForm.buttons.submit}
+            accessibilityHint={texts.signupForm.accessibility.submitHint}
           >
             {isLoading ? (
-              <ActivityIndicator color={tokens.byteColorWhite} />
+              <ActivityIndicator color={colors.byteColorWhite} />
             ) : (
-              <Text style={styles.buttonText}>{signupFormTexts.buttons.submit}</Text>
+              <Text style={styles.buttonText}>
+                {texts.signupForm.buttons.submit}
+              </Text>
             )}
           </Pressable>
 
@@ -238,14 +210,15 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             onPress={() => router.push(routes.login)}
             style={[styles.button, styles.backButton]}
             accessibilityRole="button"
-            accessibilityLabel={signupFormTexts.buttons.back}
-            accessibilityHint={signupFormTexts.accessibility.backHint}
+            accessibilityLabel={texts.signupForm.buttons.back}
+            accessibilityHint={texts.signupForm.accessibility.backHint}
           >
-            <Text style={styles.backText}>{signupFormTexts.buttons.back}</Text>
+            <Text style={styles.backText}>
+              {texts.signupForm.buttons.back}
+            </Text>
           </Pressable>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
-

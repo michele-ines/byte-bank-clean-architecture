@@ -1,91 +1,83 @@
-import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
+import { SharedStyles } from "../shared/ProfileStyles/profile.styles.types";
+import { border } from "../theme/border";
+import { colors } from "../theme/colors";
+import { layout } from "../theme/layout";
+import { radius } from "../theme/radius";
+import { spacing } from "../theme/spacing";
+import { typography } from "../theme/typography";
 
-type SharedStyles = {
-  keyboardView: ViewStyle;
-  scrollView: ViewStyle;
-  scrollViewContent: ViewStyle;
-  formContainer: ViewStyle;
-  title: TextStyle;
-  label: TextStyle;
-  input: TextStyle;
-  button: ViewStyle;
-  buttonText: TextStyle;
-  buttonDisabled: ViewStyle;
-  backgroundPixelsTop : ViewStyle;
-  backgroundPixelsBottom: ViewStyle;
-};
 
 export const sharedStyles = StyleSheet.create<SharedStyles>({
   keyboardView: {
-    flex: tokens.flex1,
+    flex: layout.one,
   },
   scrollView: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteBgDefault,
+    flex: layout.one,
+    backgroundColor: colors.byteBgDefault,
   },
   scrollViewContent: {
-    flexGrow: tokens.flex1,
+    flexGrow: layout.one,
   },
   formContainer: {
-    flex: tokens.flex1,
-    justifyContent: tokens.alignCenter,
-    padding: tokens.spacingLg,
-    gap: tokens.spacingSm,
+    flex: layout.one,
+    justifyContent: typography.alignCenter,
+    padding: spacing.lg,
+    gap: spacing.sm,
   },
   title: {
-    fontSize: tokens.textXl,
-    fontWeight: tokens.fontBold,
-    textAlign: tokens.alignCenter,
-    color: tokens.byteGray800,
-    marginBottom: tokens.spacingMd,
+    fontSize: typography.textXl,
+    fontWeight: typography.fontBold,
+    textAlign: typography.alignCenter,
+    color: colors.byteGray800,
+    marginBottom: spacing.md,
   },
   label: {
-    fontSize: tokens.textBase,
-    fontWeight: tokens.fontSemibold,
-    color: tokens.byteGray700,
-    marginBottom: tokens.spacing2Xs,
+    fontSize: typography.textBase,
+    fontWeight: typography.fontSemibold,
+    color: colors.byteGray700,
+    marginBottom: spacing.xs2,
   },
   input: {
-    borderWidth: tokens.borderWidthThin,
-    borderColor: tokens.byteGray300,
-    borderRadius: tokens.radiusSm,
-    paddingHorizontal: tokens.spacingSm,
-    paddingVertical: tokens.spacingSm,
-    fontSize: tokens.textBase,
-    backgroundColor: tokens.byteGray50,
-    color: tokens.byteGray800,
+    borderWidth: border.widthThin,
+    borderColor: colors.byteGray300,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    fontSize: typography.textBase,
+    backgroundColor: colors.byteGray50,
+    color: colors.byteGray800,
   },
   // Botões
   button: {
-    paddingVertical:tokens.spacingMd, 
-    borderRadius: tokens.radiusSm,
-    alignItems: tokens.alignCenter,
-    marginTop: tokens.spacingXs,
-    width: tokens.width150,
+    paddingVertical:spacing.md, 
+    borderRadius: radius.sm,
+    alignItems: typography.alignCenter,
+    marginTop: spacing.xs,
+    width: layout.width150,
   },
   buttonText: {
-    color: tokens.byteColorWhite,
-    fontWeight: tokens.fontBold,
-    fontSize: tokens.textBase,
+    color: colors.byteColorWhite,
+    fontWeight: typography.fontBold,
+    fontSize: typography.textBase,
   },
   buttonDisabled: {
-    backgroundColor: tokens.byteGray400,
+    backgroundColor: colors.byteGray400,
   },
   backgroundPixelsTop : {
-    position: tokens.absolute,
-    top: tokens.width0,
-    left: tokens.width0,
-    width: tokens.width90Percent,
-    height: tokens.widthFull,
-    opacity: tokens.opacityImage, 
+    position: layout.positionAbsolute,
+    top: layout.width0,
+    left: layout.width0,
+    width: layout.width90Percent,
+    height: layout.widthFull,
+    opacity: layout.opacityImage, 
   },
   backgroundPixelsBottom: {
-    position: tokens.absolute,
-    bottom: tokens.width0,
-    right: tokens.width0,
-    width: tokens.width45Percent, 
-    height: tokens.height50Percent, 
-    opacity: tokens.opacityImage, 
+    position: layout.positionAbsolute,
+    bottom: layout.width0,
+    right: layout.width0,
+    width: layout.width45Percent, 
+    height: layout.height50Percent, 
+    opacity: layout.opacityImage, 
   },
 });
