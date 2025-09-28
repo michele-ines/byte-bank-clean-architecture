@@ -15,12 +15,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StatusBar,
   Text,
   View,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"; // ⬅️ import aqui
 import { MaskedTextInput } from "react-native-mask-text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./NewTransactionForm.styles";
@@ -45,20 +45,13 @@ export const NewTransactionForm: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!transactionType || numericAmount <= 0) {
-      showToast(
-        "error",
-        t.toasts.emptyFields.title,
-        t.toasts.emptyFields.message
-      );
+      showToast("error", t.toasts.emptyFields.title, t.toasts.emptyFields.message);
       return;
     }
 
     setIsLoading(true);
     try {
-      const description = formatTransactionDescription(
-        transactionType,
-        numericAmount
-      );
+      const description = formatTransactionDescription(transactionType, numericAmount);
 
       await addTransaction({
         tipo: transactionType,
@@ -82,7 +75,7 @@ export const NewTransactionForm: React.FC = () => {
       <StatusBar barStyle={layout.barStyle} />
       <KeyboardAvoidingView
         style={styles.keyboardAvoiding}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.container}>
           <CardPixelsTop
@@ -91,10 +84,13 @@ export const NewTransactionForm: React.FC = () => {
             accessibilityLabel={t.accessibility.cardTopIllustration}
           />
 
-          <ScrollView
+          {/* ⬇️ Substituí ScrollView por KeyboardAwareScrollView */}
+          <KeyboardAwareScrollView
             contentContainerStyle={styles.scrollContentContainer}
-            showsVerticalScrollIndicator={false}
+            enableOnAndroid={true}
+            extraScrollHeight={20}
             keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
             accessible
             accessibilityLabel={t.accessibility.form}
           >
@@ -117,9 +113,7 @@ export const NewTransactionForm: React.FC = () => {
                 setOpen={setOpen}
                 setItems={setItems}
                 setValue={(getValue) => {
-                  const v = getValue(
-                    transactionType ?? null
-                  ) as TransactionType | null;
+                  const v = getValue(transactionType ?? null) as TransactionType | null;
                   setTransactionType(v ?? undefined);
                 }}
                 placeholder={t.placeholders.transactionType}
@@ -150,16 +144,11 @@ export const NewTransactionForm: React.FC = () => {
 
             <Pressable
               onPress={handleSubmit}
-              style={[
-                styles.submitButton,
-                isFormInvalid && { opacity: layout.opacityMd },
-              ]}
+              style={[styles.submitButton, isFormInvalid && { opacity: layout.opacityMd }]}
               disabled={isFormInvalid}
               accessibilityRole="button"
               accessibilityLabel={t.accessibility.submitButton}
-              accessibilityHint={
-                isLoading ? t.accessibility.submitButtonLoading : undefined
-              }
+              accessibilityHint={isLoading ? t.accessibility.submitButtonLoading : undefined}
             >
               {isLoading ? (
                 <ActivityIndicator
@@ -184,7 +173,7 @@ export const NewTransactionForm: React.FC = () => {
                 accessibilityLabel={t.accessibility.cardBottomIllustration}
               />
             </View>
-          </ScrollView>
+          </KeyboardAwareScrollView>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

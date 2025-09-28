@@ -1,4 +1,4 @@
-import { tokens } from "@/src/theme/tokens";
+import { colors, layout, radius, spacing, typography } from "@/src/theme";
 import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 
 type Styles = {
@@ -10,26 +10,26 @@ type Styles = {
 
 export const styles = StyleSheet.create<Styles>({
   headerContainer: {
-    flexDirection: tokens.flexRow,
-    justifyContent: tokens.justifyBetween,
-    alignItems: tokens.alignCenter,
-    marginBottom: tokens.spacingMd,
+    flexDirection: layout.flexRow,
+    justifyContent: typography.justifyBetween,
+    alignItems: typography.alignCenter,
+    marginBottom: spacing.md,
   },
   title: {
-    fontSize: tokens.textXl,
-    fontWeight: tokens.fontBold,
-    color: tokens.byteGray800,
+    fontSize: typography.textXl,
+    fontWeight: typography.fontBold,
+    color: colors.byteGray800,
   },
   iconsContainer: {
-    flexDirection: tokens.flexRow,
-    gap: tokens.spacingMd,
+    flexDirection: layout.flexRow,
+    gap: spacing.md,
   },
   iconButton: {
-    width: tokens.width36,
-    height: tokens.height36,
-    borderRadius: tokens.radiusLg,
-    backgroundColor: tokens.byteColorDash,
-    justifyContent: tokens.justifyCenter,
-    alignItems: tokens.alignCenter,
+    width: layout.width36,
+    height: layout.height36,
+    borderRadius: radius.xl,
+    backgroundColor: colors.byteColorDash,
+    justifyContent: typography.justifyCenter,
+    alignItems: typography.alignCenter,
   },
 });

@@ -31,6 +31,8 @@ export const layout = {
   width0: 0,
   width12: 12,
   width20: 20,
+  height36: 36,
+  width36: 36,
   modalTopPosition: "30%" as DimensionValue,
   width45Percent: "45%" as DimensionValue,
 

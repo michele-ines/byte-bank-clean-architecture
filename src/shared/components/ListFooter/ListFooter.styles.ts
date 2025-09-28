@@ -1,4 +1,4 @@
-import { tokens } from "@/src/theme/tokens";
+import { colors, spacing, typography } from "@/src/theme";
 import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 
 type Styles = {
@@ -8,13 +8,13 @@ type Styles = {
 
 export const styles = StyleSheet.create<Styles>({
   loadingFooter: {
-    paddingVertical: tokens.spacingMl,
-    alignItems: tokens.alignCenter,
-    justifyContent: tokens.justifyBetween,
+    paddingVertical: spacing.ml,
+    alignItems: typography.alignCenter,
+    justifyContent: typography.justifyBetween,
   },
   loadingText: {
-    fontSize: tokens.textSm,
-    color: tokens.byteColorGreen500,
-    fontWeight: tokens.fontMedium,
+    fontSize: typography.textSm,
+    color: colors.byteColorGreen500,
+    fontWeight: typography.fontMedium,
   },
 });
