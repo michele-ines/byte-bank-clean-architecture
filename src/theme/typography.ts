@@ -34,6 +34,7 @@ export const typography = {
   overflow: "hidden" as const,
   flexDirection: "column" as const,
   // justifyStart: "flex-start" as const,
+  liveRegionPolite:'polite' as const,
 
   textAlignCenter: "center" as const,
   textAlignLeft: "left" as const,

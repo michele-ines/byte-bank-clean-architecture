@@ -70,6 +70,7 @@ export type ChartStyles = {
 export type TransactionsStyles = {
   container: ViewStyle;
   title: TextStyle;
+  input: TextStyle;
   card: ViewStyle;
   row: ViewStyle;
   description: TextStyle;
@@ -177,6 +178,10 @@ export type SignupFormProps = {
 export type CardListExtractProps = {
   filterFn?: (transaction: ITransaction) => boolean;
   title?: string;
+};
+
+export type EditedValuesMap = {
+  [key: string]: string;
 };
 
 

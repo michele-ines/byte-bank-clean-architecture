@@ -21,6 +21,14 @@ export const styles = StyleSheet.create<TransactionsStyles>({
     fontWeight: typography.fontBold,
     marginBottom: spacing.xs,
   },
+  input: {
+  borderWidth: border.widthThin,
+  borderColor: colors.byteGray350,
+  borderRadius: spacing.xs,
+  padding: spacing.sm,
+  fontSize: typography.textBase,
+  color: colors.byteColorDash,
+},
   card: {
     shadowColor: colors.byteColorBlack,
     shadowRadius: spacing.xs2,
