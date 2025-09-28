@@ -79,3 +79,9 @@ export interface SpendingAlertProps {
   limit: number;
   transactions: Transaction[];
 }
+
+export interface ErrorScreenProps {
+  title?: string;
+  message?: string;
+  onRetry: () => void;
+}
