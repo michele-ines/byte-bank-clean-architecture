@@ -1,5 +1,8 @@
 import { sharedStyles } from "@/src/styles/shared.styles";
-import { tokens } from "@/src/theme/tokens";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -8,11 +11,11 @@ export const styles = StyleSheet.create({
   },
   card: {
     ...sharedStyles.formContainer,
-    backgroundColor: tokens.byteColorGreen100,
+    backgroundColor: colors.byteColorGreen100,
   },
   illustration: {
-    width: tokens.widthFull,
-    marginBottom: tokens.spacingMd,
+    width: layout.widthFull,
+    marginBottom: spacing.md,
   },
   title: {
     ...sharedStyles.title,
@@ -22,7 +25,7 @@ export const styles = StyleSheet.create({
   },
   input: {
     ...sharedStyles.input,
-    backgroundColor: tokens.byteColorGreen100,
+    backgroundColor: colors.byteColorGreen100,
   },
   button: {
     ...sharedStyles.button,
@@ -31,23 +34,23 @@ export const styles = StyleSheet.create({
     ...sharedStyles.buttonText,
   },
   submitButton: {
-    backgroundColor: tokens.byteColorGreen500,
+    backgroundColor: colors.byteColorGreen500,
   },
   submitButtonDisabled: {
     ...sharedStyles.buttonDisabled,
   },
   createButton: {
-    backgroundColor: tokens.byteColorOrange500,
+    backgroundColor: colors.byteColorOrange500,
   },
   alignButtons: {
-    alignItems: tokens.alignCenter,
+    alignItems: typography.alignCenter,
   },
   forgot: {
-    color: tokens.byteColorGreen500,
-    textAlign: tokens.textAlignLeft,
-    fontWeight: tokens.fontSemibold,
-    marginTop: tokens.spacing2Xs,
-    marginBottom: tokens.spacingMd,
-    textDecorationLine: tokens.textDecorationUnderline,
+    color: colors.byteColorGreen500,
+    textAlign: typography.textAlignLeft,
+    fontWeight: typography.fontSemibold,
+    marginTop: spacing.xs2,
+    marginBottom: spacing.md,
+    textDecorationLine: typography.textDecorationUnderline,
   },
 });

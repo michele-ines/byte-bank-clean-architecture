@@ -1,5 +1,6 @@
-import { tokens } from "@/src/theme/tokens";
 import { StyleSheet, ViewStyle } from "react-native";
+import { layout, typography } from "../theme";
+import { colors } from "../theme/colors";
 
 type CadastroPageStyles = {
   container: ViewStyle;
@@ -7,8 +8,8 @@ type CadastroPageStyles = {
 
 export const styles = StyleSheet.create<CadastroPageStyles>({
   container: { 
-    flex: 1, 
-    padding: 16, 
-    backgroundColor: tokens.byteBgDefault,
+    flex: layout.flex1, 
+    padding: typography.padding, 
+    backgroundColor: colors.byteBgDefault,
   },
 });

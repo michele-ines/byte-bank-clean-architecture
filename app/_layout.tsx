@@ -1,6 +1,7 @@
 import { toastConfig } from "@/src/config/Toast.config";
 import { GlobalContextProvider } from "@/src/contexts";
 import { WidgetPreferencesProvider } from "@/src/contexts/WidgetPreferencesContext";
+import { layout } from "@/src/theme";
 import { Slot } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -8,7 +9,7 @@ import Toast from "react-native-toast-message";
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: layout.flex1 }}>
       <SafeAreaProvider>
         <GlobalContextProvider>
           <WidgetPreferencesProvider>

@@ -1,5 +1,9 @@
 import { sharedStyles } from "@/src/styles/shared.styles";
-import { tokens } from "@/src/theme/tokens";
+import { border } from "@/src/theme/border";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -14,71 +18,71 @@ export const styles = StyleSheet.create({
   },
   card: {
     ...sharedStyles.formContainer,
-    backgroundColor: tokens.byteBgDefault,
+    backgroundColor: colors.byteBgDefault,
   },
   title: {
     ...sharedStyles.title,
-    fontSize: tokens.textLg,
-    lineHeight: tokens.lineHeightRelaxed,
+    fontSize: typography.textLg,
+    lineHeight: typography.lineHeightRelaxed,
   },
   label: {
     ...sharedStyles.label,
-    fontSize: tokens.textSm,
+    fontSize: typography.textSm,
   },
   input: {
     ...sharedStyles.input,
   },
   button: {
     ...sharedStyles.button,
-    paddingVertical: tokens.spacingSm,
-    width: tokens.widthFull,
+    paddingVertical: spacing.sm,
+    width: layout.widthFull,
   },
   buttonText: {
     ...sharedStyles.buttonText,
-    fontSize: tokens.textSm,
+    fontSize: typography.textSm,
   },
   submitButtonDisabled: {
     ...sharedStyles.buttonDisabled,
   },
 
-  illustration: { 
-    marginBottom: tokens.spacingSm,
-    alignSelf: tokens.alignCenter,
+  illustration: {
+    marginBottom: spacing.sm,
+    alignSelf: typography.alignCenter,
   },
-  inputError: { 
-    borderColor: tokens.byteColorError,
+  inputError: {
+    borderColor: colors.byteColorError,
   },
   errorText: {
-    color: tokens.byteColorError,
-    fontSize: tokens.textXs,
-    marginTop: tokens.spacing2Xs,
+    color: colors.byteColorError,
+    fontSize: typography.textXs,
+    marginTop: spacing.sm,
   },
   checkboxContainer: {
-    flexDirection: tokens.flexRow,
-    alignItems: tokens.alignFlexStart,
-    marginVertical: tokens.spacingSm,
+    flexDirection: layout.flexRow,
+    alignItems: typography.alignFlexStart,
+    marginVertical: spacing.sm,
   },
-  checkbox: { 
-    marginRight: tokens.spacingXs,
-    marginTop: tokens.spacing2Xs,
+  checkbox: {
+    marginRight: spacing.xs,
+    marginTop: spacing.xs,
   },
   checkboxLabel: {
-    flex: tokens.flex1,
-    fontSize: tokens.textSm,
-    color: tokens.byteGray600,
-    lineHeight: tokens.lineHeightRelaxed,
+    flex: layout.flex1,
+    fontSize: typography.textSm,
+    color: colors.byteGray600,
+    lineHeight: typography.lineHeightRelaxed,
   },
-  submitButton: { 
-    backgroundColor: tokens.byteColorOrange500,
+  submitButton: {
+    backgroundColor: colors.byteColorOrange500,
   },
   backButton: {
-    borderWidth: tokens.borderWidthThin,
-    borderColor: tokens.byteColorDash,
-    backgroundColor: tokens.byteBgDefault,
+    borderWidth: border.widthThin,
+    borderColor: colors.byteColorDash,
+    backgroundColor: colors.byteBgDefault,
   },
   backText: {
-    color: tokens.byteColorDash,
-    fontWeight: tokens.fontSemibold,
-    fontSize: tokens.textSm,
+    color: colors.byteColorDash,
+    fontWeight: typography.fontSemibold,
+    fontSize: typography.textSm,
   },
 });

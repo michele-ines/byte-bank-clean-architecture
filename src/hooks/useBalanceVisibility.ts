@@ -1,21 +1,7 @@
-import { tokens } from '@/src/theme/tokens';
 import { formatBRL } from '@/src/utils/currency-formatte';
 import { useMemo, useState } from 'react';
-
-type BalanceValue = number | null;
-
-interface UseBalanceVisibilityProps {
-  balance: BalanceValue;
-}
-
-interface UseBalanceVisibilityReturn {
-  showBalance: boolean;
-  toggleBalance: () => void;
-  displayValue: string;
-  accessibilityLabel: string;
-  accessibilityHint: string;
-  buttonAccessibilityLabel: string;
-}
+import { UseBalanceVisibilityProps, UseBalanceVisibilityReturn } from '../shared/interfaces/auth.interfaces';
+import { texts } from '../theme';
 
 /**
  * Hook customizado para gerenciar a visibilidade e formatação do saldo
@@ -28,9 +14,9 @@ export function useBalanceVisibility({ balance }: UseBalanceVisibilityProps): Us
   const toggleBalance = () => setShowBalance(prev => !prev);
 
   const displayValue = useMemo(() => {
-    if (!showBalance) return tokens.hiddenBalanceMask;
+    if (!showBalance) return texts.hiddenBalanceMask;
     if (typeof balance === "number") return formatBRL(balance);
-    return tokens.loadingText;
+    return texts.loadingText;
   }, [showBalance, balance]);
 
   const accessibilityLabel = useMemo(() => {

@@ -1,35 +1,33 @@
-import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
-
-type ToastStyles = {
-  baseToast: ViewStyle;
-  errorToast: ViewStyle;
-  successToast: ViewStyle;
-  text1: TextStyle;
-  text2: TextStyle;
-};
+import { StyleSheet } from "react-native";
+import { ToastStyles } from "../shared/ProfileStyles/profile.styles.types";
+import { border } from "../theme/border";
+import { colors } from "../theme/colors";
+import { layout } from "../theme/layout";
+import { radius } from "../theme/radius";
+import { spacing } from "../theme/spacing";
+import { typography } from "../theme/typography";
 
 export const toastStyles = StyleSheet.create<ToastStyles>({
   baseToast: {
-    borderLeftWidth: tokens.borderLeft0,
-    borderRadius: tokens.radiusSm,
-    width: tokens.width90Percent,
-    height: tokens.height80,
-    padding: tokens.spacingMd,
+    borderLeftWidth: border.left0,
+    borderRadius: radius.sm,
+    width: layout.width90Percent,
+    height: layout.height80,
+    padding: spacing.md,
   },
   errorToast: {
-    backgroundColor: tokens.byteColorError,
+    backgroundColor: colors.byteColorError,
   },
   successToast: {
-    backgroundColor: tokens.byteColorGreen500,
+    backgroundColor: colors.byteColorGreen500,
   },
   text1: {
-    fontSize: tokens.textBase,
-    fontWeight: tokens.fontBold,
-    color: tokens.byteColorWhite,
+    fontSize: typography.textBase,
+    fontWeight: typography.fontBold,
+    color: colors.byteColorWhite,
   },
   text2: {
-    fontSize: tokens.textSm,
-    color: tokens.byteColorWhite,
+    fontSize: typography.textSm,
+    color: colors.byteColorWhite,
   },
 });

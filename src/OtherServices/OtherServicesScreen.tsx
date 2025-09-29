@@ -8,12 +8,9 @@ import { UserInfo } from "firebase/auth";
 import SavingsGoalWidget from "../shared/components/SavingsGoalWidget/SavingsGoalWidget";
 import SpendingAlertWidget from "../shared/components/SpendingAlertWidget/SpendingAlertWidget";
 import WidgetPreferencesButton from "../shared/components/WidgetPreferencesButton/WidgetPreferencesButton";
+import { Transaction } from "../shared/ProfileStyles/profile.styles.types";
 import { styles } from "./OtherServicesScreen.styles";
 
-type Transaction = {
-  tipo: "entrada" | "saida";
-  valor: number;
-};
 
 const transactions: Transaction[] = [
   { tipo: "entrada", valor: 500 },

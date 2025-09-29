@@ -4,10 +4,13 @@ import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 import React from "react";
 import { GestureResponderEvent, Pressable, View } from "react-native";
-import { tokens } from "../../theme/tokens";
 import { styles } from "./Header.styles";
 
 import HeaderLogo from "@/assets/images/header/header-logo.svg";
+import { colors } from "@/src/theme/colors";
+import { sizes } from "@/src/theme/sizes";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
 
 export const Header: React.FC = () => {
   const navigation = useNavigation();
@@ -24,8 +27,8 @@ export const Header: React.FC = () => {
         styles.container,
         {
           backgroundColor: isAuthenticated
-            ? tokens.byteColorDash 
-            : tokens.byteColorBlack, 
+            ? colors.byteColorDash
+            : colors.byteColorBlack,
         },
       ]}
       accessibilityRole="header"
@@ -34,15 +37,15 @@ export const Header: React.FC = () => {
         <View style={styles.row}>
           <Pressable
             onPress={openDrawer}
-            hitSlop={tokens.spacingSm}
+            hitSlop={spacing.sm}
             accessibilityRole="button"
             accessibilityLabel="Abrir menu de navegação lateral"
             accessibilityHint="Abre o menu lateral com opções de navegação"
           >
             <Feather
               name="menu"
-              size={tokens.textLg}
-              color={tokens.byteColorGreen500}
+              size={typography.textLg}
+              color={colors.byteColorGreen500}
             />
           </Pressable>
 
@@ -51,24 +54,17 @@ export const Header: React.FC = () => {
             accessibilityRole="imagebutton"
             accessibilityLabel="Logotipo Bytebank, voltar para Home"
           >
-            <HeaderLogo
-              width={tokens.logoWidth}
-              height={tokens.logoHeight}
-            />
+            <HeaderLogo width={sizes.logoWidth} height={sizes.logoHeight} />
           </Pressable>
         </View>
       ) : (
-
         <Pressable
           onPress={() => router.push("/")}
           style={styles.centerLogo}
           accessibilityRole="imagebutton"
           accessibilityLabel="Logotipo Bytebank, voltar para Home"
         >
-          <HeaderLogo
-            width={tokens.logoWidth}
-            height={tokens.logoHeight}
-          />
+          <HeaderLogo width={sizes.logoWidth} height={sizes.logoHeight} />
         </Pressable>
       )}
     </View>

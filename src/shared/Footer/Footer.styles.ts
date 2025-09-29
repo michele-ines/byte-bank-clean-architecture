@@ -1,38 +1,41 @@
-import { tokens } from "@/src/theme/tokens";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    backgroundColor: tokens.byteColorBlack,
-    paddingVertical: tokens.spacingXl,
-    paddingHorizontal: tokens.spacingLg,
-    flexDirection: "column", // 🔑 sempre em coluna (mobile-first)
-    alignItems: "flex-start",
-    gap: tokens.spacingXl,
-    marginTop: tokens.spacingLg,
+    width: layout.widthFull,
+    backgroundColor: colors.byteColorBlack,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    flexDirection: layout.flexColumn, 
+    alignItems: typography.alignFlexStart,
+    gap: spacing.xl,
+    marginTop: spacing.lg,
   },
   section: {
-    width: "100%",
-    gap: tokens.spacing2Xs,
+    width: layout.widthFull,
+    gap: spacing.xs2,
   },
   title: {
-    color: tokens.byteColorWhite,
-    fontWeight: tokens.fontBold,
-    marginBottom: tokens.spacing2Xs,
-    fontSize: tokens.textSm,
-    lineHeight: tokens.lineHeightNormal,
-    textAlign: "left",
+    color: colors.byteColorWhite,
+    fontWeight: typography.fontBold,
+    marginBottom: spacing.xs2,
+    fontSize: typography.textSm,
+    lineHeight: typography.lineHeightNormal,
+    textAlign: typography.textAlignLeft,
   },
   link: {
-    color: tokens.byteColorWhite,
-    fontSize: tokens.textSm,
-    lineHeight: tokens.lineHeightNormal,
-    textAlign: "left",
+    color: colors.byteColorWhite,
+    fontSize: typography.textSm,
+    lineHeight: typography.lineHeightNormal,
+    textAlign: typography.textAlignLeft,
   },
   social: {
-    flexDirection: "row",
-    gap: tokens.spacingSm,
-    marginTop: tokens.spacingSm,
+    flexDirection: layout.flexRow,
+    gap: spacing.sm,
+    marginTop: spacing.sm,
   },
 });

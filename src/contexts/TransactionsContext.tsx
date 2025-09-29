@@ -1,7 +1,7 @@
 import {
   addDoc,
   collection,
-  DocumentData,
+  doc,
   getDocs,
   limit,
   onSnapshot,
@@ -10,6 +10,7 @@ import {
   serverTimestamp,
   startAfter,
   Timestamp,
+  updateDoc
 } from "firebase/firestore";
 import React, {
   createContext,
@@ -19,19 +20,13 @@ import React, {
   useState,
 } from "react";
 import { db } from "../config/firebaseConfig";
+import {
+  ITransaction,
+  ITransactionsContextData,
+} from "../shared/interfaces/auth.interfaces";
 import { useAuth } from "./AuthContext";
+
 export type TransactionType = "deposito" | "cambio" | "transferencia";
-export interface ITransaction extends DocumentData {
-  id?: string;
-  description: string;
-  valor: number;
-  receiptUrl?: string;
-  anexos: Array<any>;
-  tipo: string;
-  userId: string;
-  createdAt: string;
-  updateAt: string;
-}
 
 export interface INewTransactionInput {
   tipo: TransactionType;
@@ -40,15 +35,6 @@ export interface INewTransactionInput {
 }
 
 const PAGE_SIZE = 5;
-
-interface ITransactionsContextData {
-  transactions: ITransaction[];
-  addTransaction: (transaction: INewTransactionInput) => Promise<void>;
-  loading: boolean;
-  loadingMore: boolean;
-  hasMore: boolean;
-  loadMoreTransactions: () => Promise<void>;
-}
 
 const TransactionsContext = createContext<ITransactionsContextData>(
   {} as ITransactionsContextData
@@ -73,41 +59,41 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     const q = query(
-      collection(db, "transactions"), 
-      orderBy("createdAt", "desc"), 
+      collection(db, "transactions"),
+      orderBy("createdAt", "desc"),
       limit(PAGE_SIZE)
     );
-    
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((doc) => {
         const docData = doc.data();
-        const createdAtTimestamp = docData.createdAt as Timestamp; 
+        const createdAtTimestamp = docData.createdAt as Timestamp;
         const updatedAtTimestamp = docData.updateAt as Timestamp;
-        const convertedCreatedAt = createdAtTimestamp 
-          ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR") 
+        const convertedCreatedAt = createdAtTimestamp
+          ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR")
           : new Date().toLocaleDateString("pt-BR");
-        const convertedUpdateddAt = updatedAtTimestamp 
-          ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR") 
+        const convertedUpdatedAt = updatedAtTimestamp
+          ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR")
           : new Date().toLocaleDateString("pt-BR");
-        
+
         return {
           id: doc.id,
           ...doc.data(),
           createdAt: convertedCreatedAt,
           tipo: docData.tipo,
-          updateAt: convertedUpdateddAt
+          updateAt: convertedUpdatedAt,
         };
       }) as ITransaction[];
-      
-      const userTransactions = data.filter(t => t.userId === user.uid);
-      
+
+      const userTransactions = data.filter((t) => t.userId === user.uid);
+
       setTransactions(userTransactions);
       setLoading(false);
-      
+
       if (snapshot.docs.length > 0) {
         setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
       }
-      
+
       setHasMore(snapshot.docs.length >= PAGE_SIZE);
     });
 
@@ -123,10 +109,34 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     await addDoc(collection(db, "transactions"), {
       ...transaction,
       userId: user.uid,
-      anexos: [], 
+      anexos: [],
       createdAt: serverTimestamp(),
       updateAt: serverTimestamp(),
     });
+  };
+
+  const updateTransaction = async (
+    id: string,
+    data: Partial<ITransaction>
+  ): Promise<void> => {
+    try {
+      const transactionRef = doc(db, "transactions", id);
+
+      await updateDoc(transactionRef, {
+        ...data,
+        updateAt: serverTimestamp(),
+      });
+
+      // atualiza estado local
+      setTransactions((prev) =>
+        prev.map((transaction) =>
+          transaction.id === id ? { ...transaction, ...data } : transaction
+        )
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar transação:", error);
+      throw error;
+    }
   };
 
   const canLoadMore = (): boolean => {
@@ -137,18 +147,18 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     const docData = doc.data();
     const createdAtTimestamp = docData.createdAt as Timestamp;
     const updatedAtTimestamp = docData.updateAt as Timestamp;
-    const convertedCreatedAt = createdAtTimestamp 
-      ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR") 
+    const convertedCreatedAt = createdAtTimestamp
+      ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR")
       : new Date().toLocaleDateString("pt-BR");
-    const convertedUpdateddAt = updatedAtTimestamp 
-      ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR") 
+    const convertedUpdatedAt = updatedAtTimestamp
+      ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR")
       : new Date().toLocaleDateString("pt-BR");
 
     return {
       id: doc.id,
       ...docData,
       createdAt: convertedCreatedAt,
-      updateAt: convertedUpdateddAt
+      updateAt: convertedUpdatedAt,
     } as ITransaction;
   };
 
@@ -164,15 +174,20 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     return snapshot;
   };
 
-  const updateTransactionsState = (newTransactions: ITransaction[], snapshot: any) => {
-    const userTransactions = newTransactions.filter(t => t.userId === user?.uid);
-    
-    setTransactions(prev => [...prev, ...userTransactions]);
-    
+  const updateTransactionsState = (
+    newTransactions: ITransaction[],
+    snapshot: any
+  ) => {
+    const userTransactions = newTransactions.filter(
+      (t) => t.userId === user?.uid
+    );
+
+    setTransactions((prev) => [...prev, ...userTransactions]);
+
     if (snapshot.docs.length > 0) {
       setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
     }
-    
+
     setHasMore(snapshot.docs.length >= PAGE_SIZE);
   };
 
@@ -183,7 +198,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       const snapshot = await fetchNextPage();
-      
+
       if (!snapshot.empty) {
         const newTransactions = snapshot.docs.map(transformDocumentToTransaction);
         updateTransactionsState(newTransactions, snapshot);
@@ -200,13 +215,14 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <TransactionsContext.Provider
-      value={{ 
-        transactions, 
-        addTransaction, 
-        loading, 
-        loadingMore, 
-        hasMore, 
-        loadMoreTransactions 
+      value={{
+        transactions,
+        addTransaction,
+        loading,
+        loadingMore,
+        hasMore,
+        loadMoreTransactions,
+        updateTransaction,
       }}
     >
       {children}

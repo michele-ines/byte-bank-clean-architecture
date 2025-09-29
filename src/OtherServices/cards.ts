@@ -1,4 +1,3 @@
-// src/services/cards.ts
 export type CardKind = "fisico" | "digital";
 export type CardState = "active" | "blocked";
 

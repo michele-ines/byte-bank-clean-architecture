@@ -14,6 +14,6 @@ const firebaseConfig = {
 
 const app: FirebaseApp = initializeApp(firebaseConfig);
 
-export const auth: Auth = getAuth(app); // sem persistência no Expo Go
+export const auth: Auth = getAuth(app); 
 export const db: Firestore = getFirestore(app);
 export const storage: FirebaseStorage = getStorage(app);

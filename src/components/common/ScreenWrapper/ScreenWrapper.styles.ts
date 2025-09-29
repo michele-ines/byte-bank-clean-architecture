@@ -1,18 +1,19 @@
-// src/components/layouts/ScreenWrapper.styles.ts
-import { tokens } from '@/src/theme/tokens';
-import { StyleSheet } from 'react-native';
+import { layout } from "@/src/theme";
+import { colors } from "@/src/theme/colors";
+import { spacing } from "@/src/theme/spacing";
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   wrapper: {
-    flex: 1,
-    padding: tokens.spacingMd, 
-    backgroundColor: tokens.byteBgDashboard, 
-    gap: tokens.spacingMd
+    flex: layout.flex1,
+    padding: spacing.md,
+    backgroundColor: colors.byteBgDashboard,
+    gap: spacing.md,
   },
   header: {
-    marginBottom: tokens.spacingMd,
+    marginBottom: spacing.md,
   },
   footer: {
-    marginTop: tokens.spacingMd,
+    marginTop: spacing.md,
   },
 });

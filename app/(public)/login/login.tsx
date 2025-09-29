@@ -1,16 +1,14 @@
 import { LoginForm } from "@/src/features/auth/LoginForm/LoginForm";
-import { tokens } from "@/src/theme/tokens";
+import { styles } from "@/src/OtherServices/OtherServicesScreen.styles";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
-export default function LoginScreen() {
+const LoginPage: React.FC = () => {
   return (
     <View style={styles.container}>
       <LoginForm />
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: tokens.byteBgDefault },
-});
+export default LoginPage;

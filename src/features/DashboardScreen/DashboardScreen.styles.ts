@@ -1,36 +1,47 @@
-import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { DashboardExtraStyles } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { colors } from "@/src/theme/colors";
+import { layout } from "@/src/theme/layout";
+import { sizes } from "@/src/theme/sizes";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
+import { StyleSheet } from "react-native";
 
-type DashboardStyles = {
-  wrapper: ViewStyle;
-  row: ViewStyle;
-  card: ViewStyle;
-  cardTitle: TextStyle;
-  cardValue: TextStyle;
-  balance: ViewStyle;
-  balanceLabel: TextStyle;
-  balanceValue: TextStyle;
-};
-
-export const styles = StyleSheet.create<DashboardStyles>({
-  wrapper: { flex: tokens.flex1, paddingVertical: tokens.spacingMd, backgroundColor: tokens.byteBgDashboard, gap: tokens.spacingMd },
-  row: { flexDirection: tokens.flexRow, gap: tokens.spacingMd },
+export const styles = StyleSheet.create<DashboardExtraStyles>({
+  wrapper: {
+    flex: layout.one,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.byteBgDashboard,
+    gap: spacing.md,
+  },
+  row: { flexDirection: layout.flexRow, gap: spacing.md },
   card: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteColorWhite,
-    padding: tokens.spacingMd,
-    borderRadius: tokens.spacingSm,
-    minHeight: tokens.buttonMinWidth,
+    flex: layout.one,
+    backgroundColor: colors.byteColorWhite,
+    padding: spacing.md,
+    borderRadius: spacing.sm,
+    minHeight: sizes.buttonMinWidth,
   },
-  cardTitle: { fontWeight: tokens.fontBold, marginBottom: 8, color: tokens.byteColorDash },
-  cardValue: { fontSize: tokens.textLg, fontWeight: tokens.fontBold },
+  cardTitle: {
+    fontWeight: typography.fontBold,
+    marginBottom: 8,
+    color: colors.byteColorDash,
+  },
+  cardValue: { fontSize: typography.textLg, fontWeight: typography.fontBold },
   balance: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteColorDash2,
-    padding: tokens.spacingMd,
-    borderRadius: tokens.spacingSm,
-    minHeight: tokens.buttonMinWidth,
+    flex: layout.one,
+    backgroundColor: colors.byteColorDash2,
+    padding: spacing.md,
+    borderRadius: spacing.sm,
+    minHeight: sizes.buttonMinWidth,
   },
-  balanceLabel: { color: tokens.byteColorBlue100, fontWeight:tokens.fontBold },
-  balanceValue: { color: tokens.byteColorWhite, fontSize: tokens.textXl, fontWeight: tokens.fontExtraBold, marginTop: tokens.spacingSm },
+  balanceLabel: {
+    color: colors.byteColorBlue100,
+    fontWeight: typography.fontBold,
+  },
+  balanceValue: {
+    color: colors.byteColorWhite,
+    fontSize: typography.textXl,
+    fontWeight: typography.fontExtraBold,
+    marginTop: spacing.sm,
+  },
 });

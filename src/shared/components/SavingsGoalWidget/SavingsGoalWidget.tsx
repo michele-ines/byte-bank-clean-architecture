@@ -1,18 +1,9 @@
-import { tokens } from "@/src/theme/tokens";
+import { radius, spacing, texts } from "@/src/theme";
 import React from "react";
 import { Text, View } from "react-native";
 import * as Progress from "react-native-progress";
+import { SavingsGoalProps } from "../../interfaces/auth.interfaces";
 import { styles } from "./SavingsGoalWidget.styles";
-
-interface Transaction {
-  tipo: "entrada" | "saida";
-  valor: number;
-}
-
-interface SavingsGoalProps {
-  goal: number;
-  transactions: Transaction[];
-}
 
 export default function SavingsGoalWidget({ goal, transactions }: SavingsGoalProps) {
   const saved = transactions
@@ -24,28 +15,28 @@ export default function SavingsGoalWidget({ goal, transactions }: SavingsGoalPro
   return (
     <View
       style={styles.container}
-      accessibilityLabel={tokens.a11ySavingsGoal}
+      accessibilityLabel={texts.a11ySavingsGoal}
     >
-      <Text style={styles.title}>{tokens.textMetaEconomia}</Text>
+      <Text style={styles.title}>{texts.textMetaEconomia}</Text>
       <Text>
-        {tokens.textMetaAtual}: R$ {goal}
+        {texts.textMetaAtual}: R$ {goal}
       </Text>
       <Text>
-        {tokens.textEconomizado}: R$ {saved}
+        {texts.textEconomizado}: R$ {saved}
       </Text>
 
       <Progress.Bar
         progress={percentage}
         width={null}
-        height={tokens.spacingXs} 
+        height={spacing.xs} 
         color={styles.progressBar.backgroundColor}
-        borderRadius={tokens.radiusSm} 
+        borderRadius={radius.sm} 
       />
 
       <Text style={styles.status}>
         {percentage >= 1
-          ? tokens.textParabens 
-          : `${tokens.textProgresso} ${(percentage * 100).toFixed(1)}%`}
+          ? texts.textParabens 
+          : `${texts.textProgresso} ${(percentage * 100).toFixed(1)}%`}
       </Text>
     </View>
   );

@@ -1,69 +1,61 @@
-import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { ProfileStyles } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { colors } from "@/src/theme/colors";
+import { sizes } from "@/src/theme/sizes";
+import { spacing } from "@/src/theme/spacing";
+import { typography } from "@/src/theme/typography";
+import { StyleSheet } from "react-native";
 
-type Styles = {
-  container: ViewStyle;
-  header: ViewStyle;
-  avatarCircle: ViewStyle;
-  avatarText: TextStyle;
-  userName: TextStyle;
-  userEmail: TextStyle;
-  scrollContent: ViewStyle;
-  logoutButton: ViewStyle;
-  logoutButtonText: TextStyle;
-};
-
-export const styles = StyleSheet.create<Styles>({
+export const styles = StyleSheet.create<ProfileStyles>({
   container: {
     flex: 1,
-    backgroundColor: tokens.byteColorDash,
+    backgroundColor: colors.byteColorDash,
   },
   header: {
-    paddingTop: tokens.spacingXl,
-    paddingBottom: tokens.spacingLg,
-    alignItems: "center",
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.lg,
+    alignItems: typography.alignCenter,
     borderBottomWidth: 1,
-    borderBottomColor: tokens.byteGray400,
+    borderBottomColor: colors.byteGray400,
   },
   avatarCircle: {
-    width: tokens.avatarLg,
-    height: tokens.avatarLg,
-    borderRadius: tokens.avatarLg / 2,
-    backgroundColor: tokens.byteColorGreen500,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: tokens.spacingMd,
+    width: sizes.avatarLg,
+    height: sizes.avatarLg,
+    borderRadius: sizes.avatarLg / 2,
+    backgroundColor: colors.byteColorGreen500,
+    alignItems: typography.alignCenter,
+    justifyContent: typography.alignCenter,
+    marginBottom: spacing.md,
   },
   avatarText: {
-    color: tokens.byteColorWhite,
-    fontSize: tokens.textMd,
-    fontWeight: tokens.fontBold,
+    color: colors.byteColorWhite,
+    fontSize: typography.textMd,
+    fontWeight: typography.fontBold,
   },
   userName: {
-    color: tokens.byteGray50,
-    fontSize: tokens.textBase,
-    fontWeight: tokens.fontSemibold,
-    marginTop: tokens.spacingXs,
+    color: colors.byteGray50,
+    fontSize: typography.textBase,
+    fontWeight: typography.fontSemibold,
+    marginTop: spacing.xs,
   },
   userEmail: {
-    color: tokens.byteGray100,
-    fontSize: tokens.textSm,
-    marginTop: tokens.spacing2Xs,
+    color: colors.byteGray100,
+    fontSize: typography.textSm,
+    marginTop: spacing.xs2,
   },
   scrollContent: {
-    paddingTop: tokens.spacingSm,
+    paddingTop: spacing.sm,
   },
   logoutButton: {
-    paddingVertical: tokens.spacingSm,
-    marginTop: tokens.spacingMd,
-    marginHorizontal: tokens.spacingSm,
+    paddingVertical: spacing.sm,
+    marginTop: spacing.md,
+    marginHorizontal: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: tokens.byteGray400,
+    borderTopColor: colors.byteGray400,
   },
   logoutButtonText: {
-    fontSize: tokens.textSm,
-    color: tokens.byteGray100,
-    fontWeight: tokens.fontSemibold,
-    textAlign: "center",
+    fontSize: typography.textSm,
+    color: colors.byteGray100,
+    fontWeight: typography.fontSemibold,
+    textAlign: typography.textAlignCenter,
   },
 });

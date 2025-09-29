@@ -1,6 +1,5 @@
 import { Footer } from "@/src/shared/Footer/Footer";
 import { Header } from "@/src/shared/Header/Header";
-import { tokens } from "@/src/theme/tokens";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
@@ -13,43 +12,10 @@ import IconPontos from "@/assets/images/page/icon-pontos.svg";
 import IconPresente from "@/assets/images/page/icon-presente.svg";
 import IconSaque from "@/assets/images/page/icon-saque.svg";
 
+import { texts } from "@/src/theme";
+import { colors } from "@/src/theme/colors";
+import { sizes } from "@/src/theme/sizes";
 import { styles } from "./MainScreen.styles";
-
-const mainScreenTexts = {
-  hero: {
-    title: "Experimente mais liberdade no controle da sua vida financeira.",
-    subtitle: "Crie sua conta com a gente!",
-  },
-  buttons: {
-    openAccount: "Abrir conta",
-    login: "Já tenho conta",
-  },
-  advantages: {
-    title: "Vantagens do nosso banco:",
-    features: {
-      freeAccount: {
-        title: "Conta e cartão gratuitos",
-        description:
-          "Isso mesmo, nossa conta é digital,\nsem custo fixo e mais que isso:\nsem tarifa de manutenção.",
-      },
-      freeWithdrawals: {
-        title: "Saques sem custo",
-        description:
-          "Você pode sacar gratuitamente 4x\npor mês de qualquer Banco 24h.",
-      },
-      pointsProgram: {
-        title: "Programa de pontos",
-        description:
-          "Você pode acumular pontos com\nsuas compras no crédito sem pagar\nmensalidade!",
-      },
-      deviceInsurance: {
-        title: "Seguro Dispositivos",
-        description:
-          "Seus dispositivos móveis\n(computador e laptop) protegidos\npor uma mensalidade simbólica.",
-      },
-    },
-  },
-};
 
 const MainScreen: React.FC = () => {
   return (
@@ -57,32 +23,30 @@ const MainScreen: React.FC = () => {
       <Header />
 
       <LinearGradient
-        colors={[tokens.gradientTealFrom, tokens.gradientTealTo]}
+        colors={[colors.gradientTealFrom, colors.gradientTealTo]}
         style={styles.gradientBg}
       >
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.innerContent}>
             <View style={styles.hero}>
-              <Text style={styles.heroTitle}>{mainScreenTexts.hero.title}</Text>
+              <Text style={styles.heroTitle}>{texts.mainScreen.hero.title}</Text>
               <Text style={styles.heroSubtitle}>
-                {mainScreenTexts.hero.subtitle}
+                {texts.mainScreen.hero.subtitle}
               </Text>
 
               <BannerIlustracao
                 width={"100%"}
-                height={tokens.illustrationSignupHeight}
+                height={sizes.illustrationSignupHeight}
                 accessibilityLabel="Ilustração de pessoa com gráfico financeiro"
               />
 
               <View style={styles.buttonsRow}>
                 <TouchableOpacity
                   style={[styles.btn, styles.btnPrimary]}
-                  onPress={() =>
-                    router.push("/(public)/cadastro/CadastroPage")
-                  }
+                  onPress={() => router.push("/(public)/cadastro/CadastroPage")}
                 >
                   <Text style={styles.btnPrimaryText}>
-                    {mainScreenTexts.buttons.openAccount}
+                    {texts.mainScreen.buttons.openAccount}
                   </Text>
                 </TouchableOpacity>
 
@@ -91,7 +55,7 @@ const MainScreen: React.FC = () => {
                   onPress={() => router.push("/(public)/login/login")}
                 >
                   <Text style={styles.btnSecondaryText}>
-                    {mainScreenTexts.buttons.login}
+                    {texts.mainScreen.buttons.login}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -99,39 +63,45 @@ const MainScreen: React.FC = () => {
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
-                {mainScreenTexts.advantages.title}
+                {texts.mainScreen.advantages.title}
               </Text>
 
               <FeatureCard
                 Icon={IconPresente}
-                title={mainScreenTexts.advantages.features.freeAccount.title}
+                title={texts.mainScreen.advantages.features.freeAccount.title}
                 description={
-                  mainScreenTexts.advantages.features.freeAccount.description
+                  texts.mainScreen.advantages.features.freeAccount.description
                 }
-                descriptionStyle={{ color: tokens.byteTextMediumGray }}
+                descriptionStyle={{ color: colors.byteTextMediumGray }}
               />
 
               <FeatureCard
                 Icon={IconSaque}
-                title={mainScreenTexts.advantages.features.freeWithdrawals.title}
+                title={
+                  texts.mainScreen.advantages.features.freeWithdrawals.title
+                }
                 description={
-                  mainScreenTexts.advantages.features.freeWithdrawals.description
+                  texts.mainScreen.advantages.features.freeWithdrawals
+                    .description
                 }
               />
 
               <FeatureCard
                 Icon={IconPontos}
-                title={mainScreenTexts.advantages.features.pointsProgram.title}
+                title={texts.mainScreen.advantages.features.pointsProgram.title}
                 description={
-                  mainScreenTexts.advantages.features.pointsProgram.description
+                  texts.mainScreen.advantages.features.pointsProgram.description
                 }
               />
 
               <FeatureCard
                 Icon={IconDispositivos}
-                title={mainScreenTexts.advantages.features.deviceInsurance.title}
+                title={
+                  texts.mainScreen.advantages.features.deviceInsurance.title
+                }
                 description={
-                  mainScreenTexts.advantages.features.deviceInsurance.description
+                  texts.mainScreen.advantages.features.deviceInsurance
+                    .description
                 }
               />
             </View>
@@ -162,11 +132,13 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 }) => (
   <View style={styles.card}>
     <Icon
-      width={tokens.avatarMd}
-      height={tokens.avatarMd}
+      width={sizes.avatarMd}
+      height={sizes.avatarMd}
       accessibilityLabel={title}
     />
     <Text style={styles.cardTitle}>{title}</Text>
-    <Text style={[styles.cardDescription, descriptionStyle]}>{description}</Text>
+    <Text style={[styles.cardDescription, descriptionStyle]}>
+      {description}
+    </Text>
   </View>
 );

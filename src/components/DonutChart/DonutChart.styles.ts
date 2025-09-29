@@ -1,13 +1,10 @@
-import { tokens } from "@/src/theme/tokens";
-import { StyleSheet, ViewStyle } from "react-native";
+import { ChartStyles } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { typography } from "@/src/theme";
+import { StyleSheet } from "react-native";
 
-type styles = {
-  chartContainer: ViewStyle;
-};
-
-export const styles = StyleSheet.create<styles>({
+export const styles = StyleSheet.create<ChartStyles>({
   chartContainer: {
-    alignItems: tokens.alignCenter,
-    justifyContent: tokens.justifyCenter,
+    alignItems: typography.alignCenter,
+    justifyContent: typography.justifyCenter,
   },
 });

@@ -1,25 +1,14 @@
 import CardPixelsTop from "@/assets/images/dash-card-new-transacao/card-pixels-3.svg";
-import { tokens } from "@/src/theme/tokens";
 import React from "react";
 import { Text, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
+import { texts } from "@/src/theme";
 import { DonutChart } from "../../DonutChart/DonutChart";
-import { investmentSummaryTexts } from "./InvestmentSumaryCard.texts";
 import { styles } from "./InvestmentSummaryCard.styles";
+import { investmentSummaryMock } from "./Mock/InvestmentSummaryCard.mock";
 
-const t = investmentSummaryTexts;
-const mockData = {
-  total: t.legenda.total,
-  fixedIncome: t.legenda.fixedIncome,
-  variableIncome: t.legenda.variableIncome,
-  portfolio: [
-    { name: t.legenda.fundoInvesimentos.text, value: t.legenda.fundoInvesimentos.value, color: tokens.byteColorBlue500 },
-    { name: t.legenda.tesouroDireto.text, value: t.legenda.tesouroDireto.value, color: tokens.byteColorPurple500 },
-    { name: t.legenda.previdenciaPrivada.text, value: t.legenda.previdenciaPrivada.value, color: tokens.byteColorOrange300 },
-    { name: t.legenda.bolsaValores.text, value: t.legenda.bolsaValores.value, color: tokens.byteColorMagenta500 },
-  ],
-};
+const investmentTexts = texts.investmentSummary;
 
 export const InvestmentSummaryCard: React.FC = () => {
   const formatCurrency = (value: number) => {
@@ -34,60 +23,72 @@ export const InvestmentSummaryCard: React.FC = () => {
       <CardPixelsTop
         style={styles.cardPixelsTop}
         accessible
-        accessibilityLabel={t.accessibility.cardTopIllustration}
+        accessibilityLabel={investmentTexts.accessibility.cardTopIllustration}
       />
-       <ScrollView
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
-        accessibilityLabel={t.accessibility.container}
+        accessibilityLabel={investmentTexts.accessibility.container}
       >
-      <Text
-        style={styles.headerTitle}
-        accessibilityRole="header"
-      >
-        {t.title}
-      </Text>
+        <Text style={styles.headerTitle} accessibilityRole="header">
+          {investmentTexts.title}
+        </Text>
 
-      <Text style={styles.totalValue}>
-        {t.totalLabel} {formatCurrency(mockData.total)}
-      </Text>
+        <Text style={styles.totalValue}>
+          {investmentTexts.totalLabel}{" "}
+          {formatCurrency(investmentSummaryMock.total)}
+        </Text>
 
-      <View style={styles.summaryContainer}>
-        <View style={styles.summaryCard} accessibilityLabel={t.accessibility.fixedIncomeCard}>
-          <Text style={styles.summaryCardTitle}>{t.fixedIncomeLabel}</Text>
-          <Text style={styles.summaryCardValue}>
-            {formatCurrency(mockData.fixedIncome)}
-          </Text>
+        <View style={styles.summaryContainer}>
+          <View
+            style={styles.summaryCard}
+            accessibilityLabel={investmentTexts.accessibility.fixedIncomeCard}
+          >
+            <Text style={styles.summaryCardTitle}>
+              {investmentTexts.fixedIncomeLabel}
+            </Text>
+            <Text style={styles.summaryCardValue}>
+              {formatCurrency(investmentSummaryMock.fixedIncome)}
+            </Text>
+          </View>
+
+          <View
+            style={styles.summaryCard}
+            accessibilityLabel={
+              investmentTexts.accessibility.variableIncomeCard
+            }
+          >
+            <Text style={styles.summaryCardTitle}>
+              {investmentTexts.variableIncomeLabel}
+            </Text>
+            <Text style={styles.summaryCardValue}>
+              {formatCurrency(investmentSummaryMock.variableIncome)}
+            </Text>
+          </View>
         </View>
 
-        <View style={styles.summaryCard} accessibilityLabel={t.accessibility.variableIncomeCard}>
-          <Text style={styles.summaryCardTitle}>{t.variableIncomeLabel}</Text>
-          <Text style={styles.summaryCardValue}>
-            {formatCurrency(mockData.variableIncome)}
-          </Text>
+        <Text style={styles.statsTitle}>{investmentTexts.statsTitle}</Text>
+
+        <View style={styles.statsCard}>
+          <DonutChart
+            data={investmentSummaryMock.portfolio}
+            accessibilityLabel={investmentTexts.accessibility.donutChart}
+          />
+
+          <View
+            style={styles.legendContainer}
+            accessibilityLabel={investmentTexts.accessibility.legend}
+          >
+            {investmentSummaryMock.portfolio.map((item) => (
+              <View key={item.name} style={styles.legendItem}>
+                <View
+                  style={[styles.legendDot, { backgroundColor: item.color }]}
+                />
+                <Text style={styles.legendText}>{item.name}</Text>
+              </View>
+            ))}
+          </View>
         </View>
-      </View>
-
-      <Text style={styles.statsTitle}>{t.statsTitle}</Text>
-
-      <View style={styles.statsCard}>
-        <DonutChart
-          data={mockData.portfolio}
-          accessibilityLabel={t.accessibility.donutChart}
-        />
-
-        <View
-          style={styles.legendContainer}
-          accessibilityLabel={t.accessibility.legend}
-        >
-          {mockData.portfolio.map((item) => (
-            <View key={item.name} style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: item.color }]} />
-              <Text style={styles.legendText}>{item.name}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
       </ScrollView>
     </View>
   );

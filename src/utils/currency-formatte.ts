@@ -1,19 +1,7 @@
-/**
- * Formata um número para BRL – ex.: 500  -> "R$ 500,00"
- */
+
 export const formatBRL = (value: number): string =>
   `R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
 
-/**
- * Converte string em formato BRL para número.
- * – Aceita no máx. 9 dígitos inteiros e 2 decimais (999 999 999,99).
- * – Remove qualquer caractere extra que o usuário cole.
- *
- * Exemplos:
- *  "R$ 1.234,56"  -> 1234.56
- *  "999999999,99" -> 999999999.99
- *  "123.456.789,123" (excesso) -> 123456789.12  (trunca para 2 decimais)
- */
 export const parseBRL = (input: string): number => {
   // 1. Mantém apenas dígitos, vírgula ou ponto
   const cleaned = input.replace(/[^\d.,]/g, "");
@@ -58,8 +46,8 @@ export const maskCurrency = (valor?: string): string => {
   // Limita a 11 dígitos (9 inteiros + 2 decimais)
   numeros = numeros.slice(0, 11);
 
-  const inteiro = numeros.slice(0, -2) || "0"; // pelo menos 1 inteiro
-  const decimal = numeros.slice(-2).padStart(2, "0"); // sempre 2 decimais
+  const inteiro = numeros.slice(0, -2) || "0";
+  const decimal = numeros.slice(-2).padStart(2, "0"); 
 
   const numeroFinal = `${inteiro}.${decimal}`;
 

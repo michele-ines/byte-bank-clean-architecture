@@ -1,12 +1,13 @@
+import { layout } from "@/src/theme";
+import { colors } from "@/src/theme/colors";
 import { Slot } from "expo-router";
 import React from "react";
 import { StyleSheet } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context"; // 👈 use o da lib
-import { tokens } from "../../src/theme/tokens";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PublicLayout() {
   return (
-    <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+    <SafeAreaView style={styles.safe} edges={layout.safeEdges}>
       <Slot />
     </SafeAreaView>
   );
@@ -14,7 +15,7 @@ export default function PublicLayout() {
 
 const styles = StyleSheet.create({
   safe: {
-    flex: 1,
-    backgroundColor: tokens.byteBgDefault, 
+    flex: layout.flex1,
+    backgroundColor: colors.byteBgDefault,
   },
 });
