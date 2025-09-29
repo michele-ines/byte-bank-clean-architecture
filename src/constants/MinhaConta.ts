@@ -70,7 +70,7 @@ export const formTexts = {
       },
       weakPassword: {
         title: "Erro",
-        message: "A nova senha deve ter pelo menos 8 caracteres.",
+        message: "A senha deve ter no mínimo 8 caracteres.",
       },
       generic: {
         title: "Erro",

@@ -45,16 +45,35 @@ export function EditFieldModal({
     updateUserPassword,
   } = useEditField(field, initialValue, onClose);
 
-  const inputRef = useRef<TextInput>(null);
+  const currentPasswordRef = useRef<TextInput>(
+    null
+  ) as React.RefObject<TextInput>;
+  const mainFieldRef = useRef<TextInput>(null) as React.RefObject<TextInput>;
+
+  const isPasswordField = field === "password";
+  const requiresCurrentPassword = field === "email" || isPasswordField;
 
   useEffect(() => {
     if (visible) {
       setValue(initialValue);
       setCurrentPassword("");
       setError({ field: "", message: "" });
-      setTimeout(() => inputRef.current?.focus(), 200);
+      setTimeout(() => {
+        if (requiresCurrentPassword) {
+          currentPasswordRef.current?.focus();
+        } else {
+          mainFieldRef.current?.focus();
+        }
+      }, 200);
     }
-  }, [visible, initialValue, setValue, setCurrentPassword, setError]);
+  }, [
+    visible,
+    initialValue,
+    setValue,
+    setCurrentPassword,
+    setError,
+    requiresCurrentPassword,
+  ]);
 
   if (!field) return null;
 
@@ -64,9 +83,6 @@ export function EditFieldModal({
       email: "Editar e-mail",
       password: "Alterar senha",
     }[field]);
-
-  const isPasswordField = field === "password";
-  const requiresCurrentPassword = field === "email" || isPasswordField;
 
   const handleSave = async () => {
     setLoading(true);
@@ -100,7 +116,8 @@ export function EditFieldModal({
     label: string,
     fieldValue: string,
     setFieldValue: (v: string) => void,
-    secureText: boolean
+    secureText: boolean,
+    refProp?: React.RefObject<TextInput>
   ) => {
     let passwordToggle = null;
     if (isPasswordField && label === "Nova senha") {
@@ -132,7 +149,7 @@ export function EditFieldModal({
         <Text style={styles.label}>{label}</Text>
         <View style={styles.inputWrapper}>
           <TextInput
-            ref={inputRef}
+            ref={refProp}
             style={styles.input}
             value={fieldValue}
             placeholderTextColor={styles.input.color}
@@ -169,7 +186,8 @@ export function EditFieldModal({
               "Senha atual",
               currentPassword,
               setCurrentPassword,
-              !showCurrentPassword
+              !showCurrentPassword,
+              currentPasswordRef
             )}
 
           {(() => {
@@ -187,7 +205,8 @@ export function EditFieldModal({
                   fieldLabel,
                   value,
                   setValue,
-                  isPasswordField && !showNewPassword
+                  isPasswordField && !showNewPassword,
+                  !requiresCurrentPassword ? mainFieldRef : undefined
                 )}
               </>
             );

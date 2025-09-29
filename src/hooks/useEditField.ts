@@ -64,7 +64,7 @@ export function useEditField(
   const reauthenticate = async () => {
     if (!user?.email) {
       validateEmail("");
-      return;
+      return false;
     }
 
     if (!currentPassword) {
@@ -72,7 +72,7 @@ export function useEditField(
         field: "password",
         message: formTexts.toasts.error.reauth.message,
       });
-      return;
+      return false;
     }
 
     try {
@@ -81,18 +81,17 @@ export function useEditField(
         currentPassword
       );
       await reauthenticateWithCredential(user, credential);
+      return true;
     } catch (error) {
-      let message = formTexts.toasts.error.password.message;
-      let title = formTexts.toasts.error.password.title;
-
       if (error instanceof FirebaseError) {
         if (error.code === "auth/wrong-password") {
-          title = formTexts.toasts.error.reauthWrongPassword.title;
-          message = formTexts.toasts.error.reauthWrongPassword.message;
+          setError({
+            field: "currentPassword",
+            message: formTexts.toasts.error.reauthWrongPassword.message,
+          });
         }
-
-        showToast("error", title, message);
       }
+      return false;
     }
   };
 
@@ -149,7 +148,8 @@ export function useEditField(
     }
 
     try {
-      await reauthenticate();
+      const reauthSuccess = await reauthenticate();
+      if (!reauthSuccess) return;
       await verifyBeforeUpdateEmail(user, email);
       await updateUserDataInFirestore(undefined, email);
       showToast(
@@ -195,7 +195,8 @@ export function useEditField(
     }
 
     try {
-      await reauthenticate();
+      const reauthSuccess = await reauthenticate();
+      if (!reauthSuccess) return;
       await updatePassword(user, newPassword);
       showToast(
         "success",

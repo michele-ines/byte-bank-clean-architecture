@@ -28,6 +28,7 @@ export const styles = StyleSheet.create<CardMinhaContaStyles>({
   },
   label: {
     ...sharedStyles.label,
+    margin: spacing.xs,
   },
   inputWrapper: {
     flexDirection: layout.flexRow,

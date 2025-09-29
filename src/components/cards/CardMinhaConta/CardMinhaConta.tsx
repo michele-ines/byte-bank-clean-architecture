@@ -86,7 +86,7 @@ export function CardMinhaConta() {
 
       {renderField("Nome", "name")}
       {renderField("E-mail", "email")}
-      {renderField("Senha atual", "password", true)}
+      {renderField("Senha", "password", true)}
 
       <EditFieldModal
         visible={!!activeField}

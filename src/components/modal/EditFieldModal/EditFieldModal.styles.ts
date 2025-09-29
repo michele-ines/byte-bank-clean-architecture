@@ -37,7 +37,7 @@ export const styles = StyleSheet.create<EditFieldModalStyles>({
     fontWeight: typography.fontBold,
     fontSize: typography.textSm,
     color: colors.byteColorBlack,
-    marginBottom: spacing.xs,
+    margin: spacing.xs,
   },
   inputWrapper: {
     flexDirection: layout.flexRow,
@@ -123,6 +123,6 @@ export const styles = StyleSheet.create<EditFieldModalStyles>({
   errorText: {
     color: colors.byteColorError,
     fontSize: typography.textXs,
-    marginTop: spacing.sm2,
+    marginTop: spacing.xs2,
   },
 });
