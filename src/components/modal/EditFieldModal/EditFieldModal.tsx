@@ -1,4 +1,5 @@
 import { useEditField } from "@/src/hooks/useEditField";
+import { EditFieldModalProps } from "@/src/shared/ProfileStyles/profile.styles.types";
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useRef } from "react";
 import {
@@ -13,13 +14,6 @@ import {
   View,
 } from "react-native";
 import { styles } from "./EditFieldModal.styles";
-
-type EditFieldModalProps = {
-  visible: boolean;
-  field: "name" | "email" | "password" | null;
-  initialValue: string;
-  onClose: () => void;
-};
 
 export function EditFieldModal({
   visible,

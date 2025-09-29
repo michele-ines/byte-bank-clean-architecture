@@ -1,3 +1,4 @@
+import { EditFieldModalStyles } from "@/src/shared/ProfileStyles/profile.styles.types";
 import {
   border,
   colors,
@@ -7,26 +8,8 @@ import {
   spacing,
   typography,
 } from "@/src/theme";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 
-type EditFieldModalStyles = {
-  field: ViewStyle;
-  label: TextStyle;
-  input: TextStyle;
-  inputEditing: ViewStyle;
-  modalOverlay: ViewStyle;
-  modalContent: ViewStyle;
-  modalTitle: TextStyle;
-  modalActions: ViewStyle;
-  cancelButton: ViewStyle;
-  cancelButtonText: TextStyle;
-  modalInput: TextStyle;
-  showPasswordBtn: ViewStyle;
-  saveButton: ViewStyle;
-  saveButtonText: TextStyle;
-  inputWrapper: ViewStyle;
-  errorText: TextStyle;
-};
 
 export const styles = StyleSheet.create<EditFieldModalStyles>({
   field: {

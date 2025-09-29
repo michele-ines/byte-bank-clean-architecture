@@ -1,6 +1,4 @@
 import { db } from "@/src/config/firebaseConfig";
-import { formTexts } from "@/src/constants/MinhaConta";
-import { showToast } from "@/src/utils/toast";
 import {
   validateEmail,
   validateName,
@@ -18,6 +16,8 @@ import { doc, updateDoc } from "firebase/firestore";
 
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { texts } from "../theme";
+import { showToast } from "../utils/transactions.utils";
 
 export function useEditField(
   field: "name" | "email" | "password" | null,
@@ -48,14 +48,14 @@ export function useEditField(
       if (error instanceof FirebaseError) {
         showToast(
           "error",
-          formTexts.toasts.error.generic.title,
-          error.message || formTexts.toasts.error.generic.message
+          texts.formToasts.error.generic.title,
+          error.message || texts.formToasts.error.generic.message
         );
       } else {
         showToast(
           "error",
-          formTexts.toasts.error.generic.title,
-          formTexts.toasts.error.generic.message
+          texts.formToasts.error.generic.title,
+          texts.formToasts.error.generic.message
         );
       }
     }
@@ -70,7 +70,7 @@ export function useEditField(
     if (!currentPassword) {
       setError({
         field: "password",
-        message: formTexts.toasts.error.reauth.message,
+        message: texts.formToasts.error.reauth.message,
       });
       return false;
     }
@@ -87,7 +87,7 @@ export function useEditField(
         if (error.code === "auth/wrong-password") {
           setError({
             field: "currentPassword",
-            message: formTexts.toasts.error.reauthWrongPassword.message,
+            message: texts.formToasts.error.reauthWrongPassword.message,
           });
         }
       }
@@ -113,16 +113,16 @@ export function useEditField(
       await updateUserDataInFirestore(name);
       showToast(
         "success",
-        formTexts.toasts.success.name.title,
-        formTexts.toasts.success.name.message
+        texts.formToasts.success.name.title,
+        texts.formToasts.success.name.message
       );
       onClose();
     } catch (error) {
       const message =
         error instanceof FirebaseError
           ? error.message
-          : formTexts.toasts.error.name.message;
-      showToast("error", formTexts.toasts.error.name.title, message);
+          : texts.formToasts.error.name.message;
+      showToast("error", texts.formToasts.error.name.title, message);
     }
   };
 
@@ -137,7 +137,7 @@ export function useEditField(
     if (!currentPassword) {
       setError({
         field: "currentPassword",
-        message: formTexts.toasts.error.reauth.message,
+        message: texts.formToasts.error.reauth.message,
       });
       return;
     }
@@ -154,24 +154,24 @@ export function useEditField(
       await updateUserDataInFirestore(undefined, email);
       showToast(
         "success",
-        formTexts.toasts.success.email.title,
-        formTexts.toasts.success.email.message
+        texts.formToasts.success.email.title,
+        texts.formToasts.success.email.message
       );
       onClose();
     } catch (error) {
-      let message = formTexts.toasts.error.email.message;
+      let message = texts.formToasts.error.email.message;
 
       if (error instanceof FirebaseError) {
         switch (error.code) {
           case "auth/email-already-in-use":
-            message = formTexts.toasts.error.emailInUse.message;
+            message = texts.formToasts.error.emailInUse.message;
             break;
           case "auth/invalid-email":
-            message = formTexts.toasts.error.invalidEmail.message;
+            message = texts.formToasts.error.invalidEmail.message;
             break;
         }
       }
-      showToast("error", formTexts.toasts.error.email.title, message);
+      showToast("error", texts.formToasts.error.email.title, message);
     }
   };
 
@@ -200,20 +200,20 @@ export function useEditField(
       await updatePassword(user, newPassword);
       showToast(
         "success",
-        formTexts.toasts.success.password.title,
-        formTexts.toasts.success.password.message
+        texts.formToasts.success.password.title,
+        texts.formToasts.success.password.message
       );
       onClose();
     } catch (error) {
-      let message = formTexts.toasts.error.password.message;
-      let title = formTexts.toasts.error.password.title;
+      let message = texts.formToasts.error.password.message;
+      let title = texts.formToasts.error.password.title;
 
       if (error instanceof Error) {
         if (error.message.includes("auth/wrong-password")) {
-          title = formTexts.toasts.error.reauth.title;
-          message = formTexts.toasts.error.reauth.message;
+          title = texts.formToasts.error.reauth.title;
+          message = texts.formToasts.error.reauth.message;
         } else if (error.message.includes("auth/weak-password")) {
-          message = formTexts.toasts.error.weakPassword.message;
+          message = texts.formToasts.error.weakPassword.message;
         } else {
           message = error.message;
         }
