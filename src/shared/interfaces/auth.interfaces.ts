@@ -50,6 +50,7 @@ export interface ITransactionsContextData {
   hasMore: boolean;
   loadMoreTransactions: () => Promise<void>;
   updateTransaction: (id: string, data: Partial<ITransaction>) => Promise<void>;
+  deleteTransactions: (ids: string[]) => Promise<void>;
 }
 
 export interface UseBalanceVisibilityProps {

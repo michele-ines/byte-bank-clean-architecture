@@ -15,11 +15,11 @@ import {
 } from "react-native";
 
 import { SignupFormProps } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { Checkbox } from "@/src/shared/components/Checkbox/Checkbox";
 import { colors } from "@/src/theme/colors";
 import { sizes } from "@/src/theme/sizes";
 import { texts } from "@/src/theme/texts";
 import { showToast } from "@/src/utils/transactions.utils";
-import ExpoCheckbox from "expo-checkbox";
 import { styles } from "./SignupForm.styles";
 
 export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
@@ -169,7 +169,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
 
           {/* Checkbox */}
           <View style={styles.checkboxContainer}>
-            <ExpoCheckbox
+            <Checkbox
               style={styles.checkbox}
               value={isChecked}
               onValueChange={setChecked}

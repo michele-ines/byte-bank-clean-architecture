@@ -8,6 +8,7 @@ import { headerTexts } from "./ListHeader.texts";
 type ListHeaderProps = {
   title?: string;
   isEditing: boolean;
+  isDeleting: boolean;
   onSave: () => void;
   onCancel: () => void;
   onEdit: () => void;
@@ -17,6 +18,7 @@ type ListHeaderProps = {
 export const ListHeader: React.FC<ListHeaderProps> = ({
   title,
   isEditing,
+  isDeleting,
   onSave,
   onCancel,
   onEdit,
@@ -32,7 +34,7 @@ export const ListHeader: React.FC<ListHeaderProps> = ({
         {title}
       </Text>
       <View style={styles.iconsContainer}>
-        {isEditing ? (
+        {isEditing || isDeleting ? (
           <>
             <Pressable
               onPress={onSave}
