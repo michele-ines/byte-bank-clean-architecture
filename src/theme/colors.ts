@@ -4,6 +4,7 @@ export const colors = {
   byteBgDashboard: "#e4ede3",
   byteTextMediumGray: "#767676",
   byteColorBlack: "#000000",
+  byteColorOverlay: "rgba(0, 0, 0, 0.5)",
   byteColorDash: "#004d61",
   byteColorDash2: "#0a4956",
   byteColorNeutral600: "#8b8b8b",

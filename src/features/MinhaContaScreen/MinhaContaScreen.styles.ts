@@ -1,4 +1,4 @@
-import { tokens } from "@/src/theme/tokens";
+import { colors, layout, radius, spacing, typography } from "@/src/theme";
 import { StyleSheet, ViewStyle } from "react-native";
 
 type MinhaContaStyles = {
@@ -12,37 +12,37 @@ type MinhaContaStyles = {
 
 export const styles = StyleSheet.create<MinhaContaStyles>({
   wrapper: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteBgDashboard,
-    padding: tokens.spacingMd,
+    flex: layout.flex1,
+    backgroundColor: colors.byteBgDashboard,
+    padding: spacing.md,
   },
   cardContainer: {
-    flex: tokens.flex1,
-    backgroundColor: tokens.byteGray,
-    borderRadius: tokens.radiusLg,
-    padding: tokens.spacingMd,
-    maxHeight: tokens.height100Percent,
+    flex: layout.flex1,
+    backgroundColor: colors.byteGray,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    maxHeight: layout.height100Percent,
   },
   IllustrationsContainer: {
-    alignItems: tokens.alignCenter,
-    justifyContent: tokens.justifyCenter,
-    maxHeight: tokens.heightModalMax,
-    zIndex: tokens.zIndex1,
-    width: tokens.widthFull,
-    minHeight: tokens.minHeight,
-    marginLeft: tokens.spacingMd,
+    alignItems: typography.alignCenter,
+    justifyContent: typography.justifyCenter,
+    maxHeight: layout.heightModalMax,
+    zIndex: layout.zIndex1,
+    width: layout.widthFull,
+    minHeight: layout.minHeight,
+    marginLeft: spacing.md,
   },
   illustration: {
-    maxWidth: tokens.widthFull,
-    maxHeight: tokens.heightModalMax,
+    maxWidth: layout.widthFull,
+    maxHeight: layout.heightModalMax,
   },
   pixelTop: {
-    position: tokens.positionAbsolute,
-    left: tokens.width0,
+    position: layout.positionAbsolute,
+    left: layout.width0,
   },
   pixelBottom: {
-    position: tokens.positionAbsolute,
-    bottom: tokens.width0,
-    right: tokens.width0,
+    position: layout.positionAbsolute,
+    bottom: layout.width0,
+    right: layout.width0,
   },
 });

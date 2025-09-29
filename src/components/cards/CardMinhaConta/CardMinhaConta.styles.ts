@@ -1,5 +1,13 @@
 import { sharedStyles } from "@/src/styles/shared.styles";
-import { tokens } from "@/src/theme/tokens";
+import {
+  border,
+  colors,
+  layout,
+  radius,
+  sizes,
+  spacing,
+  typography,
+} from "@/src/theme";
 import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 
 type CardMinhaContaStyles = {
@@ -16,31 +24,31 @@ export const styles = StyleSheet.create<CardMinhaContaStyles>({
     ...sharedStyles.title,
   },
   field: {
-    marginBottom: tokens.spacing2Sm,
+    marginBottom: spacing.sm2,
   },
   label: {
     ...sharedStyles.label,
   },
   inputWrapper: {
-    flexDirection: tokens.flexRow,
-    alignItems: tokens.alignCenter,
-    borderWidth: tokens.borderWidthThin,
-    borderColor: tokens.byteGray300,
-    borderRadius: tokens.radiusSm,
-    backgroundColor: tokens.byteBgDefault,
-    paddingHorizontal: tokens.spacing2Sm,
+    flexDirection: layout.flexRow,
+    alignItems: typography.alignCenter,
+    borderWidth: border.widthThin,
+    borderColor: colors.byteGray300,
+    borderRadius: radius.sm,
+    backgroundColor: colors.byteBgDefault,
+    paddingHorizontal: spacing.sm2,
   },
   input: {
-    flex: tokens.flex1,
-    height: tokens.buttonHeight,
-    fontSize: tokens.textBase,
-    color: tokens.byteTextMediumGray,
-    maxWidth: tokens.width90Percent,
+    flex: layout.flex1,
+    height: sizes.buttonHeight,
+    fontSize: typography.textBase,
+    color: colors.byteTextMediumGray,
+    maxWidth: layout.width90Percent,
   },
   inputEditing: {
-    borderColor: tokens.byteColorGreen500,
+    borderColor: colors.byteColorGreen500,
   },
   icon: {
-    fontSize: tokens.width20,
+    fontSize: layout.width20,
   },
 });
