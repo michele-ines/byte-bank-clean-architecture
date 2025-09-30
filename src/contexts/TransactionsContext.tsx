@@ -21,18 +21,11 @@ import React, {
 } from "react";
 import { db } from "../config/firebaseConfig";
 import {
+  INewTransactionInput,
   ITransaction,
   ITransactionsContextData,
 } from "../shared/interfaces/auth.interfaces";
 import { useAuth } from "./AuthContext";
-
-export type TransactionType = "deposito" | "cambio" | "transferencia";
-
-export interface INewTransactionInput {
-  tipo: TransactionType;
-  valor: number;
-  description: string;
-}
 
 const PAGE_SIZE = 5;
 
@@ -213,6 +206,31 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const deleteTransactions = async (ids: string[]): Promise<void> => {
+    if (!user) {
+      console.error("Tentativa de excluir transações sem usuário autenticado.");
+      throw new Error("Usuário não autenticado.");
+    }
+
+    try {
+      // Importar deleteDoc dinamicamente para evitar problemas de import
+      const { deleteDoc } = await import("firebase/firestore");
+      
+      const deletePromises = ids.map(async (id) => {
+        const transactionRef = doc(db, "transactions", id);
+        return deleteDoc(transactionRef);
+      });
+
+      await Promise.all(deletePromises);
+
+      // Atualizar estado local removendo as transações excluídas
+      setTransactions((prev) => prev.filter((transaction) => !ids.includes(transaction.id!)));
+    } catch (error) {
+      console.error("Erro ao excluir transações:", error);
+      throw error;
+    }
+  };
+
   return (
     <TransactionsContext.Provider
       value={{
@@ -223,6 +241,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
         hasMore,
         loadMoreTransactions,
         updateTransaction,
+        deleteTransactions,
       }}
     >
       {children}

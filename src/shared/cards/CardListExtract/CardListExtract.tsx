@@ -2,21 +2,24 @@ import { CardListExtractProps, EditedValuesMap } from "../../ProfileStyles/profi
 
 
 import { useTransactions } from "@/src/contexts/TransactionsContext";
-import { typography } from "@/src/theme";
+import { layout, spacing, typography } from "@/src/theme";
 import { showToast } from "@/src/utils/transactions.utils";
 import React, { useState } from "react";
 import { FlatList, Linking, Pressable, Text, View } from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
+import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
 import { styles } from "./CardListExtract.styles";
 import { cardListTexts } from "./cardListExtractTexts";
 
 export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, title }) => {
-  const { transactions, loading, loadingMore, hasMore, loadMoreTransactions,  updateTransaction } = useTransactions();
+  const { transactions, loading, loadingMore, hasMore, loadMoreTransactions, updateTransaction, deleteTransactions } = useTransactions();
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editedValues, setEditedValues] = useState<EditedValuesMap>({});
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
  
   const filtered = transactions;
@@ -50,10 +53,17 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
 
   const handleCancelClick = () => {
     setIsEditing(false);
+    setIsDeleting(false);
     setEditedValues({});
+    setSelectedItems(new Set());
   };
 
 const handleSaveClick = async () => {
+    if (isDeleting) {
+      await handleDeleteSelected();
+      return;
+    }
+
     const transacoesAlteradas = Object.entries(editedValues).filter(([id, rawTextCentavos]) => {
       const transacaoOriginal = transactions.find(t => t.id === id);
       const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
@@ -86,7 +96,36 @@ const handleSaveClick = async () => {
   };
 
   const handleDelete = () => {
-    showToast("error", cardListTexts.toasts.deleteSoon.title, cardListTexts.toasts.deleteSoon.message);
+    setIsDeleting(true);
+  };
+
+  const handleItemSelection = (itemId: string, isSelected: boolean) => {
+    setSelectedItems(prevSelected => {
+      const newSelected = new Set(prevSelected);
+      if (isSelected) {
+        newSelected.add(itemId);
+      } else {
+        newSelected.delete(itemId);
+      }
+      return newSelected;
+    });
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedItems.size === 0) {
+      showToast("error", "Atenção", "Selecione pelo menos um item para excluir.");
+      return;
+    }
+
+    try {
+      await deleteTransactions(Array.from(selectedItems));
+      showToast("success", "Sucesso!", `${selectedItems.size} item(ns) excluído(s) com sucesso.`);
+      setIsDeleting(false);
+      setSelectedItems(new Set());
+    } catch (error) {
+      console.error("Erro ao excluir transações:", error);
+      showToast("error", "Erro", "Não foi possível excluir os itens selecionados.");
+    }
   };
 
  const handleValueChange = (id: string, newValue: string) => {
@@ -105,6 +144,7 @@ const handleSaveClick = async () => {
           <ListHeader
             title={title}
             isEditing={isEditing}
+            isDeleting={isDeleting}
             onSave={handleSaveClick}
             onCancel={handleCancelClick}
             onEdit={handleEditClick}
@@ -122,7 +162,20 @@ const handleSaveClick = async () => {
             }
           >
             <View style={styles.row}>
-              <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
+              {
+              isDeleting ? 
+                <View style={{ flexDirection: layout.flexRow, alignItems: typography.alignCenter, gap: spacing.xs }}>
+                  <Checkbox
+                    value={selectedItems.has(item.id!)}
+                    onValueChange={(isSelected) => handleItemSelection(item.id!, isSelected)}
+                    accessibilityLabel={`Selecionar ${item.tipo} para exclusão`}
+                    accessibilityHint="Marque para incluir este item na exclusão"
+                  />
+                  <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
+                </View>
+              
+              : <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
+              }
               
               {isEditing ? (
                 <MaskedTextInput

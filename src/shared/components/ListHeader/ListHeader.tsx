@@ -2,21 +2,14 @@ import { colors, sizes } from "@/src/theme";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
+import { ListHeaderProps } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./ListHeader.styles";
 import { headerTexts } from "./ListHeader.texts";
-
-type ListHeaderProps = {
-  title?: string;
-  isEditing: boolean;
-  onSave: () => void;
-  onCancel: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
-};
 
 export const ListHeader: React.FC<ListHeaderProps> = ({
   title,
   isEditing,
+  isDeleting,
   onSave,
   onCancel,
   onEdit,
@@ -32,7 +25,7 @@ export const ListHeader: React.FC<ListHeaderProps> = ({
         {title}
       </Text>
       <View style={styles.iconsContainer}>
-        {isEditing ? (
+        {isEditing || isDeleting ? (
           <>
             <Pressable
               onPress={onSave}

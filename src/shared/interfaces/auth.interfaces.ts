@@ -1,7 +1,7 @@
-import { INewTransactionInput } from "@/src/contexts/TransactionsContext";
 import { User, UserCredential } from "firebase/auth";
 import { DocumentData } from "firebase/firestore";
-import { BalanceValue } from "../ProfileStyles/profile.styles.types";
+import { ViewStyle } from "react-native";
+import { BalanceValue, TransactionType } from "../ProfileStyles/profile.styles.types";
 
 export interface UserData {
   uuid: string; 
@@ -42,6 +42,20 @@ export interface ITransaction extends DocumentData {
   updateAt: string;
 }
 
+export interface CheckboxProps {
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+  style?: ViewStyle;
+  color?: string;
+  // Parâmetros opcionais de acessibilidade
+  accessibilityLabel?: string;
+  accessibilityRole?: 'checkbox' | 'button' | 'switch';
+  accessibilityHint?: string;
+  accessibilityState?: {
+    checked?: boolean;
+    disabled?: boolean;
+  };
+}
 export interface ITransactionsContextData {
   transactions: ITransaction[];
   addTransaction: (transaction: INewTransactionInput) => Promise<void>;
@@ -50,6 +64,7 @@ export interface ITransactionsContextData {
   hasMore: boolean;
   loadMoreTransactions: () => Promise<void>;
   updateTransaction: (id: string, data: Partial<ITransaction>) => Promise<void>;
+  deleteTransactions: (ids: string[]) => Promise<void>;
 }
 
 export interface UseBalanceVisibilityProps {
@@ -75,6 +90,11 @@ export interface SavingsGoalProps {
   transactions: Transaction[];
 }
 
+export interface INewTransactionInput {
+  tipo: TransactionType;
+  valor: number;
+  description: string;
+}
 export interface SpendingAlertProps {
   limit: number;
   transactions: Transaction[];
