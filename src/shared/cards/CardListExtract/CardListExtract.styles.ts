@@ -1,3 +1,4 @@
+import { radius } from "@/src/theme";
 import { border } from "@/src/theme/border";
 import { colors } from "@/src/theme/colors";
 import { layout } from "@/src/theme/layout";
@@ -10,7 +11,6 @@ import { TransactionsStyles } from "../../ProfileStyles/profile.styles.types";
 export const styles = StyleSheet.create<TransactionsStyles>({
   container: {
     flex: layout.one,
-    gap: spacing.xs,
     backgroundColor: colors.byteColorWhite,
     borderRadius: spacing.sm2,
     padding: typography.textMd,
@@ -22,25 +22,23 @@ export const styles = StyleSheet.create<TransactionsStyles>({
     marginBottom: spacing.xs,
   },
   input: {
-  borderWidth: border.widthThin,
-  borderColor: colors.byteGray350,
-  borderRadius: spacing.xs,
-  padding: spacing.sm,
-  fontSize: typography.textBase,
-  color: colors.byteColorDash,
-},
+    borderWidth: border.widthThin,
+    borderColor: colors.byteGray350,
+    borderRadius: spacing.xs,
+    padding: spacing.sm,
+    fontSize: typography.textBase,
+    color: colors.byteColorDash,
+  },
   card: {
     shadowColor: colors.byteColorBlack,
     shadowRadius: spacing.xs2,
-    gap: shadows.radius,
+    paddingVertical: spacing.sm, 
     borderBottomWidth: border.widthThin,
     borderBottomColor: colors.byteColorGreen500,
-    marginBottom: spacing.xs2,
   },
   row: {
     flexDirection: layout.flexRow,
     justifyContent: typography.justifyBetween,
-    marginBottom: spacing.xs2,
   },
   description: {
     fontSize: typography.textBase,
@@ -55,7 +53,6 @@ export const styles = StyleSheet.create<TransactionsStyles>({
   date: {
     fontSize: typography.textXs,
     color: colors.byteGray450,
-    marginBottom: spacing.sm2,
   },
   empty: {
     fontSize: typography.textSm,
@@ -64,7 +61,6 @@ export const styles = StyleSheet.create<TransactionsStyles>({
     marginTop: spacing.ml,
   },
   receiptButton: {
-    marginTop: spacing.xs,
     paddingVertical: shadows.radius,
     paddingHorizontal: spacing.sm2,
     backgroundColor: colors.byteColorGreen500,
@@ -85,5 +81,45 @@ export const styles = StyleSheet.create<TransactionsStyles>({
     fontSize: typography.textSm,
     color: colors.byteColorGreen500,
     fontWeight: typography.fontMedium,
+  },
+  attachmentsContainer: {
+    marginTop: 10, 
+  },
+  attachmentsTitle: {
+    fontWeight: typography.fontBold,
+    color:colors.byteGray500,
+    marginBottom: spacing.xs,
+  },
+  attachmentLink: {
+    color: colors.byteColorBlue500,
+    textDecorationLine: typography.textDecorationUnderline,
+  },
+  editActionsContainer: {
+    marginTop: spacing.sm,
+    alignItems:  typography.alignCenter,
+  },
+  attachmentRow: {
+    flexDirection: layout.row,
+    alignItems: typography.alignCenter,
+    justifyContent:typography.justifyBetween,
+    marginBottom: spacing.xs, 
+  },
+  deleteButton: {
+    marginLeft: spacing.sm2,
+    paddingHorizontal: spacing.xs,
+    paddingVertical:spacing.xs2,
+    borderRadius: radius.lg,
+  },
+  deleteButtonText: {
+    color: colors.byteColorRed500,
+    fontWeight: typography.fontBold,
+    fontSize: typography.textMd,
+  },
+
+   separator: {
+    height: layout.height2,
+    width: layout.widthFull, 
+    backgroundColor: colors.byteGray300, 
+    marginVertical: spacing.xs, 
   },
 });

@@ -35,7 +35,7 @@ export interface ITransaction extends DocumentData {
   description: string;
   valor: number;
   receiptUrl?: string;
-  anexos: Array<any>;
+  anexos: Array<string>;
   tipo: string;
   userId: string;
   createdAt: string;
@@ -50,6 +50,8 @@ export interface ITransactionsContextData {
   hasMore: boolean;
   loadMoreTransactions: () => Promise<void>;
   updateTransaction: (id: string, data: Partial<ITransaction>) => Promise<void>;
+  uploadAttachmentAndUpdateTransaction: (transactionId: string, fileUri: string, fileName: string) => Promise<void>;
+  deleteAttachment: (transactionId: string, fileUrl: string) => Promise<void>;
 }
 
 export interface UseBalanceVisibilityProps {

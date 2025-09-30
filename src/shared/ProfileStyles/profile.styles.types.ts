@@ -81,6 +81,14 @@ export type TransactionsStyles = {
   receiptButtonText: TextStyle;
   loadingFooter: ViewStyle;
   loadingText: TextStyle;
+  attachmentsTitle:TextStyle;
+  attachmentsContainer:ViewStyle;
+  attachmentLink:TextStyle
+  editActionsContainer:ViewStyle;
+  deleteButton:ViewStyle;
+  deleteButtonText:TextStyle;
+  attachmentRow:ViewStyle;
+  separator:ViewStyle;
 };
 
 export type HeaderStyles = {

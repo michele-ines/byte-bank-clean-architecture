@@ -1,25 +1,35 @@
-import { CardListExtractProps, EditedValuesMap } from "../../ProfileStyles/profile.styles.types";
-
-
 import { useTransactions } from "@/src/contexts/TransactionsContext";
-import { typography } from "@/src/theme";
+import { colors, spacing, typography } from "@/src/theme";
 import { showToast } from "@/src/utils/transactions.utils";
-import React, { useState } from "react";
-import { FlatList, Linking, Pressable, Text, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import * as DocumentPicker from 'expo-document-picker';
+import React, { Fragment, useState } from "react";
+import { ActivityIndicator, Alert, FlatList, Linking, Pressable, Text, View } from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
+import { CardListExtractProps, EditedValuesMap } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./CardListExtract.styles";
 import { cardListTexts } from "./cardListExtractTexts";
 
 export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, title }) => {
-  const { transactions, loading, loadingMore, hasMore, loadMoreTransactions,  updateTransaction } = useTransactions();
+  const { 
+    transactions, 
+    loading, 
+    loadingMore, 
+    hasMore, 
+    loadMoreTransactions, 
+    updateTransaction, 
+    uploadAttachmentAndUpdateTransaction, 
+    deleteAttachment 
+  } = useTransactions();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedValues, setEditedValues] = useState<EditedValuesMap>({});
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
 
- 
   const filtered = transactions;
+
   const handleOpenReceipt = async (url: string) => {
     const supported = await Linking.canOpenURL(url);
     if (supported) {
@@ -38,7 +48,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
   const handleEditClick = () => {
     const initialValues = filtered.reduce((acc, transaction) => {
       if (transaction.id) {
-        const valorComDecimais = transaction.valor.toFixed(2); 
+        const valorComDecimais = transaction.valor.toFixed(2);
         const valorEmCentavosString = valorComDecimais.replace('.', '');
         acc[transaction.id] = valorEmCentavosString;
       }
@@ -53,14 +63,12 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
     setEditedValues({});
   };
 
-const handleSaveClick = async () => {
+  const handleSaveClick = async () => {
     const transacoesAlteradas = Object.entries(editedValues).filter(([id, rawTextCentavos]) => {
       const transacaoOriginal = transactions.find(t => t.id === id);
       const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
-
       return !isNaN(novoValorNumerico) && transacaoOriginal && transacaoOriginal.valor !== novoValorNumerico;
     });
-
 
     if (transacoesAlteradas.length === 0) {
       setIsEditing(false);
@@ -77,22 +85,64 @@ const handleSaveClick = async () => {
       await Promise.all(updatePromises);
       showToast("success", cardListTexts.toasts.saveSuccess.title, cardListTexts.toasts.saveSuccess.message);
     } catch (error) {
-      console.error("Ocorreu um erro ao atualizar as transações:", error);
       showToast("error", cardListTexts.toasts.saveError.title, cardListTexts.toasts.saveError.message);
     } finally {
       setIsEditing(false);
       setEditedValues({});
     }
   };
+  
+  const handleAttachFile = async (transactionId: string) => {
+    setUploadingId(transactionId);
+    try {
+      const result = await DocumentPicker.getDocumentAsync({});
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const file = result.assets[0];
+        await uploadAttachmentAndUpdateTransaction(transactionId, file.uri, file.name);
+        const toast = cardListTexts.toasts.attachSuccess;
+        showToast("success", toast.title, toast.message);
+      }
+    } catch (error) {
+      const toast = cardListTexts.toasts.attachError;
+      showToast("error", toast.title, toast.message);
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
+  const handleDeleteAttachment = (transactionId: string, fileUrl: string) => {
+    const dialog = cardListTexts.dialogs.deleteAttachment;
+    Alert.alert(
+      dialog.title,
+      dialog.message,
+      [
+        { text: dialog.cancelButton, style: "cancel" },
+        {
+          text: dialog.confirmButton,
+          onPress: async () => {
+            try {
+              await deleteAttachment(transactionId, fileUrl);
+              const toast = cardListTexts.toasts.deleteAttachmentSuccess;
+              showToast("success", toast.title, toast.message);
+            } catch (error) {
+              const toast = cardListTexts.toasts.deleteAttachmentError;
+              showToast("error", toast.title, toast.message);
+            }
+          },
+          style: "destructive",
+        },
+      ]
+    );
+  };
 
   const handleDelete = () => {
     showToast("error", cardListTexts.toasts.deleteSoon.title, cardListTexts.toasts.deleteSoon.message);
   };
 
- const handleValueChange = (id: string, newValue: string) => {
+  const handleValueChange = (id: string, newValue: string) => {
     setEditedValues(prevValues => ({
-      ...prevValues, 
-      [id]: newValue, 
+      ...prevValues,
+      [id]: newValue,
     }));
   };
 
@@ -112,18 +162,17 @@ const handleSaveClick = async () => {
           />
         }
         renderItem={({ item }) => (
-          <View 
-            style={styles.card} 
+          <View
+            style={styles.card}
             accessible={true}
             accessibilityLabel={
-              !isEditing 
-              ? cardListTexts.item.accessibility.cardLabel(item.tipo, item.valor,'1') 
-              : cardListTexts.item.accessibility.editingCardLabel(item.tipo)
+              !isEditing
+                ? cardListTexts.item.accessibility.cardLabel(item.tipo, item.valor, item.updateAt)
+                : cardListTexts.item.accessibility.editingCardLabel(item.tipo)
             }
           >
             <View style={styles.row}>
               <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
-              
               {isEditing ? (
                 <MaskedTextInput
                   style={styles.input}
@@ -149,17 +198,55 @@ const handleSaveClick = async () => {
                 </Text>
               )}
             </View>
-            <Text style={styles.date} accessibilityElementsHidden={true}></Text>
-            {item.receiptUrl && (
-              <Pressable
-                onPress={() => handleOpenReceipt(item.receiptUrl!)}
-                style={styles.receiptButton}
-                accessibilityRole="button"
-                accessibilityLabel={cardListTexts.item.accessibility.receiptButtonLabel(item.tipo)}
-                accessibilityHint={cardListTexts.item.accessibility.receiptButtonHint}
-              >
-                <Text style={styles.receiptButtonText}>{cardListTexts.item.receiptButton}</Text>
-              </Pressable>
+
+            <Text style={styles.date} accessibilityElementsHidden={true}>
+              {cardListTexts.item.updatedAtLabel} {item.updateAt}
+            </Text>
+
+             {item.anexos && item.anexos.length > 0 && (
+              <View style={styles.attachmentsContainer}>
+                <Text style={styles.attachmentsTitle}>{cardListTexts.item.attachmentsTitle}</Text>
+                {item.anexos.map((url, index) => (
+                  <Fragment key={index}>
+                    <View style={styles.attachmentRow}>
+                      <Pressable onPress={() => handleOpenReceipt(url)}>
+                        <Text style={styles.attachmentLink}>{cardListTexts.item.attachmentLink(index + 1)}</Text>
+                      </Pressable>
+                      
+                      {isEditing && (
+                        <Pressable
+                          style={styles.deleteButton}
+                          onPress={() => handleDeleteAttachment(item.id!, url)}
+                        >
+                          <Feather name="trash-2" size={spacing.md} color={colors.byteColorRed500} />
+                        </Pressable>
+                      )}
+                    </View>
+
+                    {index < item.anexos.length - 1 && (
+                      <View style={styles.separator} />
+                    )}
+                  </Fragment>
+                ))}
+              </View>
+            )}
+
+            {isEditing && (
+              <View style={styles.editActionsContainer}>
+                {uploadingId === item.id ? (
+                  <ActivityIndicator size="small" color={colors.byteColorBlue500} />
+                ) : (
+                  <Pressable
+                    onPress={() => handleAttachFile(item.id!)}
+                    style={styles.receiptButton}
+                    disabled={!!uploadingId}
+                    accessibilityRole="button"
+                    accessibilityLabel={cardListTexts.item.accessibility.attachButtonLabel(item.tipo)}
+                  >
+                    <Text style={styles.receiptButtonText}>{cardListTexts.item.attachButton}</Text>
+                  </Pressable>
+                )}
+              </View>
             )}
           </View>
         )}

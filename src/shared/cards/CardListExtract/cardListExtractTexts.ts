@@ -5,6 +5,12 @@ const formatCurrency = (value: number) => {
 export const cardListTexts = {
   item: {
     receiptButton: "Ver Recibo",
+    attachButton: "Anexar Comprovante",
+    deleteButton: "X",
+    updatedAtLabel: "Atualizado em:",
+    attachmentsTitle: "Anexos:",
+    attachmentLink: (index: number) => `Anexo ${index + 1}`,
+    
     accessibility: {
       cardLabel: (type: string, value: number, date: string) => `Transação do tipo ${type}. Valor de ${formatCurrency(value)}. Data: ${date}.`,
       editingCardLabel: (type: string) => `Editando transação do tipo ${type}.`,
@@ -13,6 +19,7 @@ export const cardListTexts = {
       amountInputHint: "Digite o novo valor para esta transação",
       receiptButtonLabel: (type: string) => `Ver recibo da transação do tipo ${type}`,
       receiptButtonHint: "Toque duas vezes para abrir o comprovante",
+      attachButtonLabel: (type: string) => `Anexar comprovante para a transação do tipo ${type}`,
     },
   },
   list: {
@@ -23,5 +30,17 @@ export const cardListTexts = {
     saveError: { title: "Erro!", message: "Não foi possível atualizar as transações." },
     deleteSoon: { title: "Em breve!", message: "A função para excluir o extrato ainda será implementada." },
     openReceiptError: { title: "Erro!", message: "Não foi possível abrir o link do recibo." },
+    attachSuccess: { title: "Sucesso!", message: "O anexo foi enviado e associado à transação." },
+    attachError: { title: "Erro!", message: "Não foi possível enviar o anexo." },
+    deleteAttachmentSuccess: { title: "Anexo Excluído", message: "O anexo foi removido com sucesso." },
+    deleteAttachmentError: { title: "Erro", message: "Não foi possível excluir o anexo." },
   },
+  dialogs: {
+    deleteAttachment: {
+      title: "Confirmar Exclusão",
+      message: "Tem certeza de que deseja excluir este anexo? Esta ação não pode ser desfeita.",
+      cancelButton: "Cancelar",
+      confirmButton: "Excluir",
+    }
+  }
 };

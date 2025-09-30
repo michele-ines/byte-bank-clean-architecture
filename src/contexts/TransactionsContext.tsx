@@ -1,7 +1,9 @@
 import {
   addDoc,
+  arrayRemove,
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   onSnapshot,
@@ -12,6 +14,12 @@ import {
   Timestamp,
   updateDoc
 } from "firebase/firestore";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import React, {
   createContext,
   ReactNode,
@@ -19,7 +27,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { db } from "../config/firebaseConfig";
+import { db, storage } from "../config/firebaseConfig";
 import {
   ITransaction,
   ITransactionsContextData,
@@ -126,11 +134,12 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
         ...data,
         updateAt: serverTimestamp(),
       });
-
-      // atualiza estado local
-      setTransactions((prev) =>
+    const updatedDateString = new Date().toLocaleDateString("pt-BR");
+    setTransactions((prev) =>
         prev.map((transaction) =>
-          transaction.id === id ? { ...transaction, ...data } : transaction
+          transaction.id === id
+            ? { ...transaction, ...data, updateAt: updatedDateString }
+            : transaction
         )
       );
     } catch (error) {
@@ -174,7 +183,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     return snapshot;
   };
 
-  const updateTransactionsState = (
+ const updateTransactionsState = (
     newTransactions: ITransaction[],
     snapshot: any
   ) => {
@@ -182,7 +191,16 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       (t) => t.userId === user?.uid
     );
 
-    setTransactions((prev) => [...prev, ...userTransactions]);
+    setTransactions((prev) => {
+      const combinedTransactions = [...prev, ...userTransactions];
+      
+      const uniqueTransactions = combinedTransactions.filter(
+        (transaction, index, self) =>
+          index === self.findIndex((t) => t.id === transaction.id)
+      );
+      
+      return uniqueTransactions;
+    });
 
     if (snapshot.docs.length > 0) {
       setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
@@ -213,6 +231,76 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const uploadAttachmentAndUpdateTransaction = async (
+    transactionId: string,
+    fileUri: string,
+    fileName: string
+  ): Promise<void> => {
+    if (!user) {
+      throw new Error("Usuário não autenticado para fazer upload.");
+    }
+
+    try {
+      const response = await fetch(fileUri);
+      const blob = await response.blob();
+      const storageRef = ref(storage, `attachments/${Date.now()}-${fileName}`);
+      const uploadTask = uploadBytesResumable(storageRef, blob);
+
+      await uploadTask;
+      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+      const transactionRef = doc(db, "transactions", transactionId);
+      const transactionSnap = await getDoc(transactionRef);
+      const existingData = transactionSnap.data();
+      const existingAnexos = existingData?.anexos || [];
+
+      await updateDoc(transactionRef, {
+        anexos: [...existingAnexos, downloadURL],
+        updateAt: serverTimestamp(),
+      });
+
+      setTransactions((prev) =>
+        prev.map((t) =>
+          t.id === transactionId
+            ? { ...t, anexos: [...(t.anexos || []), downloadURL] }
+            : t
+        )
+      );
+    } catch (error) {
+      console.error("Erro ao fazer upload do anexo:", error);
+      throw error;
+    }
+  };
+
+  const deleteAttachment = async (transactionId: string, fileUrl: string) => {
+    if (!user) {
+      throw new Error("Usuário não autenticado para excluir.");
+    }
+
+    try {
+      const fileRef = ref(storage, fileUrl);
+      await deleteObject(fileRef);
+
+      const transactionRef = doc(db, "transactions", transactionId);
+      await updateDoc(transactionRef, {
+        anexos: arrayRemove(fileUrl),
+      });
+
+      setTransactions((prev) =>
+        prev.map((t) => {
+          if (t.id === transactionId) {
+            const updatedAnexos = t.anexos?.filter((url) => url !== fileUrl);
+            return { ...t, anexos: updatedAnexos };
+          }
+          return t;
+        })
+      );
+    } catch (error) {
+      console.error("Erro ao excluir anexo:", error);
+      throw error;
+    }
+  };
+
+
   return (
     <TransactionsContext.Provider
       value={{
@@ -223,6 +311,8 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
         hasMore,
         loadMoreTransactions,
         updateTransaction,
+        uploadAttachmentAndUpdateTransaction,
+        deleteAttachment
       }}
     >
       {children}
