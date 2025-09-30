@@ -1,22 +1,7 @@
 import { colors } from '@/src/theme/colors';
 import ExpoCheckbox from 'expo-checkbox';
 import React from 'react';
-import { ViewStyle } from 'react-native';
-
-interface CheckboxProps {
-  value: boolean;
-  onValueChange: (value: boolean) => void;
-  style?: ViewStyle;
-  color?: string;
-  // Parâmetros opcionais de acessibilidade
-  accessibilityLabel?: string;
-  accessibilityRole?: 'checkbox' | 'button' | 'switch';
-  accessibilityHint?: string;
-  accessibilityState?: {
-    checked?: boolean;
-    disabled?: boolean;
-  };
-}
+import { CheckboxProps } from '../../interfaces/auth.interfaces';
 
 export const Checkbox: React.FC<CheckboxProps> = ({
   value,

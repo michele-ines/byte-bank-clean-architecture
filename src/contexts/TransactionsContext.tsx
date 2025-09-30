@@ -21,18 +21,11 @@ import React, {
 } from "react";
 import { db } from "../config/firebaseConfig";
 import {
+  INewTransactionInput,
   ITransaction,
   ITransactionsContextData,
 } from "../shared/interfaces/auth.interfaces";
 import { useAuth } from "./AuthContext";
-
-export type TransactionType = "deposito" | "cambio" | "transferencia";
-
-export interface INewTransactionInput {
-  tipo: TransactionType;
-  valor: number;
-  description: string;
-}
 
 const PAGE_SIZE = 5;
 

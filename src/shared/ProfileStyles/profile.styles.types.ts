@@ -197,6 +197,8 @@ export type CardProps = {
   variant?: "elevated" | "outlined";
 };
 
+
+
 export type AccountType = "corrente" | "poupança" | string;
 
 export type BalanceComponentProps = {
@@ -253,6 +255,16 @@ export type PortfolioItem = {
   name: string;
   value: number;
   color: string;
+};
+
+export type ListHeaderProps = {
+  title?: string;
+  isEditing: boolean;
+  isDeleting: boolean;
+  onSave: () => void;
+  onCancel: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 };
 
 
