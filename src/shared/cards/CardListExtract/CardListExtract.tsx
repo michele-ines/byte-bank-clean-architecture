@@ -1,11 +1,12 @@
 import { useTransactions } from "@/src/contexts/TransactionsContext";
-import { colors, spacing, typography } from "@/src/theme";
+import { colors, layout, spacing, typography } from "@/src/theme";
 import { showToast } from "@/src/utils/transactions.utils";
 import { Feather } from "@expo/vector-icons";
 import * as DocumentPicker from 'expo-document-picker';
 import React, { Fragment, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Linking, Pressable, Text, View } from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
+import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
 import { CardListExtractProps, EditedValuesMap } from "../../ProfileStyles/profile.styles.types";
@@ -21,12 +22,15 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
     loadMoreTransactions, 
     updateTransaction, 
     uploadAttachmentAndUpdateTransaction, 
-    deleteAttachment 
+    deleteAttachment ,
+    deleteTransactions
   } = useTransactions();
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editedValues, setEditedValues] = useState<EditedValuesMap>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   const filtered = transactions;
 
@@ -60,10 +64,17 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
 
   const handleCancelClick = () => {
     setIsEditing(false);
+    setIsDeleting(false);
     setEditedValues({});
+    setSelectedItems(new Set());
   };
 
-  const handleSaveClick = async () => {
+const handleSaveClick = async () => {
+    if (isDeleting) {
+      await handleDeleteSelected();
+      return;
+    }
+
     const transacoesAlteradas = Object.entries(editedValues).filter(([id, rawTextCentavos]) => {
       const transacaoOriginal = transactions.find(t => t.id === id);
       const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
@@ -136,7 +147,37 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
   };
 
   const handleDelete = () => {
-    showToast("error", cardListTexts.toasts.deleteSoon.title, cardListTexts.toasts.deleteSoon.message);
+    setIsDeleting(true);
+  };
+
+  const handleItemSelection = (itemId: string, isSelected: boolean) => {
+    setSelectedItems(prevSelected => {
+      const newSelected = new Set(prevSelected);
+      if (isSelected) {
+        newSelected.add(itemId);
+      } else {
+        newSelected.delete(itemId);
+      }
+      return newSelected;
+    });
+  };
+ const handleDeleteSelected = async () => {
+    if (selectedItems.size === 0) {
+      const toast = cardListTexts.toasts.deleteTransactionsWarning;
+      showToast("error", toast.title, toast.message);
+      return;
+    }
+
+    try {
+      await deleteTransactions(Array.from(selectedItems));
+      const toast = cardListTexts.toasts.deleteTransactionsSuccess;
+      showToast("success", toast.title, toast.message(selectedItems.size));
+      setIsDeleting(false);
+      setSelectedItems(new Set());
+    } catch (error) {
+      const toast = cardListTexts.toasts.deleteTransactionsError;
+      showToast("error", toast.title, toast.message);
+    }
   };
 
   const handleValueChange = (id: string, newValue: string) => {
@@ -155,6 +196,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
           <ListHeader
             title={title}
             isEditing={isEditing}
+            isDeleting={isDeleting}
             onSave={handleSaveClick}
             onCancel={handleCancelClick}
             onEdit={handleEditClick}
@@ -172,7 +214,21 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
             }
           >
             <View style={styles.row}>
-              <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
+              {
+              isDeleting ? 
+                <View style={{ flexDirection: layout.flexRow, alignItems: typography.alignCenter, gap: spacing.xs }}>
+                  <Checkbox
+                    value={selectedItems.has(item.id!)}
+                    onValueChange={(isSelected) => handleItemSelection(item.id!, isSelected)}
+                    accessibilityLabel={`Selecionar ${item.tipo} para exclusão`}
+                    accessibilityHint="Marque para incluir este item na exclusão"
+                  />
+                  <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
+                </View>
+              
+              : <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
+              }
+              
               {isEditing ? (
                 <MaskedTextInput
                   style={styles.input}

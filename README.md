@@ -21,15 +21,18 @@ Estrutura **Feature-first** com Expo Router.
    ```
 
 ## Features / Páginas
+
 - Home (com Login) `/`
 - Dashboard `/dashboard`
 - Meus cartões `/meus-cartoes`
 - Investimentos `/investments`
 - Outros serviços `/outros-servicos`
+- Minha conta `/minha-conta`
 - Cadastro `/cadastro`
 - Esqueci a senha `/esqueci-senha`
 
 ### Scripts
+
 ```bash
 npm run web       # iniciar no browser
 npm run android   # abrir no emulador Android
@@ -38,23 +41,25 @@ npm test          # testes com Jest
 npm run lint      # lint
 ```
 
-
 Mantém o mesmo package e scripts do projeto original.
 
 ## Arquitetura
 
 ### Stack
+
 - **Expo** + **Expo Router** (web/ios/android)
 - **React Native** com **TypeScript**
 - **StyleSheet** + **tokens de design** em `src/theme/tokens.ts`
 - **ESLint** + **Jest** (mantidos do projeto original)
 
 ### Princípios
+
 - **Feature-first**: cada área do produto vive em `src/features/<feature>` e expõe **telas** (screens) e componentes da própria feature.
 - **Roteamento por arquivo** (Expo Router): cada arquivo/pasta dentro de `app/` vira uma rota.
 - **Layout compartilhado**: `app/_layout.tsx` embrulha as telas com `Header` (variante por rota) e `Footer`.
 
 ### Estrutura de pastas (resumo)
+
 ```
 app/                         # Rotas
   _layout.tsx                # Header + Slot + Footer
@@ -63,6 +68,7 @@ app/                         # Rotas
   meus-cartoes/index.tsx
   investments/index.tsx
   outros-servicos/index.tsx
+  minha-conta/index.tsx
   cadastro/index.tsx
   esqueci-senha/index.tsx
 
@@ -83,6 +89,8 @@ src/
       InvestmentsScreen.tsx
     services/
       ServicesScreen.tsx
+    minha-conta/
+      MinhaContaScreen.tsx
     auth/
       LoginForm.tsx
       SignupForm.tsx
@@ -92,13 +100,16 @@ assets/                      # fontes, imagens (herdadas)
 ```
 
 ### Header com variantes
+
 - **Home/Auth**: `background: #000000`, `color: #47a138`, menus: `Dashboard`, `Serviços`.
-- **Dashboard e internas**: `background: #004d61`, `color: #47a138`, menus: `Início`, `Meus cartões`, `Investimentos`, `Outros serviços`.
+- **Dashboard e internas**: `background: #004d61`, `color: #47a138`, menus: `Início`, `Meus cartões`, `Investimentos`, `Outros serviços`, `Minha conta`.
 - A variante é resolvida por `usePathname()` no `Header`.
 
 ### Design Tokens
+
 Arquivo: `src/theme/tokens.ts` – espelha as variáveis fornecidas (cores base, utilitárias, tipografia, gradientes).  
 Use import direto:
+
 ```ts
 import { colors } from "@/src/theme/colors";
 const styles = StyleSheet.create({
@@ -107,24 +118,28 @@ const styles = StyleSheet.create({
 ```
 
 ### Padrões de código
+
 - **Componentes**: `PascalCase` (ex.: `LoginForm`), **arquivos de tela** terminam com `Screen.tsx`.
 - **Semântica**: features isolam regras e UI do domínio; evite componentes “globais” até que haja repetição real.
 - **Estilo**: `StyleSheet` local ao componente. Se um estilo for usado por muitas telas, promova para `src/theme` ou para uma pasta `ui/` da feature.
 
 ### Como criar uma nova feature
+
 1. Crie `src/features/<minha-feature>`.
 2. Adicione `MinhaFeatureScreen.tsx` (ou mais arquivos / hooks / serviços).
 3. Crie a rota em `app/<minha-rota>/index.tsx` exportando o screen.
 4. Se precisar entrar no header, adicione o link em `src/features/layout/Header.tsx`.
 
 ### Estado, dados e serviços (futuro)
+
 O exemplo atual usa estado local. Se precisar de estado global/HTTP:
+
 - Context em `src/core/state` ou `src/core/services` (a criar).
 - Camadas por feature: `src/features/<feature>/services`, `hooks`, `types`.
 
 ### Testes
-- Jest está configurado do template original. Recomendado criar testes por feature em `src/features/<feature>/__tests__`.
 
+- Jest está configurado do template original. Recomendado criar testes por feature em `src/features/<feature>/__tests__`.
 
 ## Por que existem `app/` e `src/`?
 
@@ -134,6 +149,7 @@ O exemplo atual usa estado local. Se precisar de estado global/HTTP:
 Benefícios: separação de responsabilidades, escalabilidade, organização clara por domínio e reuso das mesmas telas em diferentes rotas.
 
 ### Como criar uma página nova
+
 1. Crie a tela em `src/features/<minha-feature>/MinhaTelaScreen.tsx`.
 2. Crie a rota em `app/<minha-rota>/index.tsx` exportando o screen:
 
@@ -144,7 +160,6 @@ export default MinhaTela;
 ```
 
 3. (Opcional) adicione o link no `src/features/layout/Header.tsx` caso a página deva aparecer no menu.
-
 
 ## Boas práticas para React Native + Expo (Feature-first com `app/` + `src/`)
 
@@ -157,14 +172,16 @@ export default MinhaTela;
 
 ## Aliases de import (opcional)
 
-> Mantivemos o *package* original. Se quiser habilitar **imports curtos**, siga estes passos **opcionais**:
+> Mantivemos o _package_ original. Se quiser habilitar **imports curtos**, siga estes passos **opcionais**:
 
-1) Instale o plugin:
+1. Instale o plugin:
+
 ```bash
 npm i -D babel-plugin-module-resolver
 ```
 
-2) Ajuste o **`tsconfig.json`** (adição de `baseUrl` e `paths`):
+2. Ajuste o **`tsconfig.json`** (adição de `baseUrl` e `paths`):
+
 ```json
 {
   "compilerOptions": {
@@ -177,28 +194,33 @@ npm i -D babel-plugin-module-resolver
 }
 ```
 
-3) Ajuste o **`babel.config.js`** adicionando o plugin:
+3. Ajuste o **`babel.config.js`** adicionando o plugin:
+
 ```js
 module.exports = function (api) {
   api.cache(true);
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      ["module-resolver", {
-        "root": ["./"],
-        "alias": {
-          "@": ".",
-          "@/src": "./src"
-        }
-      }]
-    ]
+      [
+        "module-resolver",
+        {
+          root: ["./"],
+          alias: {
+            "@": ".",
+            "@/src": "./src",
+          },
+        },
+      ],
+    ],
   };
 };
 ```
 
-4) Reinicie o Metro bundler.
+4. Reinicie o Metro bundler.
 
 **Uso**:
+
 ```ts
 import { tokens } from "@/src/theme/tokens";
 import DashboardScreen from "@/src/features/dashboard/DashboardScreen";

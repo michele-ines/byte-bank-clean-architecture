@@ -43,6 +43,7 @@ export const layout = {
   minHeight: 220,
   heightModalMax: "85%" as DimensionValue,
   height50Percent: "50%" as DimensionValue,
+  height100Percent: "100%" as DimensionValue,
   minHeight600: 600,
 
   paddingVertical: 44,

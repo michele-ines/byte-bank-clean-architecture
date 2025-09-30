@@ -10,7 +10,7 @@ export const cardListTexts = {
     updatedAtLabel: "Atualizado em:",
     attachmentsTitle: "Anexos:",
     attachmentLink: (index: number) => `Anexo ${index + 1}`,
-    
+
     accessibility: {
       cardLabel: (type: string, value: number, date: string) => `Transação do tipo ${type}. Valor de ${formatCurrency(value)}. Data: ${date}.`,
       editingCardLabel: (type: string) => `Editando transação do tipo ${type}.`,
@@ -34,6 +34,9 @@ export const cardListTexts = {
     attachError: { title: "Erro!", message: "Não foi possível enviar o anexo." },
     deleteAttachmentSuccess: { title: "Anexo Excluído", message: "O anexo foi removido com sucesso." },
     deleteAttachmentError: { title: "Erro", message: "Não foi possível excluir o anexo." },
+    deleteTransactionsWarning: { title: "Atenção", message: "Selecione pelo menos um item para excluir." },
+    deleteTransactionsSuccess: { title: "Sucesso!", message: (count: number) => `${count} item(ns) excluído(s) com sucesso.` },
+    deleteTransactionsError: { title: "Erro", message: "Não foi possível excluir os itens selecionados." },
   },
   dialogs: {
     deleteAttachment: {

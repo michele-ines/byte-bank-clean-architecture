@@ -91,6 +91,25 @@ export type TransactionsStyles = {
   separator:ViewStyle;
 };
 
+export type EditFieldModalStyles = {
+  field: ViewStyle;
+  label: TextStyle;
+  input: TextStyle;
+  inputEditing: ViewStyle;
+  modalOverlay: ViewStyle;
+  modalContent: ViewStyle;
+  modalTitle: TextStyle;
+  modalActions: ViewStyle;
+  cancelButton: ViewStyle;
+  cancelButtonText: TextStyle;
+  modalInput: TextStyle;
+  showPasswordBtn: ViewStyle;
+  saveButton: ViewStyle;
+  saveButtonText: TextStyle;
+  inputWrapper: ViewStyle;
+  errorText: TextStyle;
+};
+
 export type HeaderStyles = {
   container: ViewStyle;
   row: ViewStyle;
@@ -205,6 +224,8 @@ export type CardProps = {
   variant?: "elevated" | "outlined";
 };
 
+
+
 export type AccountType = "corrente" | "poupança" | string;
 
 export type BalanceComponentProps = {
@@ -256,11 +277,27 @@ export const TransactionTypeItems = [
   { label: "Transferência", value: "transferencia" },
 ];
 
+export type EditFieldModalProps = {
+  visible: boolean;
+  field: "name" | "email" | "password" | null;
+  initialValue: string;
+  onClose: () => void;
+};
 
 export type PortfolioItem = {
   name: string;
   value: number;
   color: string;
+};
+
+export type ListHeaderProps = {
+  title?: string;
+  isEditing: boolean;
+  isDeleting: boolean;
+  onSave: () => void;
+  onCancel: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 };
 
 

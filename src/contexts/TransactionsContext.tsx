@@ -29,18 +29,11 @@ import React, {
 } from "react";
 import { db, storage } from "../config/firebaseConfig";
 import {
+  INewTransactionInput,
   ITransaction,
   ITransactionsContextData,
 } from "../shared/interfaces/auth.interfaces";
 import { useAuth } from "./AuthContext";
-
-export type TransactionType = "deposito" | "cambio" | "transferencia";
-
-export interface INewTransactionInput {
-  tipo: TransactionType;
-  valor: number;
-  description: string;
-}
 
 const PAGE_SIZE = 5;
 
@@ -134,8 +127,8 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
         ...data,
         updateAt: serverTimestamp(),
       });
-    const updatedDateString = new Date().toLocaleDateString("pt-BR");
-    setTransactions((prev) =>
+      const updatedDateString = new Date().toLocaleDateString("pt-BR");
+      setTransactions((prev) =>
         prev.map((transaction) =>
           transaction.id === id
             ? { ...transaction, ...data, updateAt: updatedDateString }
@@ -183,7 +176,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     return snapshot;
   };
 
- const updateTransactionsState = (
+  const updateTransactionsState = (
     newTransactions: ITransaction[],
     snapshot: any
   ) => {
@@ -193,12 +186,12 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 
     setTransactions((prev) => {
       const combinedTransactions = [...prev, ...userTransactions];
-      
+
       const uniqueTransactions = combinedTransactions.filter(
         (transaction, index, self) =>
           index === self.findIndex((t) => t.id === transaction.id)
       );
-      
+
       return uniqueTransactions;
     });
 
@@ -228,6 +221,31 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       setHasMore(false);
     } finally {
       setLoadingMore(false);
+    }
+  };
+
+  const deleteTransactions = async (ids: string[]): Promise<void> => {
+    if (!user) {
+      console.error("Tentativa de excluir transações sem usuário autenticado.");
+      throw new Error("Usuário não autenticado.");
+    }
+
+    try {
+      // Importar deleteDoc dinamicamente para evitar problemas de import
+      const { deleteDoc } = await import("firebase/firestore");
+
+      const deletePromises = ids.map(async (id) => {
+        const transactionRef = doc(db, "transactions", id);
+        return deleteDoc(transactionRef);
+      });
+
+      await Promise.all(deletePromises);
+
+      // Atualizar estado local removendo as transações excluídas
+      setTransactions((prev) => prev.filter((transaction) => !ids.includes(transaction.id!)));
+    } catch (error) {
+      console.error("Erro ao excluir transações:", error);
+      throw error;
     }
   };
 
@@ -299,8 +317,6 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       throw error;
     }
   };
-
-
   return (
     <TransactionsContext.Provider
       value={{
@@ -312,7 +328,8 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
         loadMoreTransactions,
         updateTransaction,
         uploadAttachmentAndUpdateTransaction,
-        deleteAttachment
+        deleteAttachment,
+        deleteTransactions,
       }}
     >
       {children}

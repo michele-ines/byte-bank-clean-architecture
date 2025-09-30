@@ -1,4 +1,7 @@
-import { AuthContextData, UserData } from "@/src/shared/interfaces/auth.interfaces";
+import {
+  AuthContextData,
+  UserData,
+} from "@/src/shared/interfaces/auth.interfaces";
 import { router } from "expo-router";
 import {
   User,
@@ -6,19 +9,16 @@ import {
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
 } from "firebase/auth";
-import {
-  doc,
-  getDoc,
-  serverTimestamp,
-  setDoc,
-} from "firebase/firestore";
+import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
 import React, {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { auth, db } from "../config/firebaseConfig";
@@ -34,7 +34,9 @@ const AUTH_MESSAGES = {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -45,13 +47,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (currentUser) {
         const docRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(docRef);
+        const unsubscribeUser = onSnapshot(docRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data() as UserData);
+          } else {
+            setUserData(null);
+          }
+        });
 
-        if (docSnap.exists()) {
-          setUserData(docSnap.data() as UserData);
-        } else {
-          setUserData(null);
-        }
+        return () => unsubscribeUser();
       } else {
         setUserData(null);
       }
@@ -62,24 +66,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => unsubscribe();
   }, []);
 
-  const signup = async (email: string, password: string, name: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const newUser = userCredential.user;
-   
-    await setDoc(doc(db, "users", newUser.uid), {
-      uuid: newUser.uid, 
-      name,
-      email,
-      createdAt: serverTimestamp(), 
-    });
+  const signup = useCallback(
+    async (email: string, password: string, name: string) => {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const newUser = userCredential.user;
 
-    return userCredential;
-  };
+      await setDoc(doc(db, "users", newUser.uid), {
+        uuid: newUser.uid,
+        name,
+        email,
+        createdAt: serverTimestamp(),
+      });
 
-  const login = (email: string, password: string) =>
-    signInWithEmailAndPassword(auth, email, password);
+      return userCredential;
+    },
+    []
+  );
 
-  const resetPassword = (email: string) => sendPasswordResetEmail(auth, email);
+  const login = useCallback(
+    (email: string, password: string) =>
+      signInWithEmailAndPassword(auth, email, password),
+    []
+  );
+
+  const resetPassword = useCallback(
+    (email: string) => sendPasswordResetEmail(auth, email),
+    []
+  );
 
   const handleSignOut = async () => {
     try {
@@ -90,21 +107,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const contextValue = useMemo(
+    () => ({
+      user,
+      userData,
+      isAuthenticated: !!user,
+      loading,
+      signup,
+      login,
+      resetPassword,
+      signOut: () => {
+        handleSignOut();
+      },
+    }),
+    [user, userData, loading, signup, login, resetPassword]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        userData,
-        isAuthenticated: !!user,
-        loading,
-        signup,
-        login,
-        resetPassword,
-        signOut: handleSignOut,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
