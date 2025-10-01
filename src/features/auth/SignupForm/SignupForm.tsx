@@ -4,15 +4,15 @@ import { routes } from "@/src/routes";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   TextInput,
   View,
 } from "react-native";
+
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
 
 import { SignupFormProps } from "@/src/shared/ProfileStyles/profile.styles.types";
 import { Checkbox } from "@/src/shared/components/Checkbox/Checkbox";
@@ -27,7 +27,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isChecked, setChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,19 +50,35 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
       return;
     }
     if (password.length < 8) {
-      showToast("error", toasts.passwordWeak.title, toasts.passwordWeak.message);
+      showToast(
+        "error",
+        toasts.passwordWeak.title,
+        toasts.passwordWeak.message
+      );
       return;
     }
     if (password !== confirmPassword) {
-      showToast("error", toasts.passwordMismatch.title, toasts.passwordMismatch.message);
+      showToast(
+        "error",
+        toasts.passwordMismatch.title,
+        toasts.passwordMismatch.message
+      );
       return;
     }
     if (!isChecked) {
-      showToast("error", toasts.termsNotAccepted.title, toasts.termsNotAccepted.message);
+      showToast(
+        "error",
+        toasts.termsNotAccepted.title,
+        toasts.termsNotAccepted.message
+      );
       return;
     }
     if (emailError) {
-      showToast("error", toasts.emailInvalid.title, toasts.emailInvalid.message);
+      showToast(
+        "error",
+        toasts.emailInvalid.title,
+        toasts.emailInvalid.message
+      );
       return;
     }
 
@@ -76,7 +92,10 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
       let errorMessage = toasts.genericError.message;
       let errorTitle = toasts.genericError.title;
 
-      if (error instanceof Error && (error as any).code === "auth/email-already-in-use") {
+      if (
+        error instanceof Error &&
+        (error as any).code === "auth/email-already-in-use"
+      ) {
         errorMessage = toasts.emailInUse.message;
         errorTitle = toasts.emailInUse.title;
       }
@@ -172,7 +191,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             <Checkbox
               style={styles.checkbox}
               value={isChecked}
-              onValueChange={setChecked}
+              onValueChange={setIsChecked}
               color={isChecked ? colors.byteColorGreen500 : undefined}
               accessibilityRole="checkbox"
               accessibilityLabel={texts.signupForm.accessibility.checkbox}
@@ -184,39 +203,30 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           </View>
 
           {/* Botão Criar conta */}
-          <Pressable
-            onPress={handleSubmit}
-            style={[
-              styles.button,
-              styles.submitButton,
-              isFormInvalid && styles.submitButtonDisabled,
-            ]}
+          <DefaultButton
+            title={texts.signupForm.buttons.submit}
+            loading={isLoading}
             disabled={isFormInvalid}
-            accessibilityRole="button"
+            onPress={handleSubmit}
+            buttonStyle={[styles.button, styles.submitButton]}
+            textStyle={styles.buttonText}
+            indicatorColor={colors.byteColorWhite}
             accessibilityLabel={texts.signupForm.buttons.submit}
             accessibilityHint={texts.signupForm.accessibility.submitHint}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.byteColorWhite} />
-            ) : (
-              <Text style={styles.buttonText}>
-                {texts.signupForm.buttons.submit}
-              </Text>
-            )}
-          </Pressable>
+          />
 
           {/* Botão Voltar */}
-          <Pressable
-            onPress={() => router.push(routes.login)}
-            style={[styles.button, styles.backButton]}
-            accessibilityRole="button"
+          <DefaultButton
+            title={texts.signupForm.buttons.back}
+            loading={false}
+            disabled={false}
+            onPress={() => router.push(routes.home)}
+            buttonStyle={[styles.button, styles.backButton]}
+            textStyle={styles.backText}
+            indicatorColor={colors.byteColorWhite}
             accessibilityLabel={texts.signupForm.buttons.back}
             accessibilityHint={texts.signupForm.accessibility.backHint}
-          >
-            <Text style={styles.backText}>
-              {texts.signupForm.buttons.back}
-            </Text>
-          </Pressable>
+          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

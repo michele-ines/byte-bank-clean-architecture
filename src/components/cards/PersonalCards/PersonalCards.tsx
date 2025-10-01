@@ -1,14 +1,9 @@
 import ConfirmModal from "@/src/components/common/ConfirmModal/ConfirmModal";
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
 import { apiToggleCardState, CardState } from "@/src/OtherServices/cards";
 import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 
 import CartaoDigitalImg from "@/assets/images/dash-card-my-cards/cartao-digital.svg";
 import CartaoFisicoImg from "@/assets/images/dash-card-my-cards/cartao-fisico.svg";
@@ -128,42 +123,31 @@ export default function PersonalCards() {
 
           <View style={styles.actions}>
             {/* Botão configurar */}
-            <Pressable
+            <DefaultButton
+              title={texts.textConfigurar}
               onPress={onConfigure}
-              accessibilityRole="button"
+              loading={false}
+              disabled={false}
+              buttonStyle={[styles.btn, styles.btnPrimary]}
+              textStyle={[styles.btnTextBase, styles.btnPrimaryText]}
               accessibilityLabel={`${texts.a11yConfigurar} ${title}`}
-              style={({ pressed }) => [
-                styles.btn,
-                styles.btnPrimary,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text style={[styles.btnTextBase, styles.btnPrimaryText]}>
-                {texts.textConfigurar}
-              </Text>
-            </Pressable>
+            />
 
             {/* Botão bloquear/desbloquear */}
-            <Pressable
+            <DefaultButton
+              title={btnToggleTitle}
               onPress={onToggle}
-              accessibilityRole="button"
-              accessibilityLabel={`${btnToggleTitle} ${title}`}
+              loading={!!loading}
               disabled={!!loading}
-              style={({ pressed }) => [
+              buttonStyle={[
                 styles.btn,
                 btnToggleStyle,
-                pressed && styles.pressed,
                 loading && styles.disabled,
               ]}
-            >
-              {loading ? (
-                <ActivityIndicator color={colors.byteColorDash} />
-              ) : (
-                <Text style={[styles.btnTextBase, btnToggleTextStyle]}>
-                  {btnToggleTitle}
-                </Text>
-              )}
-            </Pressable>
+              textStyle={[styles.btnTextBase, btnToggleTextStyle]}
+              indicatorColor={colors.byteColorDash}
+              accessibilityLabel={`${btnToggleTitle} ${title}`}
+            />
 
             <Text style={styles.functionText}>{functionText}</Text>
           </View>
