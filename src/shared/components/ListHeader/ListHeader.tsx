@@ -33,13 +33,22 @@ export const ListHeader: React.FC<ListHeaderProps> = ({
               accessibilityLabel={t.save.label}
               accessibilityHint={t.save.hint}
             >
-              <View style={styles.iconButton}>
-                <Feather
+              <View style={isEditing ? styles.iconButton : styles.iconButtonDelete}>
+                { isEditing && <Feather
                   name="check"
                   size={sizes.iconMd}
                   color={colors.byteColorWhite}
                   accessibilityElementsHidden={true}
                 />
+                }
+                {
+                  isDeleting && <Feather
+                  name="trash-2"
+                  size={sizes.iconMd}
+                  color={colors.byteColorWhite}
+                  accessibilityElementsHidden={true}
+                />
+                }
               </View>
             </Pressable>
             <Pressable
