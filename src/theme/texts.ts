@@ -415,4 +415,12 @@ export const texts = {
       },
     },
   },
+  modal: {
+    buttons: {
+      cancel: "Cancelar",
+      save: "Salvar",
+      accessibilityCancel: "Cancelar edição do campo",
+      accessibilitySave: "Salvar alterações do campo",
+    },
+  },
 };
