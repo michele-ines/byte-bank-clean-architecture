@@ -1,6 +1,6 @@
 import { User, UserCredential } from "firebase/auth";
 import { DocumentData } from "firebase/firestore";
-import { ViewStyle } from "react-native";
+import { AccessibilityRole, StyleProp, TextStyle, ViewStyle } from "react-native";
 import { BalanceValue, TransactionType } from "../ProfileStyles/profile.styles.types";
 
 export interface UserData {
@@ -9,6 +9,19 @@ export interface UserData {
   email: string;
   photoURL?: string | null;
   createdAt?: any;
+}
+
+export interface DefaultButtonProps {
+  title: string;
+  loading?: boolean;
+  disabled?: boolean;
+  onPress: () => void;
+  buttonStyle?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  indicatorColor?: string;
+  accessibilityRole?: AccessibilityRole;
+  accessibilityLabel: string;
+  accessibilityHint?: string;
 }
 
 export interface AuthContextData {

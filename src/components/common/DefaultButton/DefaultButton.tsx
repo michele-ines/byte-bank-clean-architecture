@@ -1,27 +1,12 @@
+import { DefaultButtonProps } from "@/src/shared/interfaces/auth.interfaces";
 import { colors, layout } from "@/src/theme";
 import React from "react";
 import {
-  AccessibilityRole,
   ActivityIndicator,
-  StyleProp,
   Text,
-  TextStyle,
-  TouchableOpacity,
-  ViewStyle,
+  TouchableOpacity
 } from "react-native";
 
-interface DefaultButtonProps {
-  title: string;
-  loading?: boolean;
-  disabled?: boolean;
-  onPress: () => void;
-  buttonStyle?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
-  indicatorColor?: string;
-  accessibilityRole?: AccessibilityRole;
-  accessibilityLabel: string;
-  accessibilityHint?: string;
-}
 
 export const DefaultButton: React.FC<DefaultButtonProps> = ({
   title,
