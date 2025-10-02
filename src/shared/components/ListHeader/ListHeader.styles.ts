@@ -6,6 +6,7 @@ type Styles = {
   title: TextStyle;
   iconsContainer: ViewStyle;
   iconButton: ViewStyle;
+  iconButtonDelete: ViewStyle;
 };
 
 export const styles = StyleSheet.create<Styles>({
@@ -29,6 +30,14 @@ export const styles = StyleSheet.create<Styles>({
     height: layout.height36,
     borderRadius: radius.xl,
     backgroundColor: colors.byteColorDash,
+    justifyContent: typography.justifyCenter,
+    alignItems: typography.alignCenter,
+  },
+  iconButtonDelete: {
+    width: layout.width36,
+    height: layout.height36,
+    borderRadius: radius.xl,
+    backgroundColor: colors.byteColorRed500,
     justifyContent: typography.justifyCenter,
     alignItems: typography.alignCenter,
   },
