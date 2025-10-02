@@ -1,9 +1,10 @@
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
 import { Footer } from "@/src/shared/Footer/Footer";
 import { Header } from "@/src/shared/Header/Header";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SvgProps } from "react-native-svg";
 
 import BannerIlustracao from "@/assets/images/page/banner-ilustracao.svg";
@@ -12,6 +13,7 @@ import IconPontos from "@/assets/images/page/icon-pontos.svg";
 import IconPresente from "@/assets/images/page/icon-presente.svg";
 import IconSaque from "@/assets/images/page/icon-saque.svg";
 
+import { routes } from "@/src/routes";
 import { texts } from "@/src/theme";
 import { colors } from "@/src/theme/colors";
 import { sizes } from "@/src/theme/sizes";
@@ -29,7 +31,9 @@ const MainScreen: React.FC = () => {
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.innerContent}>
             <View style={styles.hero}>
-              <Text style={styles.heroTitle}>{texts.mainScreen.hero.title}</Text>
+              <Text style={styles.heroTitle}>
+                {texts.mainScreen.hero.title}
+              </Text>
               <Text style={styles.heroSubtitle}>
                 {texts.mainScreen.hero.subtitle}
               </Text>
@@ -41,23 +45,21 @@ const MainScreen: React.FC = () => {
               />
 
               <View style={styles.buttonsRow}>
-                <TouchableOpacity
-                  style={[styles.btn, styles.btnPrimary]}
-                  onPress={() => router.push("/(public)/cadastro/CadastroPage")}
-                >
-                  <Text style={styles.btnPrimaryText}>
-                    {texts.mainScreen.buttons.openAccount}
-                  </Text>
-                </TouchableOpacity>
+                <DefaultButton
+                  title={texts.mainScreen.buttons.openAccount}
+                  onPress={() => router.push(routes.signup)}
+                  buttonStyle={[styles.btn, styles.btnPrimary]}
+                  textStyle={styles.btnPrimaryText}
+                  accessibilityLabel={texts.mainScreen.buttons.openAccount}
+                />
 
-                <TouchableOpacity
-                  style={[styles.btn, styles.btnSecondary]}
-                  onPress={() => router.push("/(public)/login/login")}
-                >
-                  <Text style={styles.btnSecondaryText}>
-                    {texts.mainScreen.buttons.login}
-                  </Text>
-                </TouchableOpacity>
+                <DefaultButton
+                  title={texts.mainScreen.buttons.login}
+                  onPress={() => router.push(routes.login)}
+                  buttonStyle={[styles.btn, styles.btnSecondary]}
+                  textStyle={styles.btnSecondaryText}
+                  accessibilityLabel={texts.mainScreen.buttons.login}
+                />
               </View>
             </View>
 

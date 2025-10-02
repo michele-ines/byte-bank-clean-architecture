@@ -1,3 +1,4 @@
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
 import { useAuth } from "@/src/contexts/AuthContext";
 import {
   DrawerContentComponentProps,
@@ -5,12 +6,12 @@ import {
   DrawerItemList,
 } from "@react-navigation/drawer";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { styles } from "./CustomDrawerContent.styles";
 
 type CustomDrawerContentProps = DrawerContentComponentProps;
 
-export function CustomDrawerContent(props: CustomDrawerContentProps) {
+export function CustomDrawerContent(props: Readonly<CustomDrawerContentProps>) {
   const { user, userData, signOut } = useAuth();
 
   const handleLogout = (): void => {
@@ -18,7 +19,10 @@ export function CustomDrawerContent(props: CustomDrawerContentProps) {
   };
 
   const displayName =
-    userData?.name ?? user?.displayName ?? user?.email?.split("@")[0] ?? "Usuário";
+    userData?.name ??
+    user?.displayName ??
+    user?.email?.split("@")[0] ??
+    "Usuário";
 
   const email = userData?.email ?? user?.email ?? "sem-email";
 
@@ -57,18 +61,14 @@ export function CustomDrawerContent(props: CustomDrawerContentProps) {
       >
         <DrawerItemList {...props} />
 
-        <Pressable
+        <DefaultButton
+          title="Sair"
           onPress={handleLogout}
-          style={({ pressed }) => [
-            styles.logoutButton,
-            pressed && { opacity: 0.7 },
-          ]}
-          accessibilityRole="button"
+          buttonStyle={styles.logoutButton}
+          textStyle={styles.logoutButtonText}
           accessibilityLabel="Sair da conta"
           accessibilityHint="Finaliza a sessão e retorna para a tela inicial"
-        >
-          <Text style={styles.logoutButtonText}>Sair</Text>
-        </Pressable>
+        />
       </DrawerContentScrollView>
     </View>
   );

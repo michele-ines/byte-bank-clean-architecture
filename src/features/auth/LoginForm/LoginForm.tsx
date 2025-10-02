@@ -3,22 +3,20 @@ import { useAuth } from "@/src/contexts/AuthContext";
 import { routes } from "@/src/routes";
 import { LoginFormProps } from "@/src/shared/ProfileStyles/profile.styles.types";
 import { texts } from "@/src/theme";
-import { colors } from "@/src/theme/colors";
 import { showToast } from "@/src/utils/transactions.utils";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   Text,
   TextInput,
   View,
 } from "react-native";
+
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
 import { ScrollView } from "react-native-gesture-handler";
 import { styles } from "./LoginForm.styles";
-
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState<string>("");
@@ -102,48 +100,36 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           accessibilityHint={texts.loginForm.accessibility.passwordHint}
         />
 
-        <Link href={routes.forgotPassword} asChild>
-          <Pressable
-            accessibilityRole="link"
-            accessibilityLabel={texts.loginForm.accessibility.forgotLink}
-          >
-            <Text style={styles.forgot}>{texts.loginForm.buttons.forgot}</Text>
-          </Pressable>
+        <Link
+          href={routes.forgotPassword}
+          accessibilityRole="link"
+          accessibilityLabel={texts.loginForm.accessibility.forgotLink}
+        >
+          <Text style={styles.forgot}>{texts.loginForm.buttons.forgot}</Text>
         </Link>
 
         <View style={styles.alignButtons}>
-          <Pressable
-            onPress={handleLogin}
-            style={[
-              styles.button,
-              styles.submitButton,
-              isFormInvalid && styles.submitButtonDisabled,
-            ]}
+          <DefaultButton
+            title={texts.loginForm.buttons.submit}
+            loading={isLoading}
             disabled={isFormInvalid}
-            accessibilityRole="button"
+            onPress={handleLogin}
+            buttonStyle={[styles.button, styles.submitButton]}
+            textStyle={styles.buttonText}
             accessibilityLabel={texts.loginForm.accessibility.submitButton}
             accessibilityHint={texts.loginForm.accessibility.submitHint}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.byteColorWhite} />
-            ) : (
-              <Text style={styles.buttonText}>
-                {texts.loginForm.buttons.submit}
-              </Text>
-            )}
-          </Pressable>
+          />
 
-          <Pressable
+          <DefaultButton
+            title={texts.loginForm.buttons.create}
+            loading={false}
+            disabled={false}
             onPress={handleCreateAccount}
-            style={[styles.button, styles.createButton]}
-            accessibilityRole="button"
+            buttonStyle={[styles.button, styles.createButton]}
+            textStyle={styles.buttonText}
             accessibilityLabel={texts.loginForm.accessibility.createButton}
             accessibilityHint={texts.loginForm.accessibility.createHint}
-          >
-            <Text style={[styles.buttonText]}>
-              {texts.loginForm.buttons.create}
-            </Text>
-          </Pressable>
+          />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

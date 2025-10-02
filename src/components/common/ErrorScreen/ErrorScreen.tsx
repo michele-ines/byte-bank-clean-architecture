@@ -1,9 +1,9 @@
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
 import { ErrorScreenProps } from "@/src/shared/interfaces/auth.interfaces";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./ErrorScreen.styles";
-
 
 export const ErrorScreen: React.FC<ErrorScreenProps> = ({
   title = "Ocorreu um erro",
@@ -16,9 +16,13 @@ export const ErrorScreen: React.FC<ErrorScreenProps> = ({
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.message}>{message}</Text>
 
-        <Pressable style={styles.retryButton} onPress={onRetry}>
-          <Text style={styles.retryButtonText}>Tente novamente</Text>
-        </Pressable>
+        <DefaultButton
+          title="Tente novamente"
+          onPress={onRetry}
+          accessibilityLabel="Tentar novamente"
+          buttonStyle={styles.retryButton}
+          textStyle={styles.retryButtonText}
+        />
       </View>
     </SafeAreaView>
   );

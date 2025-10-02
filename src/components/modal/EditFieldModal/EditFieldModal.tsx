@@ -1,9 +1,10 @@
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
 import { useEditField } from "@/src/hooks/useEditField";
 import { EditFieldModalProps } from "@/src/shared/ProfileStyles/profile.styles.types";
+import { texts } from "@/src/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useRef } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -207,18 +208,22 @@ export function EditFieldModal({
           })()}
 
           <View style={styles.modalActions}>
-            <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-              {loading ? (
-                <ActivityIndicator
-                  color={styles.inputWrapper.backgroundColor}
-                />
-              ) : (
-                <Text style={styles.saveButtonText}>Salvar</Text>
-              )}
-            </TouchableOpacity>
+            <DefaultButton
+              title={texts.modal.buttons.cancel}
+              onPress={onClose}
+              buttonStyle={styles.cancelButton}
+              textStyle={styles.cancelButtonText}
+              accessibilityLabel={texts.modal.buttons.accessibilityCancel}
+            />
+            <DefaultButton
+              title={texts.modal.buttons.save}
+              onPress={handleSave}
+              loading={loading}
+              disabled={loading}
+              buttonStyle={styles.saveButton}
+              textStyle={styles.saveButtonText}
+              accessibilityLabel={texts.modal.buttons.accessibilitySave}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

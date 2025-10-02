@@ -1,20 +1,24 @@
 import CardPixelsTop from "@/assets/images/dash-card-new-transacao/card-pixels-3.svg";
 import CardPixelBotton from "@/assets/images/dash-card-new-transacao/card-pixels-4.svg";
 import TransactionIllustration from "@/assets/images/dash-card-new-transacao/Ilustracao-2.svg";
-import { INewTransactionInput, TransactionType, useTransactions } from "@/src/contexts/TransactionsContext";
-import { colors } from "@/src/theme/colors";
+import { useTransactions } from "@/src/contexts/TransactionsContext";
 import { layout } from "@/src/theme/layout";
-import { shadows } from "@/src/theme/shadows";
 import { texts } from "@/src/theme/texts";
 
-import { TransactionTypeItems } from "@/src/shared/ProfileStyles/profile.styles.types";
-import { formatTransactionDescription, showToast } from "@/src/utils/transactions.utils";
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
+import { INewTransactionInput } from "@/src/shared/interfaces/auth.interfaces";
+import {
+  TransactionType,
+  TransactionTypeItems,
+} from "@/src/shared/ProfileStyles/profile.styles.types";
+import {
+  formatTransactionDescription,
+  showToast,
+} from "@/src/utils/transactions.utils";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StatusBar,
   Text,
   View,
@@ -45,13 +49,20 @@ export const NewTransactionForm: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!transactionType || numericAmount <= 0) {
-      showToast("error", t.toasts.emptyFields.title, t.toasts.emptyFields.message);
+      showToast(
+        "error",
+        t.toasts.emptyFields.title,
+        t.toasts.emptyFields.message
+      );
       return;
     }
 
     setIsLoading(true);
     try {
-      const description = formatTransactionDescription(transactionType, numericAmount);
+      const description = formatTransactionDescription(
+        transactionType,
+        numericAmount
+      );
 
       await addTransaction({
         tipo: transactionType,
@@ -113,7 +124,9 @@ export const NewTransactionForm: React.FC = () => {
                 setOpen={setOpen}
                 setItems={setItems}
                 setValue={(getValue) => {
-                  const v = getValue(transactionType ?? null) as TransactionType | null;
+                  const v = getValue(
+                    transactionType ?? null
+                  ) as TransactionType | null;
                   setTransactionType(v ?? undefined);
                 }}
                 placeholder={t.placeholders.transactionType}
@@ -142,24 +155,18 @@ export const NewTransactionForm: React.FC = () => {
               accessibilityHint={t.accessibility.amountHint}
             />
 
-            <Pressable
-              onPress={handleSubmit}
-              style={[styles.submitButton, isFormInvalid && { opacity: layout.opacityMd }]}
+            <DefaultButton
+              title={t.buttons.submit}
+              loading={isLoading}
               disabled={isFormInvalid}
-              accessibilityRole="button"
+              onPress={handleSubmit}
+              buttonStyle={styles.submitButton}
+              textStyle={styles.submitButtonText}
               accessibilityLabel={t.accessibility.submitButton}
-              accessibilityHint={isLoading ? t.accessibility.submitButtonLoading : undefined}
-            >
-              {isLoading ? (
-                <ActivityIndicator
-                  size={shadows.heightIndicator}
-                  color={colors.byteColorWhite}
-                  accessibilityLabel={t.accessibility.loading}
-                />
-              ) : (
-                <Text style={styles.submitButtonText}>{t.buttons.submit}</Text>
-              )}
-            </Pressable>
+              accessibilityHint={
+                isLoading ? t.accessibility.submitButtonLoading : undefined
+              }
+            />
 
             <View style={styles.bottomIllustrationsContainer}>
               <TransactionIllustration

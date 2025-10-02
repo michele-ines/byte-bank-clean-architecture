@@ -1,8 +1,9 @@
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
 import { ConfirmModalProps } from "@/src/shared/ProfileStyles/profile.styles.types";
 import { colors } from "@/src/theme/colors";
 import { texts } from "@/src/theme/texts";
 import React from "react";
-import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
+import { Modal, Text, View } from "react-native";
 import { styles } from "./ConfirmModal.styles";
 
 export default function ConfirmModal({
@@ -15,7 +16,7 @@ export default function ConfirmModal({
   loading,
   onConfirm,
   onCancel,
-}: ConfirmModalProps) {
+}: Readonly<ConfirmModalProps>) {
   return (
     <Modal
       visible={visible}
@@ -38,41 +39,33 @@ export default function ConfirmModal({
 
         <View style={styles.row}>
           {/* Cancelar */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.btn,
-              styles.btnGhost,
-              pressed && styles.pressed,
-            ]}
-            accessibilityRole="button"
+          <DefaultButton
+            title={cancelText}
+            onPress={onCancel}
+            loading={false}
+            disabled={loading}
+            buttonStyle={[styles.btn, styles.btnGhost]}
+            textStyle={styles.btnGhostText}
             accessibilityLabel={cancelText}
             accessibilityHint={texts.a11yCancelar}
-            onPress={onCancel}
-            disabled={loading}
-          >
-            <Text style={styles.btnGhostText}>{cancelText}</Text>
-          </Pressable>
+          />
 
           {/* Confirmar */}
-          <Pressable
-            style={({ pressed }) => [
+          <DefaultButton
+            title={confirmText}
+            onPress={onConfirm}
+            loading={loading}
+            disabled={loading}
+            buttonStyle={[
               styles.btn,
               isDestructive ? styles.btnDanger : styles.btnPrimary,
-              pressed && styles.pressed,
               loading && styles.loadingBtn,
             ]}
-            accessibilityRole="button"
+            textStyle={styles.btnText}
             accessibilityLabel={confirmText}
             accessibilityHint={texts.a11yConfirmar}
-            onPress={onConfirm}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={colors.byteColorWhite} />
-            ) : (
-              <Text style={styles.btnText}>{confirmText}</Text>
-            )}
-          </Pressable>
+            indicatorColor={colors.byteColorWhite}
+          />
         </View>
       </View>
     </Modal>

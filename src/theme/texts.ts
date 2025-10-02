@@ -1,4 +1,3 @@
-
 export const texts = {
   // Gerais
   cancelar: "Cancelar",
@@ -164,7 +163,7 @@ export const texts = {
     },
   },
 
-    forgotPasswordForm: {
+  forgotPasswordForm: {
     title: "Recuperar Senha",
     label: "E-mail",
     placeholder: "Digite seu e-mail cadastrado",
@@ -196,105 +195,111 @@ export const texts = {
   },
 
   loginForm: {
-  title: "Login",
-  labels: {
-    email: "Email",
-    password: "Senha",
+    title: "Login",
+    labels: {
+      email: "Email",
+      password: "Senha",
+    },
+    placeholders: {
+      email: "Digite seu email",
+      password: "Digite sua senha",
+    },
+    buttons: {
+      submit: "ACESSAR",
+      create: "CRIAR CONTA",
+      forgot: "Esqueci a Senha!",
+    },
+    accessibility: {
+      form: "Formulário de login",
+      illustration:
+        "Ilustração de uma pessoa interagindo com um celular gigante para fazer login.",
+      emailInput: "Campo de entrada de email",
+      passwordInput: "Campo de entrada de senha",
+      passwordHint: "A senha será escondida por segurança",
+      forgotLink: "Esqueci a senha! Toque para recuperar.",
+      submitButton: "Acessar conta",
+      submitHint: "Faz login na sua conta com as credenciais inseridas",
+      createButton: "Criar nova conta",
+      createHint: "Navega para a tela de criação de conta",
+    },
+    toasts: {
+      emptyFields: { title: "Atenção", message: "Informe e-mail e senha." },
+      loginError: {
+        title: "Erro de Login",
+        message: "Email ou senha inválidos.",
+      },
+      unexpectedError: {
+        title: "Erro",
+        message: "Ocorreu um erro inesperado.",
+      },
+    },
   },
-  placeholders: {
-    email: "Digite seu email",
-    password: "Digite sua senha",
-  },
-  buttons: {
-    submit: "ACESSAR",
-    create: "CRIAR CONTA",
-    forgot: "Esqueci a Senha!",
-  },
-  accessibility: {
-    form: "Formulário de login",
-    illustration:
-      "Ilustração de uma pessoa interagindo com um celular gigante para fazer login.",
-    emailInput: "Campo de entrada de email",
-    passwordInput: "Campo de entrada de senha",
-    passwordHint: "A senha será escondida por segurança",
-    forgotLink: "Esqueci a senha! Toque para recuperar.",
-    submitButton: "Acessar conta",
-    submitHint: "Faz login na sua conta com as credenciais inseridas",
-    createButton: "Criar nova conta",
-    createHint: "Navega para a tela de criação de conta",
-  },
-  toasts: {
-    emptyFields: { title: "Atenção", message: "Informe e-mail e senha." },
-    loginError: { title: "Erro de Login", message: "Email ou senha inválidos." },
-    unexpectedError: { title: "Erro", message: "Ocorreu um erro inesperado." },
-  },
-},
 
-signupForm: {
-  title: "Preencha os campos para criar sua conta!",
-  fields: {
-    name: "Nome",
-    email: "Email",
-    password: "Senha",
-    confirmPassword: "Confirmar Senha",
+  signupForm: {
+    title: "Preencha os campos para criar sua conta!",
+    fields: {
+      name: "Nome",
+      email: "Email",
+      password: "Senha",
+      confirmPassword: "Confirmar Senha",
+    },
+    placeholders: {
+      name: "Digite seu nome completo",
+      email: "Digite seu email",
+      password: "Mínimo 8 caracteres",
+      confirmPassword: "Confirme sua senha",
+    },
+    checkboxLabel:
+      "Li e estou ciente quanto às condições de tratamento dos meus dados conforme descrito na Política de Privacidade do banco.",
+    buttons: {
+      submit: "CRIAR CONTA",
+      back: "VOLTAR",
+    },
+    accessibility: {
+      form: "Formulário de cadastro de conta corrente",
+      illustration:
+        "Ilustração de uma pessoa interagindo com um ecrã de portátil seguro.",
+      checkbox: "Checkbox para aceitar os termos de privacidade.",
+      submitHint: "Cria uma nova conta e redireciona para o dashboard.",
+      backHint: "Volta para a tela de login sem salvar as alterações.",
+    },
+    toasts: {
+      emptyFields: {
+        title: "Atenção",
+        message: "Por favor, preencha todos os campos.",
+      },
+      passwordMismatch: {
+        title: "Atenção",
+        message: "As senhas não coincidem.",
+      },
+      passwordWeak: {
+        title: "Senha Fraca",
+        message: "A senha deve ter no mínimo 8 caracteres.",
+      },
+      termsNotAccepted: {
+        title: "Atenção",
+        message: "Você precisa aceitar os termos e condições.",
+      },
+      emailInvalid: {
+        title: "Atenção",
+        message: "Por favor, corrija o email antes de continuar.",
+      },
+      success: {
+        title: "Sucesso!",
+        message: "Conta criada. Você será redirecionado.",
+      },
+      emailInUse: {
+        title: "Erro",
+        message: "Este e-mail já está em uso.",
+      },
+      genericError: {
+        title: "Erro",
+        message: "Ocorreu um erro ao criar a conta.",
+      },
+    },
   },
-  placeholders: {
-    name: "Digite seu nome completo",
-    email: "Digite seu email",
-    password: "Mínimo 8 caracteres",
-    confirmPassword: "Confirme sua senha",
-  },
-  checkboxLabel:
-    "Li e estou ciente quanto às condições de tratamento dos meus dados conforme descrito na Política de Privacidade do banco.",
-  buttons: {
-    submit: "CRIAR CONTA",
-    back: "VOLTAR AO LOGIN",
-  },
-  accessibility: {
-    form: "Formulário de cadastro de conta corrente",
-    illustration:
-      "Ilustração de uma pessoa interagindo com um ecrã de portátil seguro.",
-    checkbox: "Checkbox para aceitar os termos de privacidade.",
-    submitHint: "Cria uma nova conta e redireciona para o dashboard.",
-    backHint: "Volta para a tela de login sem salvar as alterações.",
-  },
-  toasts: {
-    emptyFields: {
-      title: "Atenção",
-      message: "Por favor, preencha todos os campos.",
-    },
-    passwordMismatch: {
-      title: "Atenção",
-      message: "As senhas não coincidem.",
-    },
-    passwordWeak: {
-      title: "Senha Fraca",
-      message: "A senha deve ter no mínimo 8 caracteres.",
-    },
-    termsNotAccepted: {
-      title: "Atenção",
-      message: "Você precisa aceitar os termos e condições.",
-    },
-    emailInvalid: {
-      title: "Atenção",
-      message: "Por favor, corrija o email antes de continuar.",
-    },
-    success: {
-      title: "Sucesso!",
-      message: "Conta criada. Você será redirecionado.",
-    },
-    emailInUse: {
-      title: "Erro",
-      message: "Este e-mail já está em uso.",
-    },
-    genericError: {
-      title: "Erro",
-      message: "Ocorreu um erro ao criar a conta.",
-    },
-  },
-},
 
-mainScreen: {
+  mainScreen: {
     hero: {
       title: "Experimente mais liberdade no controle da sua vida financeira.",
       subtitle: "Crie sua conta com a gente!",
@@ -408,6 +413,14 @@ mainScreen: {
         title: "Erro",
         message: "Não foi possível atualizar os dados.",
       },
+    },
+  },
+  modal: {
+    buttons: {
+      cancel: "Cancelar",
+      save: "Salvar",
+      accessibilityCancel: "Cancelar edição do campo",
+      accessibilitySave: "Salvar alterações do campo",
     },
   },
 };

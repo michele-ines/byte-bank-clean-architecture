@@ -1,20 +1,14 @@
 import { useAuth } from "@/src/contexts/AuthContext";
 import { routes } from "@/src/routes";
 import { ForgotPasswordFormProps } from "@/src/shared/ProfileStyles/profile.styles.types";
-import { colors } from "@/src/theme/colors";
 import { texts } from "@/src/theme/texts";
 import { showToast } from "@/src/utils/transactions.utils";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { styles } from "./ForgotPasswordForm.styles";
+import { Text, TextInput, View } from "react-native";
 
+import { DefaultButton } from "@/src/components/common/DefaultButton/DefaultButton";
+import { styles } from "./ForgotPasswordForm.styles";
 
 export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   onSubmitSuccess,
@@ -49,11 +43,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
         error instanceof Error
           ? error.message
           : texts.forgotPasswordForm.toasts.error.message;
-      showToast(
-        "error",
-        texts.forgotPasswordForm.toasts.error.title,
-        message
-      );
+      showToast("error", texts.forgotPasswordForm.toasts.error.title, message);
     } finally {
       setIsLoading(false);
     }
@@ -83,33 +73,26 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
         accessibilityLabel={texts.forgotPasswordForm.accessibility.emailInput}
       />
 
-      <Pressable
-        onPress={handleSubmit}
-        style={[styles.submit, isButtonDisabled && styles.submitDisabled]}
+      <DefaultButton
+        title={texts.forgotPasswordForm.buttons.submit}
+        loading={isLoading}
         disabled={isButtonDisabled}
-        accessibilityRole="button"
+        onPress={handleSubmit}
+        buttonStyle={[styles.submit]}
+        textStyle={styles.submitText}
         accessibilityLabel={texts.forgotPasswordForm.accessibility.submitButton}
         accessibilityHint={texts.forgotPasswordForm.accessibility.submitHint}
-      >
-        {isLoading ? (
-          <ActivityIndicator color={colors.byteColorWhite} />
-        ) : (
-          <Text style={styles.submitText}>
-            {texts.forgotPasswordForm.buttons.submit}
-          </Text>
-        )}
-      </Pressable>
+      />
 
-      <Pressable
+      <DefaultButton
+        title={texts.forgotPasswordForm.buttons.back}
+        loading={false}
+        disabled={false}
         onPress={() => router.push(routes.login)}
-        style={styles.backButton}
-        accessibilityRole="button"
+        buttonStyle={styles.backButton}
+        textStyle={styles.backText}
         accessibilityLabel={texts.forgotPasswordForm.accessibility.backButton}
-      >
-        <Text style={styles.backText}>
-          {texts.forgotPasswordForm.buttons.back}
-        </Text>
-      </Pressable>
+      />
     </View>
   );
 };
