@@ -42,20 +42,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    let unsubscribeUser = () => {};
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+
+
+      unsubscribeUser();
 
       if (currentUser) {
         const docRef = doc(db, "users", currentUser.uid);
-        const unsubscribeUser = onSnapshot(docRef, (docSnap) => {
+        
+        unsubscribeUser = onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
             setUserData(docSnap.data() as UserData);
           } else {
             setUserData(null);
           }
         });
-
-        return () => unsubscribeUser();
       } else {
         setUserData(null);
       }
@@ -63,8 +67,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, []);
+  
+    return () => {
+      unsubscribeAuth();
+      unsubscribeUser();
+    };
+  }, []); 
 
   const signup = useCallback(
     async (email: string, password: string, name: string) => {
@@ -116,9 +124,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       signup,
       login,
       resetPassword,
-      signOut: () => {
-        handleSignOut();
-      },
+      signOut: handleSignOut,
     }),
     [user, userData, loading, signup, login, resetPassword]
   );
