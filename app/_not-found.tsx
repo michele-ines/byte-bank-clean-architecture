@@ -7,7 +7,7 @@ export default function NotFoundPage() {
 
   const handleRetry = () => {
     // Exemplo: voltar para a Home ou Login
-    router.replace("/(public)/login/login");
+    router.replace("/(public)/login/LoginPage");
   };
 
   return (
