@@ -1,29 +1,43 @@
 import { useTransactions } from "@/src/contexts/TransactionsContext";
-import { colors, layout, spacing, typography } from "@/src/theme";
+import { colors, layout, spacing, texts, typography } from "@/src/theme";
 import { showToast } from "@/src/utils/transactions.utils";
 import { Feather } from "@expo/vector-icons";
-import * as DocumentPicker from 'expo-document-picker';
+import * as DocumentPicker from "expo-document-picker";
 import React, { Fragment, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Linking, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Linking,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
 import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
-import { CardListExtractProps, EditedValuesMap } from "../../ProfileStyles/profile.styles.types";
+import {
+  CardListExtractProps,
+  EditedValuesMap,
+} from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./CardListExtract.styles";
-import { cardListTexts } from "./cardListExtractTexts";
 
-export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, title }) => {
-  const { 
-    transactions, 
-    loading, 
-    loadingMore, 
-    hasMore, 
-    loadMoreTransactions, 
-    updateTransaction, 
-    uploadAttachmentAndUpdateTransaction, 
-    deleteAttachment ,
-    deleteTransactions
+
+export const CardListExtract: React.FC<CardListExtractProps> = ({
+  filterFn,
+  title,
+}) => {
+  const {
+    transactions,
+    loading,
+    loadingMore,
+    hasMore,
+    loadMoreTransactions,
+    updateTransaction,
+    uploadAttachmentAndUpdateTransaction,
+    deleteAttachment,
+    deleteTransactions,
   } = useTransactions();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -39,7 +53,11 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
     if (supported) {
       await Linking.openURL(url);
     } else {
-      showToast("error", cardListTexts.toasts.openReceiptError.title, cardListTexts.toasts.openReceiptError.message);
+      showToast(
+        "error",
+        texts.cardList.toasts.openReceiptError.title,
+        texts.cardList.toasts.openReceiptError.message
+      );
     }
   };
 
@@ -53,7 +71,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
     const initialValues = filtered.reduce((acc, transaction) => {
       if (transaction.id) {
         const valorComDecimais = transaction.valor.toFixed(2);
-        const valorEmCentavosString = valorComDecimais.replace('.', '');
+        const valorEmCentavosString = valorComDecimais.replace(".", "");
         acc[transaction.id] = valorEmCentavosString;
       }
       return acc;
@@ -69,17 +87,23 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({ filterFn, titl
     setSelectedItems(new Set());
   };
 
-const handleSaveClick = async () => {
+  const handleSaveClick = async () => {
     if (isDeleting) {
       await handleDeleteSelected();
       return;
     }
 
-    const transacoesAlteradas = Object.entries(editedValues).filter(([id, rawTextCentavos]) => {
-      const transacaoOriginal = transactions.find(t => t.id === id);
-      const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
-      return !isNaN(novoValorNumerico) && transacaoOriginal && transacaoOriginal.valor !== novoValorNumerico;
-    });
+    const transacoesAlteradas = Object.entries(editedValues).filter(
+      ([id, rawTextCentavos]) => {
+        const transacaoOriginal = transactions.find((t) => t.id === id);
+        const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
+        return (
+          !isNaN(novoValorNumerico) &&
+          transacaoOriginal &&
+          transacaoOriginal.valor !== novoValorNumerico
+        );
+      }
+    );
 
     if (transacoesAlteradas.length === 0) {
       setIsEditing(false);
@@ -87,34 +111,48 @@ const handleSaveClick = async () => {
       return;
     }
 
-    const updatePromises = transacoesAlteradas.map(async ([id, rawTextCentavos]) => {
-      const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
-      return updateTransaction(id, { valor: novoValorNumerico });
-    });
+    const updatePromises = transacoesAlteradas.map(
+      async ([id, rawTextCentavos]) => {
+        const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
+        return updateTransaction(id, { valor: novoValorNumerico });
+      }
+    );
 
     try {
       await Promise.all(updatePromises);
-      showToast("success", cardListTexts.toasts.saveSuccess.title, cardListTexts.toasts.saveSuccess.message);
+      showToast(
+        "success",
+        texts.cardList.toasts.saveSuccess.title,
+        texts.cardList.toasts.saveSuccess.message
+      );
     } catch (error) {
-      showToast("error", cardListTexts.toasts.saveError.title, cardListTexts.toasts.saveError.message);
+      showToast(
+        "error",
+        texts.cardList.toasts.saveError.title,
+        texts.cardList.toasts.saveError.message
+      );
     } finally {
       setIsEditing(false);
       setEditedValues({});
     }
   };
-  
+
   const handleAttachFile = async (transactionId: string) => {
     setUploadingId(transactionId);
     try {
       const result = await DocumentPicker.getDocumentAsync({});
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const file = result.assets[0];
-        await uploadAttachmentAndUpdateTransaction(transactionId, file.uri, file.name);
-        const toast = cardListTexts.toasts.attachSuccess;
+        await uploadAttachmentAndUpdateTransaction(
+          transactionId,
+          file.uri,
+          file.name
+        );
+        const toast = texts.cardList.toasts.attachSuccess;
         showToast("success", toast.title, toast.message);
       }
     } catch (error) {
-      const toast = cardListTexts.toasts.attachError;
+      const toast = texts.cardList.toasts.attachError;
       showToast("error", toast.title, toast.message);
     } finally {
       setUploadingId(null);
@@ -122,28 +160,24 @@ const handleSaveClick = async () => {
   };
 
   const handleDeleteAttachment = (transactionId: string, fileUrl: string) => {
-    const dialog = cardListTexts.dialogs.deleteAttachment;
-    Alert.alert(
-      dialog.title,
-      dialog.message,
-      [
-        { text: dialog.cancelButton, style: "cancel" },
-        {
-          text: dialog.confirmButton,
-          onPress: async () => {
-            try {
-              await deleteAttachment(transactionId, fileUrl);
-              const toast = cardListTexts.toasts.deleteAttachmentSuccess;
-              showToast("success", toast.title, toast.message);
-            } catch (error) {
-              const toast = cardListTexts.toasts.deleteAttachmentError;
-              showToast("error", toast.title, toast.message);
-            }
-          },
-          style: "destructive",
+    const dialog = texts.cardList.dialogs.deleteAttachment;
+    Alert.alert(dialog.title, dialog.message, [
+      { text: dialog.cancelButton, style: "cancel" },
+      {
+        text: dialog.confirmButton,
+        onPress: async () => {
+          try {
+            await deleteAttachment(transactionId, fileUrl);
+            const toast = texts.cardList.toasts.deleteAttachmentSuccess;
+            showToast("success", toast.title, toast.message);
+          } catch (error) {
+            const toast = texts.cardList.toasts.deleteAttachmentError;
+            showToast("error", toast.title, toast.message);
+          }
         },
-      ]
-    );
+        style: "destructive",
+      },
+    ]);
   };
 
   const handleDelete = () => {
@@ -151,7 +185,7 @@ const handleSaveClick = async () => {
   };
 
   const handleItemSelection = (itemId: string, isSelected: boolean) => {
-    setSelectedItems(prevSelected => {
+    setSelectedItems((prevSelected) => {
       const newSelected = new Set(prevSelected);
       if (isSelected) {
         newSelected.add(itemId);
@@ -161,27 +195,28 @@ const handleSaveClick = async () => {
       return newSelected;
     });
   };
- const handleDeleteSelected = async () => {
+
+  const handleDeleteSelected = async () => {
     if (selectedItems.size === 0) {
-      const toast = cardListTexts.toasts.deleteTransactionsWarning;
+      const toast = texts.cardList.toasts.deleteTransactionsWarning;
       showToast("error", toast.title, toast.message);
       return;
     }
 
     try {
       await deleteTransactions(Array.from(selectedItems));
-      const toast = cardListTexts.toasts.deleteTransactionsSuccess;
+      const toast = texts.cardList.toasts.deleteTransactionsSuccess;
       showToast("success", toast.title, toast.message(selectedItems.size));
       setIsDeleting(false);
       setSelectedItems(new Set());
     } catch (error) {
-      const toast = cardListTexts.toasts.deleteTransactionsError;
+      const toast = texts.cardList.toasts.deleteTransactionsError;
       showToast("error", toast.title, toast.message);
     }
   };
 
   const handleValueChange = (id: string, newValue: string) => {
-    setEditedValues(prevValues => ({
+    setEditedValues((prevValues) => ({
       ...prevValues,
       [id]: newValue,
     }));
@@ -209,72 +244,113 @@ const handleSaveClick = async () => {
             accessible={true}
             accessibilityLabel={
               !isEditing
-                ? cardListTexts.item.accessibility.cardLabel(item.tipo, item.valor, item.updateAt)
-                : cardListTexts.item.accessibility.editingCardLabel(item.tipo)
+                ? texts.cardList.item.accessibility.cardLabel(
+                    item.tipo,
+                    item.valor,
+                    item.updateAt
+                  )
+                : texts.cardList.item.accessibility.editingCardLabel(item.tipo)
             }
           >
             <View style={styles.row}>
-              {
-              isDeleting ? 
-                <View style={{ flexDirection: layout.flexRow, alignItems: typography.alignCenter, gap: spacing.xs }}>
+              {isDeleting ? (
+                <View
+                  style={{
+                    flexDirection: layout.flexRow,
+                    alignItems: typography.alignCenter,
+                    gap: spacing.xs,
+                  }}
+                >
                   <Checkbox
                     value={selectedItems.has(item.id!)}
-                    onValueChange={(isSelected) => handleItemSelection(item.id!, isSelected)}
+                    onValueChange={(isSelected) =>
+                      handleItemSelection(item.id!, isSelected)
+                    }
                     accessibilityLabel={`Selecionar ${item.tipo} para exclusão`}
                     accessibilityHint="Marque para incluir este item na exclusão"
                   />
-                  <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
+                  <Text
+                    style={styles.description}
+                    accessibilityElementsHidden={true}
+                  >
+                    {item.tipo}
+                  </Text>
                 </View>
-              
-              : <Text style={styles.description} accessibilityElementsHidden={true}>{item.tipo}</Text>
-              }
-              
+              ) : (
+                <Text
+                  style={styles.description}
+                  accessibilityElementsHidden={true}
+                >
+                  {item.tipo}
+                </Text>
+              )}
+
               {isEditing ? (
                 <MaskedTextInput
                   style={styles.input}
                   type="currency"
                   options={{
-                    prefix: 'R$ ',
-                    decimalSeparator: ',',
-                    groupSeparator: '.',
+                    prefix: "R$ ",
+                    decimalSeparator: ",",
+                    groupSeparator: ".",
                     precision: 2,
                   }}
                   value={editedValues[item.id!]}
-                  onChangeText={(_, rawText) => handleValueChange(item.id!, rawText)}
+                  onChangeText={(_, rawText) =>
+                    handleValueChange(item.id!, rawText)
+                  }
                   keyboardType="decimal-pad"
-                  accessibilityLabel={cardListTexts.item.accessibility.amountInputLabel(item.tipo)}
-                  accessibilityValue={{ text: cardListTexts.item.accessibility.amountInputValue(item.valor) }}
-                  accessibilityHint={cardListTexts.item.accessibility.amountInputHint}
+                  accessibilityLabel={texts.cardList.item.accessibility.amountInputLabel(
+                    item.tipo
+                  )}
+                  accessibilityValue={{
+                    text: texts.cardList.item.accessibility.amountInputValue(
+                      item.valor
+                    ),
+                  }}
+                  accessibilityHint={
+                    texts.cardList.item.accessibility.amountInputHint
+                  }
                 />
               ) : (
                 <Text style={styles.amount} accessibilityElementsHidden={true}>
                   {item.valor >= 0
-                    ? `+ R$ ${item.valor.toFixed(2).replace('.', ',')}`
-                    : `- R$ ${Math.abs(item.valor).toFixed(2).replace('.', ',')}`}
+                    ? `+ R$ ${item.valor.toFixed(2).replace(".", ",")}`
+                    : `- R$ ${Math.abs(item.valor)
+                        .toFixed(2)
+                        .replace(".", ",")}`}
                 </Text>
               )}
             </View>
 
             <Text style={styles.date} accessibilityElementsHidden={true}>
-              {cardListTexts.item.updatedAtLabel} {item.updateAt}
+              {texts.cardList.item.updatedAtLabel} {item.updateAt}
             </Text>
 
-             {item.anexos && item.anexos.length > 0 && (
+            {item.anexos && item.anexos.length > 0 && (
               <View style={styles.attachmentsContainer}>
-                <Text style={styles.attachmentsTitle}>{cardListTexts.item.attachmentsTitle}</Text>
+                <Text style={styles.attachmentsTitle}>
+                  {texts.cardList.item.attachmentsTitle}
+                </Text>
                 {item.anexos.map((url, index) => (
                   <Fragment key={index}>
                     <View style={styles.attachmentRow}>
                       <Pressable onPress={() => handleOpenReceipt(url)}>
-                        <Text style={styles.attachmentLink}>{cardListTexts.item.attachmentLink(index + 1)}</Text>
+                        <Text style={styles.attachmentLink}>
+                          {texts.cardList.item.attachmentLink(index + 1)}
+                        </Text>
                       </Pressable>
-                      
+
                       {isEditing && (
                         <Pressable
                           style={styles.deleteButton}
                           onPress={() => handleDeleteAttachment(item.id!, url)}
                         >
-                          <Feather name="trash-2" size={spacing.md} color={colors.byteColorRed500} />
+                          <Feather
+                            name="trash-2"
+                            size={spacing.md}
+                            color={colors.byteColorRed500}
+                          />
                         </Pressable>
                       )}
                     </View>
@@ -290,16 +366,23 @@ const handleSaveClick = async () => {
             {isEditing && (
               <View style={styles.editActionsContainer}>
                 {uploadingId === item.id ? (
-                  <ActivityIndicator size="small" color={colors.byteColorBlue500} />
+                  <ActivityIndicator
+                    size="small"
+                    color={colors.byteColorBlue500}
+                  />
                 ) : (
                   <Pressable
                     onPress={() => handleAttachFile(item.id!)}
                     style={styles.receiptButton}
                     disabled={!!uploadingId}
                     accessibilityRole="button"
-                    accessibilityLabel={cardListTexts.item.accessibility.attachButtonLabel(item.tipo)}
+                    accessibilityLabel={texts.cardList.item.accessibility.attachButtonLabel(
+                      item.tipo
+                    )}
                   >
-                    <Text style={styles.receiptButtonText}>{cardListTexts.item.attachButton}</Text>
+                    <Text style={styles.receiptButtonText}>
+                      {texts.cardList.item.attachButton}
+                    </Text>
                   </Pressable>
                 )}
               </View>
@@ -307,9 +390,14 @@ const handleSaveClick = async () => {
           </View>
         )}
         ListEmptyComponent={
-          !loading 
-            ? <Text style={styles.empty} accessibilityLiveRegion={typography.liveRegionPolite}>{cardListTexts.list.empty}</Text> 
-            : null
+          !loading ? (
+            <Text
+              style={styles.empty}
+              accessibilityLiveRegion={typography.liveRegionPolite}
+            >
+              {texts.cardList.list.empty}
+            </Text>
+          ) : null
         }
         ListFooterComponent={<ListFooter isLoadingMore={loadingMore} />}
         onEndReached={handleLoadMore}
