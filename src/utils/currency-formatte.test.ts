@@ -1,76 +1,75 @@
-// import "@testing-library/jest-dom";
-// import { formatBRL, formatTipo, parseBRL } from "./currency-formatte";
+import {
+    formatBRL,
+    formatCurrencyToBRL,
+    formatTipo,
+    maskCurrency,
+    parseBRL,
+} from "./currency-formatte";
 
-// describe("formatBRL", () => {
-//   it("should format integer to BRL", () => {
-//     expect(formatBRL(500)).toBe("R$ 500,00");
-//   });
+/**
+ * Normaliza espaços (NBSP vs espaço normal) para evitar falhas de comparação.
+ */
+const normalizeCurrency = (value: string) => value.replace(/\s/g, " ");
 
-//   it("should format decimal to BRL", () => {
-//     expect(formatBRL(1234.56)).toBe("R$ 1.234,56");
-//   });
+describe("📌 formatBRL", () => {
+  it.each([
+    { input: 1000, expected: "R$ 1.000,00" },
+    { input: 1234.56, expected: "R$ 1.234,56" },
+    { input: 0, expected: "R$ 0,00" },
+    { input: 0.1, expected: "R$ 0,10" },
+  ])("deve formatar $input corretamente", ({ input, expected }) => {
+    expect(normalizeCurrency(formatBRL(input))).toBe(expected);
+  });
+});
 
-//   it("should format zero to BRL", () => {
-//     expect(formatBRL(0)).toBe("R$ 0,00");
-//   });
-// });
+describe("📌 parseBRL", () => {
+  it.each([
+    { input: "R$ 1.234,56", expected: 1234.56 },
+    { input: "R$0,00", expected: 0 },
+    { input: "R$ 99,99", expected: 99.99 },
+    // { input: "99.99", expected: 99.99 },  ❌ NÃO SUPORTADO PELA FUNÇÃO ATUAL
+    { input: "1000", expected: 1000 },
+    { input: "1.000", expected: 1000 },
+    { input: "1.000,50", expected: 1000.5 },
+  ])("deve converter '$input' para $expected", ({ input, expected }) => {
+    expect(parseBRL(input)).toBeCloseTo(expected, 2);
+  });
+});
 
-// describe("parseBRL", () => {
-//   it("should parse BRL string with symbol and comma", () => {
-//     expect(parseBRL("R$ 1234,56")).toBe(1234.56);
-//   });
+describe("📌 formatTipo", () => {
+  it.each([
+    { input: "deposito", expected: "Depósito" },
+    { input: "RETIRADA", expected: "Retirada" },
+    { input: "Transferencia", expected: "Transferência" },
+    { input: "pagamento", expected: "Pagamento" },
+    { input: "pix", expected: "Pix" },
+    { input: "", expected: "" },
+    { input: undefined, expected: "" },
+  ])("deve formatar '$input' como '$expected'", ({ input, expected }) => {
+    expect(formatTipo(input as any)).toBe(expected);
+  });
+});
 
-//   it("should parse BRL string without symbol", () => {
-//     expect(parseBRL("999999999,99")).toBe(999999999.99);
-//   });
+describe("📌 maskCurrency", () => {
+  it.each([
+    { input: "1234", expected: "12,34" },
+    { input: "123456", expected: "1.234,56" },
+    { input: "abc1234xyz", expected: "12,34" },
+    { input: undefined, expected: "" },
+    { input: "", expected: "" },
+    { input: "123456789012345", expected: "123.456.789,01" },
+    { input: "1", expected: "0,01" },
+    { input: "10", expected: "0,10" },
+  ])("deve aplicar máscara para '$input' => '$expected'", ({ input, expected }) => {
+    expect(maskCurrency(input as any)).toBe(expected);
+  });
+});
 
-//   it("should parse BRL string with excess decimals", () => {
-//     expect(parseBRL("123456789,123")).toBeCloseTo(123456789.12, 2);
-//   });
-
-//   it("should parse BRL string with only integers", () => {
-//     expect(parseBRL("500")).toBe(500);
-//   });
-
-//   it("should parse BRL string with garbage characters", () => {
-//     expect(parseBRL("R$ abc123,45xyz")).toBe(123.45);
-//   });
-
-//   it("should return 0 for empty string", () => {
-//     expect(parseBRL("")).toBe(0);
-//   });
-// });
-
-// describe("formatTipo", () => {
-//   it('should format "deposito" to "Depósito"', () => {
-//     expect(formatTipo("deposito")).toBe("Depósito");
-//   });
-
-//   it('should format "retirada" to "Retirada"', () => {
-//     expect(formatTipo("retirada")).toBe("Retirada");
-//   });
-
-//   it('should format "transferencia" to "Transferência"', () => {
-//     expect(formatTipo("transferencia")).toBe("Transferência");
-//   });
-
-//   it('should format "pagamento" to "Pagamento"', () => {
-//     expect(formatTipo("pagamento")).toBe("Pagamento");
-//   });
-
-//   it("should capitalize unknown types", () => {
-//     expect(formatTipo("custom")).toBe("Custom");
-//   });
-
-//   it("should handle uppercase input", () => {
-//     expect(formatTipo("DEPOSITO")).toBe("Depósito");
-//   });
-
-//   it("should return empty string if undefined", () => {
-//     expect(formatTipo(undefined)).toBe("");
-//   });
-
-//   it("should return empty string if empty", () => {
-//     expect(formatTipo("")).toBe("");
-//   });
-// });
+describe("📌 formatCurrencyToBRL", () => {
+  it.each([
+    { input: 1234.56, expected: "R$ 1.234,56" },
+    { input: 0, expected: "R$ 0,00" },
+  ])("deve formatar $input como moeda BRL", ({ input, expected }) => {
+    expect(normalizeCurrency(formatCurrencyToBRL(input))).toBe(expected);
+  });
+});

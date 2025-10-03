@@ -29,6 +29,8 @@ export type ConfirmModalProps = {
 };
 
 export type DashboardStyles = {
+  container: ViewStyle;
+  content: ViewStyle;
   headerTitle: TextStyle;
   totalValue: TextStyle;
   summaryContainer: ViewStyle;
@@ -42,19 +44,10 @@ export type DashboardStyles = {
   legendItem: ViewStyle;
   legendDot: ViewStyle;
   legendText: TextStyle;
-  container: ViewStyle;
   cardPixelsTop: ViewStyle;
   cardPixelsBotton: ViewStyle;
-  content: ViewStyle;
-  wrapper: ViewStyle;
-  row: ViewStyle;
-  card: ViewStyle;
-  cardTitle: TextStyle;
-  cardValue: TextStyle;
-  balance: ViewStyle;
-  balanceLabel: TextStyle;
-  balanceValue: TextStyle;
 };
+
 
 export type AppLayoutStyles = {
   loaderContainer: ViewStyle;
