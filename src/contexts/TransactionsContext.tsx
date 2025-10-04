@@ -12,7 +12,9 @@ import {
   serverTimestamp,
   startAfter,
   Timestamp,
-  updateDoc
+  updateDoc,
+  where,
+  writeBatch
 } from "firebase/firestore";
 import {
   deleteObject,
@@ -46,21 +48,23 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
+  const [balance, setBalance] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [lastVisible, setLastVisible] = useState<any>(null);
 
   useEffect(() => {
-    setLoading(true);
     if (!user) {
       setTransactions([]);
       setLoading(false);
       return;
     }
 
+    setLoading(true);
     const q = query(
       collection(db, "transactions"),
+      where("userId", "==", user.uid),
       orderBy("createdAt", "desc"),
       limit(PAGE_SIZE)
     );
@@ -83,30 +87,49 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
           createdAt: convertedCreatedAt,
           tipo: docData.tipo,
           updateAt: convertedUpdatedAt,
-        };
-      }) as ITransaction[];
-
-      const userTransactions = data.filter((t) => t.userId === user.uid);
-
-      setTransactions(userTransactions);
+        } as ITransaction;
+      });
+      
+      setTransactions(data);
       setLoading(false);
 
       if (snapshot.docs.length > 0) {
         setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
       }
-
       setHasMore(snapshot.docs.length >= PAGE_SIZE);
     });
 
     return () => unsubscribe();
   }, [user]);
 
-  const addTransaction = async (transaction: INewTransactionInput) => {
+  useEffect(() => {
     if (!user) {
-      console.error("Tentativa de adicionar transação sem usuário autenticado.");
-      throw new Error("Usuário não autenticado.");
+      setBalance(0);
+      return;
     }
 
+    const balanceQuery = query(
+      collection(db, "transactions"),
+      where("userId", "==", user.uid)
+    );
+
+    const unsubscribe = onSnapshot(balanceQuery, (snapshot) => {
+      const total = snapshot.docs.reduce((acc, doc) => {
+        const transaction = doc.data();
+        if (transaction.tipo === "transferencia") {
+          return acc - transaction.valor;
+        }
+        return acc + transaction.valor;
+      }, 0);
+
+      setBalance(total);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const addTransaction = async (transaction: INewTransactionInput) => {
+    if (!user) throw new Error("Usuário não autenticado.");
     await addDoc(collection(db, "transactions"), {
       ...transaction,
       userId: user.uid,
@@ -122,7 +145,6 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
   ): Promise<void> => {
     try {
       const transactionRef = doc(db, "transactions", id);
-
       await updateDoc(transactionRef, {
         ...data,
         updateAt: serverTimestamp(),
@@ -141,112 +163,53 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const canLoadMore = (): boolean => {
-    return hasMore && !loadingMore && lastVisible !== null;
-  };
-
-  const transformDocumentToTransaction = (doc: any): ITransaction => {
-    const docData = doc.data();
-    const createdAtTimestamp = docData.createdAt as Timestamp;
-    const updatedAtTimestamp = docData.updateAt as Timestamp;
-    const convertedCreatedAt = createdAtTimestamp
-      ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR")
-      : new Date().toLocaleDateString("pt-BR");
-    const convertedUpdatedAt = updatedAtTimestamp
-      ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR")
-      : new Date().toLocaleDateString("pt-BR");
-
-    return {
-      id: doc.id,
-      ...docData,
-      createdAt: convertedCreatedAt,
-      updateAt: convertedUpdatedAt,
-    } as ITransaction;
-  };
-
-  const fetchNextPage = async () => {
-    const nextPageQuery = query(
-      collection(db, "transactions"),
-      orderBy("createdAt", "desc"),
-      startAfter(lastVisible),
-      limit(PAGE_SIZE)
-    );
-
-    const snapshot = await getDocs(nextPageQuery);
-    return snapshot;
-  };
-
-  const updateTransactionsState = (
-    newTransactions: ITransaction[],
-    snapshot: any
-  ) => {
-    const userTransactions = newTransactions.filter(
-      (t) => t.userId === user?.uid
-    );
-
-    setTransactions((prev) => {
-      const combinedTransactions = [...prev, ...userTransactions];
-
-      const uniqueTransactions = combinedTransactions.filter(
-        (transaction, index, self) =>
-          index === self.findIndex((t) => t.id === transaction.id)
-      );
-
-      return uniqueTransactions;
-    });
-
-    if (snapshot.docs.length > 0) {
-      setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
-    }
-
-    setHasMore(snapshot.docs.length >= PAGE_SIZE);
-  };
-
   const loadMoreTransactions = async (): Promise<void> => {
-    if (!canLoadMore()) return;
+    if (!user || loadingMore || !hasMore || !lastVisible) return;
 
     setLoadingMore(true);
-
     try {
-      const snapshot = await fetchNextPage();
+      const nextPageQuery = query(
+        collection(db, "transactions"),
+        where("userId", "==", user.uid),
+        orderBy("createdAt", "desc"),
+        startAfter(lastVisible),
+        limit(PAGE_SIZE)
+      );
 
+      const snapshot = await getDocs(nextPageQuery);
       if (!snapshot.empty) {
-        const newTransactions = snapshot.docs.map(transformDocumentToTransaction);
-        updateTransactionsState(newTransactions, snapshot);
+        const newTransactions = snapshot.docs.map((doc) => {
+           const docData = doc.data();
+           const createdAtTimestamp = docData.createdAt as Timestamp;
+           const updatedAtTimestamp = docData.updateAt as Timestamp;
+           const convertedCreatedAt = createdAtTimestamp ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR") : new Date().toLocaleDateString("pt-BR");
+           const convertedUpdatedAt = updatedAtTimestamp ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR") : new Date().toLocaleDateString("pt-BR");
+           return { id: doc.id, ...docData, createdAt: convertedCreatedAt, updateAt: convertedUpdatedAt } as ITransaction;
+        });
+
+        setTransactions((prev) => [...prev, ...newTransactions]);
+        setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
+        setHasMore(snapshot.docs.length >= PAGE_SIZE);
       } else {
         setHasMore(false);
       }
     } catch (error) {
       console.error("Erro ao carregar mais transações:", error);
-      setHasMore(false);
     } finally {
       setLoadingMore(false);
     }
   };
 
   const deleteTransactions = async (ids: string[]): Promise<void> => {
-    if (!user) {
-      console.error("Tentativa de excluir transações sem usuário autenticado.");
-      throw new Error("Usuário não autenticado.");
-    }
+    if (!user) throw new Error("Usuário não autenticado.");
+    
+    const batch = writeBatch(db);
+    ids.forEach(id => {
+      batch.delete(doc(db, "transactions", id));
+    });
+    await batch.commit();
 
-    try {
-      // Importar deleteDoc dinamicamente para evitar problemas de import
-      const { deleteDoc } = await import("firebase/firestore");
-
-      const deletePromises = ids.map(async (id) => {
-        const transactionRef = doc(db, "transactions", id);
-        return deleteDoc(transactionRef);
-      });
-
-      await Promise.all(deletePromises);
-
-      // Atualizar estado local removendo as transações excluídas
-      setTransactions((prev) => prev.filter((transaction) => !ids.includes(transaction.id!)));
-    } catch (error) {
-      console.error("Erro ao excluir transações:", error);
-      throw error;
-    }
+    setTransactions((prev) => prev.filter((t) => !ids.includes(t.id!)));
   };
 
   const uploadAttachmentAndUpdateTransaction = async (
@@ -254,28 +217,22 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     fileUri: string,
     fileName: string
   ): Promise<void> => {
-    if (!user) {
-      throw new Error("Usuário não autenticado para fazer upload.");
-    }
-
+    if (!user) throw new Error("Usuário não autenticado para fazer upload.");
     try {
       const response = await fetch(fileUri);
       const blob = await response.blob();
       const storageRef = ref(storage, `attachments/${Date.now()}-${fileName}`);
       const uploadTask = uploadBytesResumable(storageRef, blob);
-
       await uploadTask;
       const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
       const transactionRef = doc(db, "transactions", transactionId);
       const transactionSnap = await getDoc(transactionRef);
       const existingData = transactionSnap.data();
       const existingAnexos = existingData?.anexos || [];
-
       await updateDoc(transactionRef, {
         anexos: [...existingAnexos, downloadURL],
         updateAt: serverTimestamp(),
       });
-
       setTransactions((prev) =>
         prev.map((t) =>
           t.id === transactionId
@@ -290,19 +247,14 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const deleteAttachment = async (transactionId: string, fileUrl: string) => {
-    if (!user) {
-      throw new Error("Usuário não autenticado para excluir.");
-    }
-
+    if (!user) throw new Error("Usuário não autenticado para excluir.");
     try {
       const fileRef = ref(storage, fileUrl);
       await deleteObject(fileRef);
-
       const transactionRef = doc(db, "transactions", transactionId);
       await updateDoc(transactionRef, {
         anexos: arrayRemove(fileUrl),
       });
-
       setTransactions((prev) =>
         prev.map((t) => {
           if (t.id === transactionId) {
@@ -317,10 +269,12 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       throw error;
     }
   };
+
   return (
     <TransactionsContext.Provider
       value={{
         transactions,
+        balance,
         addTransaction,
         loading,
         loadingMore,
@@ -339,12 +293,10 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
 
 export function useTransactions(): ITransactionsContextData {
   const context = useContext(TransactionsContext);
-
   if (!context) {
     throw new Error(
       "useTransactions deve ser usado dentro de um TransactionsProvider"
     );
   }
-
   return context;
 }

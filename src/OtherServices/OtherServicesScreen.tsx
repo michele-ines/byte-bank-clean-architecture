@@ -4,7 +4,6 @@ import React from "react";
 import { Text, View } from "react-native";
 
 import { ScreenWrapper } from "@/src/components/common/ScreenWrapper/ScreenWrapper";
-import { UserInfo } from "firebase/auth";
 import SavingsGoalWidget from "../shared/components/SavingsGoalWidget/SavingsGoalWidget";
 import SpendingAlertWidget from "../shared/components/SpendingAlertWidget/SpendingAlertWidget";
 import WidgetPreferencesButton from "../shared/components/WidgetPreferencesButton/WidgetPreferencesButton";
@@ -17,12 +16,6 @@ const transactions: Transaction[] = [
   { tipo: "saida", valor: 200 },
   { tipo: "saida", valor: 300 },
 ];
-
-const user = {
-  displayName: "Joana",
-} as UserInfo;
-
-const balance = { account: "corrente", value: 209021 };
 
 const ServicesScreen: React.FC = () => {
   const { preferences } = useWidgetPreferences();

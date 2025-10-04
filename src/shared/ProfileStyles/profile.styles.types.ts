@@ -82,6 +82,7 @@ export type TransactionsStyles = {
   deleteButtonText:TextStyle;
   attachmentRow:ViewStyle;
   separator:ViewStyle;
+  amountNegative:TextStyle;
 };
 
 export type EditFieldModalStyles = {

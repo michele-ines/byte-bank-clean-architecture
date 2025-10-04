@@ -313,14 +313,18 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
                   }
                 />
               ) : (
-                <Text style={styles.amount} accessibilityElementsHidden={true}>
-                  {item.valor >= 0
-                    ? `+ R$ ${item.valor.toFixed(2).replace(".", ",")}`
-                    : `- R$ ${Math.abs(item.valor)
-                        .toFixed(2)
-                        .replace(".", ",")}`}
+                <Text 
+                  style={[
+                    styles.amount, 
+                    item.tipo === 'transferencia' && styles.amountNegative
+                  ]} 
+                  accessibilityElementsHidden={true}
+                >
+                  {item.tipo === 'transferencia'
+                    ? `- R$ ${item.valor.toFixed(2).replace('.', ',')}`
+                    : `+ R$ ${item.valor.toFixed(2).replace('.', ',')}`}
                 </Text>
-              )}
+                )}
             </View>
 
             <Text style={styles.date} accessibilityElementsHidden={true}>

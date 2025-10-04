@@ -50,6 +50,9 @@ export const styles = StyleSheet.create<TransactionsStyles>({
     fontWeight: typography.fontBold,
     color: colors.byteColorGreen500,
   },
+   amountNegative: {
+    color: colors.byteColorRed500,
+  },
   date: {
     fontSize: typography.textXs,
     color: colors.byteGray450,

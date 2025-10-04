@@ -71,6 +71,7 @@ export interface CheckboxProps {
 }
 export interface ITransactionsContextData {
   transactions: ITransaction[];
+  balance:number;
   addTransaction: (transaction: INewTransactionInput) => Promise<void>;
   loading: boolean;
   loadingMore: boolean;

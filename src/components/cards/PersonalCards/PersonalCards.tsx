@@ -122,16 +122,6 @@ export default function PersonalCards() {
           </View>
 
           <View style={styles.actions}>
-            {/* Botão configurar */}
-            <DefaultButton
-              title={texts.textConfigurar}
-              onPress={onConfigure}
-              loading={false}
-              disabled={false}
-              buttonStyle={[styles.btn, styles.btnPrimary]}
-              textStyle={[styles.btnTextBase, styles.btnPrimaryText]}
-              accessibilityLabel={`${texts.a11yConfigurar} ${title}`}
-            />
 
             {/* Botão bloquear/desbloquear */}
             <DefaultButton

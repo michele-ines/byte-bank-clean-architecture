@@ -1,5 +1,6 @@
 // src/components/layouts/ScreenWrapper.tsx
 import { useAuth } from "@/src/contexts/AuthContext";
+import { useTransactions } from "@/src/contexts/TransactionsContext";
 import Balance from "@/src/shared/cards/balance/BalanceComponent";
 import { CardListExtract } from "@/src/shared/cards/CardListExtract/CardListExtract";
 import { ITransaction, ScreenWrapperProps } from "@/src/shared/interfaces/auth.interfaces";
@@ -16,14 +17,14 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   extractFilter,
 }) => {
   const { userData } = useAuth();
-
+  const { balance } = useTransactions();
   const userInfo = {
     displayName: userData?.name,
   } as UserInfo;
 
-  const balance = {
+  const balanceText = {
     account: "corrente",
-    value: 209021,
+    value: balance,
   };
 
   const defaultFilter = (transaction: ITransaction) => {
@@ -38,7 +39,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 
   const renderHeader = () => (
     <View style={styles.header}>
-      {showBalance && <Balance balance={balance} user={userInfo} />}
+      {showBalance && <Balance balance={balanceText} user={userInfo} />}
       {children}
     </View>
   );
