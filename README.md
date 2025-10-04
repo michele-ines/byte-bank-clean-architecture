@@ -226,6 +226,23 @@ import { tokens } from "@/src/theme/tokens";
 import DashboardScreen from "@/src/features/dashboard/DashboardScreen";
 ```
 
+
+5. configuração do firebase 
+- **os dados do firebase estao configurados no caminho /config/firebaseConfig.
+as informações sao fornecedidas pela propria conta do firebase na parte de configurações do projeto 
+
+```js
+const firebaseConfig = {
+  apiKey: "api-key",
+  authDomain: "autdomain",
+  projectId: "projectid",
+  storageBucket: "storage buacket",
+  messagingSenderId: " messaging sender id",
+  appId: "app id",
+};
+```
+os dados do firebase estao configurados na pasta 
+
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
