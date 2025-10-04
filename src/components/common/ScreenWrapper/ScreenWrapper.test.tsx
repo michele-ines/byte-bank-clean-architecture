@@ -1,10 +1,21 @@
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
 import { ScreenWrapper } from "./ScreenWrapper";
-// mock do contexto
+
+// mock do AuthContext
 jest.mock("@/src/contexts/AuthContext", () => ({
   useAuth: () => ({
     userData: { name: "Michele", uuid: "user-123" },
+  }),
+}));
+
+// mock do TransactionsContext para evitar Firebase
+jest.mock("@/src/contexts/TransactionsContext", () => ({
+  useTransactions: () => ({
+    transactions: [],
+    loading: false,
+    addTransaction: jest.fn(),
+    removeTransaction: jest.fn(),
   }),
 }));
 
@@ -13,7 +24,7 @@ jest.mock("@/src/shared/cards/balance/BalanceComponent", () => {
   const { View, Text } = require("react-native");
   return ({ user }: any) => (
     <View testID="balance">
-      <Text>{`Balance para ${user?.displayName}`}</Text>
+      <Text>{`Balance para ${user?.displayName || user?.name}`}</Text>
     </View>
   );
 });
