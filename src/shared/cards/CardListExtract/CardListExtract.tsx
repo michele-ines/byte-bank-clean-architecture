@@ -1,5 +1,6 @@
 import { useTransactions } from "@/src/contexts/TransactionsContext";
 import { colors, layout, spacing, texts, typography } from "@/src/theme";
+import { truncateString } from "@/src/utils/string";
 import { showToast } from "@/src/utils/transactions.utils";
 import { Feather } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
@@ -17,6 +18,7 @@ import { MaskedTextInput } from "react-native-mask-text";
 import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
+import { IAnexo } from "../../interfaces/auth.interfaces";
 import {
   CardListExtractProps,
   EditedValuesMap,
@@ -159,7 +161,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
   };
 
-  const handleDeleteAttachment = (transactionId: string, fileUrl: string) => {
+  const handleDeleteAttachment = (transactionId: string, file: IAnexo) => {
     const dialog = texts.cardList.dialogs.deleteAttachment;
     Alert.alert(dialog.title, dialog.message, [
       { text: dialog.cancelButton, style: "cancel" },
@@ -167,7 +169,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         text: dialog.confirmButton,
         onPress: async () => {
           try {
-            await deleteAttachment(transactionId, fileUrl);
+            await deleteAttachment(transactionId, file);
             const toast = texts.cardList.toasts.deleteAttachmentSuccess;
             showToast("success", toast.title, toast.message);
           } catch (error) {
@@ -336,19 +338,19 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
                 <Text style={styles.attachmentsTitle}>
                   {texts.cardList.item.attachmentsTitle}
                 </Text>
-                {item.anexos.map((url, index) => (
+                {item.anexos.map((file, index = 0) => (
                   <Fragment key={index}>
                     <View style={styles.attachmentRow}>
-                      <Pressable onPress={() => handleOpenReceipt(url)}>
+                      <Pressable onPress={() => handleOpenReceipt(file.url)}>
                         <Text style={styles.attachmentLink}>
-                          {texts.cardList.item.attachmentLink(index + 1)}
+                         {truncateString(file.name, 20)}
                         </Text>
                       </Pressable>
 
                       {isEditing && (
                         <Pressable
                           style={styles.deleteButton}
-                          onPress={() => handleDeleteAttachment(item.id!, url)}
+                          onPress={() => handleDeleteAttachment(item.id!, file)}
                         >
                           <Feather
                             name="trash-2"
