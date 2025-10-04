@@ -11,6 +11,11 @@ export interface UserData {
   createdAt?: any;
 }
 
+export interface IAnexo {
+  name: string;
+  url: string;
+}
+
 export interface DefaultButtonProps {
   title: string;
   loading?: boolean;
@@ -48,7 +53,7 @@ export interface ITransaction extends DocumentData {
   description: string;
   valor: number;
   receiptUrl?: string;
-  anexos: Array<string>;
+  anexos:IAnexo[];
   tipo: string;
   userId: string;
   createdAt: string;
@@ -79,7 +84,7 @@ export interface ITransactionsContextData {
   loadMoreTransactions: () => Promise<void>;
   updateTransaction: (id: string, data: Partial<ITransaction>) => Promise<void>;
   uploadAttachmentAndUpdateTransaction: (transactionId: string, fileUri: string, fileName: string) => Promise<void>;
-  deleteAttachment: (transactionId: string, fileUrl: string) => Promise<void>;
+  deleteAttachment: (transactionId: string, attachmentToDelete: IAnexo) => Promise<void>;
   deleteTransactions: (ids: string[]) => Promise<void>;
 }
 
