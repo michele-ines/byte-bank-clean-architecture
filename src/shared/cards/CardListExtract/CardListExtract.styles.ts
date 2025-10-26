@@ -1,10 +1,4 @@
-import { radius } from "@/src/theme";
-import { border } from "@/src/theme/border";
-import { colors } from "@/src/theme/colors";
-import { layout } from "@/src/theme/layout";
-import { shadows } from "@/src/theme/shadows";
-import { spacing } from "@/src/theme/spacing";
-import { typography } from "@/src/theme/typography";
+import { border, colors, layout, radius, shadows, spacing, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
 import { TransactionsStyles } from "../../ProfileStyles/profile.styles.types";
 

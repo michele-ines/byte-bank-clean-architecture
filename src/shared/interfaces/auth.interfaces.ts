@@ -65,7 +65,6 @@ export interface CheckboxProps {
   onValueChange: (value: boolean) => void;
   style?: ViewStyle;
   color?: string;
-  // Parâmetros opcionais de acessibilidade
   accessibilityLabel?: string;
   accessibilityRole?: 'checkbox' | 'button' | 'switch';
   accessibilityHint?: string;

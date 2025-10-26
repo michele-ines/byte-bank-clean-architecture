@@ -1,7 +1,7 @@
-import { toastConfig } from "@/src/config/Toast.config";
-import { GlobalContextProvider } from "@/src/contexts";
-import { WidgetPreferencesProvider } from "@/src/contexts/WidgetPreferencesContext";
-import { layout } from "@/src/theme";
+import { toastConfig } from "@infrastructure/config/Toast.config";
+import { GlobalContextProvider } from "@presentation/state";
+import { WidgetPreferencesProvider } from "@presentation/state/WidgetPreferencesContext";
+import { layout } from "@presentation/theme";
 import { Slot } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";

@@ -1,8 +1,9 @@
-import { useTransactions } from "@/src/contexts/TransactionsContext";
-import { colors, layout, spacing, texts, typography } from "@/src/theme";
-import { truncateString } from "@/src/utils/string";
-import { showToast } from "@/src/utils/transactions.utils";
+
 import { Feather } from "@expo/vector-icons";
+import { useTransactions } from "@presentation/state/TransactionsContext";
+import { colors, layout, spacing, texts, typography } from "@presentation/theme";
+import { truncateString } from "@shared/utils/string";
+import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";
 import React, { Fragment, useState } from "react";
 import {

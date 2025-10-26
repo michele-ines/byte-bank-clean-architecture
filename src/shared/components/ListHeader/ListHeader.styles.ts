@@ -1,4 +1,4 @@
-import { colors, layout, radius, spacing, typography } from "@/src/theme";
+import { colors, layout, radius, spacing, typography } from "@presentation/theme";
 import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 
 type Styles = {

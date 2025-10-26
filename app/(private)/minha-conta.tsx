@@ -1,3 +1,3 @@
-import MinhaContaScreen from "@/src/features/MinhaContaScreen/MinhaContaScreen";
+import MinhaContaScreen from "@presentation/screens/MinhaConta/MinhaContaScreen";
 
 export default MinhaContaScreen;

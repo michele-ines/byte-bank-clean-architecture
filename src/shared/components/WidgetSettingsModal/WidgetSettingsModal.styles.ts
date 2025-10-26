@@ -1,9 +1,4 @@
-import { border } from "@/src/theme/border";
-import { colors } from "@/src/theme/colors";
-import { layout } from "@/src/theme/layout";
-import { radius } from "@/src/theme/radius";
-import { spacing } from "@/src/theme/spacing";
-import { typography } from "@/src/theme/typography";
+import { border, colors, layout, radius, spacing, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({

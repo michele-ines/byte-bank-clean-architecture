@@ -1,12 +1,6 @@
+import { border, colors, layout, radius, spacing, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
 import { SharedStyles } from "../shared/ProfileStyles/profile.styles.types";
-import { border } from "../theme/border";
-import { colors } from "../theme/colors";
-import { layout } from "../theme/layout";
-import { radius } from "../theme/radius";
-import { spacing } from "../theme/spacing";
-import { typography } from "../theme/typography";
-
 
 export const sharedStyles = StyleSheet.create<SharedStyles>({
   keyboardView: {
@@ -48,7 +42,6 @@ export const sharedStyles = StyleSheet.create<SharedStyles>({
     backgroundColor: colors.byteGray50,
     color: colors.byteGray800,
   },
-  // Botões
   button: {
     paddingVertical:spacing.md, 
     borderRadius: radius.sm,

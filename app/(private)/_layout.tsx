@@ -7,16 +7,14 @@ import {
   View
 } from "react-native";
 
-import { CustomDrawerContent } from "@/src/components/CustomDrawerContent/CustomDrawerContent";
-import { useAuth } from "@/src/contexts/AuthContext";
-import { Header } from "@/src/shared/Header/Header";
-import { AppLayoutStyles } from "@/src/shared/ProfileStyles/profile.styles.types";
-import { colors } from "@/src/theme/colors";
-import { radius } from "@/src/theme/radius";
-import { spacing } from "@/src/theme/spacing";
-import { typography } from "@/src/theme/typography";
+
 import { MaterialIcons } from "@expo/vector-icons";
+import { CustomDrawerContent } from "@presentation/components/common/CustomDrawerContent/CustomDrawerContent";
+import { Header } from "@presentation/layout/Header/Header";
+import { useAuth } from "@presentation/state/AuthContext";
+import { colors, radius, spacing, typography } from "@presentation/theme";
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
+import { AppLayoutStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const drawerIcons = {

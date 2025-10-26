@@ -1,3 +1,3 @@
-import InvestmentsScreen from "@/src/features/investments/InvestmentsScreen";
+import InvestmentsScreen from "@presentation/screens/Investments/InvestmentsScreen";
 
 export default InvestmentsScreen;

@@ -1,5 +1,5 @@
-import { sizes, texts } from "@/src/theme";
 import { MaterialIcons } from "@expo/vector-icons";
+import { sizes, texts } from "@presentation/theme";
 import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { Props } from "../../ProfileStyles/profile.styles.types";

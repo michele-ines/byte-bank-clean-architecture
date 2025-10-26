@@ -1,3 +1,3 @@
-import CardsScreen from "@/src/features/MyCardsScreen/CardsScreen";
+import CardsScreen from "@presentation/screens/MyCards/CardsScreen";
 
 export default CardsScreen;

@@ -84,3 +84,8 @@ lcov.info
 # =========================
 app-example/
 
+
+# Evitar nomes reservados no Windows
+nul
+/nul
+/nul/

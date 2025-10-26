@@ -1,4 +1,4 @@
-import { texts } from "@/src/theme";
+import { texts } from "@presentation/theme";
 import React from "react";
 import { Text, View } from "react-native";
 import { SpendingAlertProps } from "../../interfaces/auth.interfaces";

@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react-native";
 import React from "react";
 import { CardListExtract } from "./CardListExtract";
 
-// 🔹 mock do contexto Transactions
 jest.mock("@/src/contexts/TransactionsContext", () => ({
   useTransactions: () => ({
     transactions: [
@@ -25,12 +24,10 @@ jest.mock("@/src/contexts/TransactionsContext", () => ({
   }),
 }));
 
-// 🔹 mock showToast
 jest.mock("@/src/utils/transactions.utils", () => ({
   showToast: jest.fn(),
 }));
 
-// 🔹 mock expo/vector-icons para evitar warnings de act()
 jest.mock("@expo/vector-icons", () => {
   const React = require("react");
   return {
@@ -38,7 +35,6 @@ jest.mock("@expo/vector-icons", () => {
   };
 });
 
-// 🔹 mock do tema (completo)
 jest.mock("@/src/theme", () => ({
   texts: {
     cardList: {
@@ -106,7 +102,6 @@ describe("CardListExtract", () => {
   it("deve renderizar a transação com acessibilidade", () => {
     render(<CardListExtract title="Minhas Transações" filterFn={() => true} />);
 
-    // 🔹 valida pelo accessibilityLabel
     const label =
       "Transação do tipo Compra. Valor de R$ 120.50. Data: 2025-10-03.";
     expect(screen.getByLabelText(label)).toBeTruthy();

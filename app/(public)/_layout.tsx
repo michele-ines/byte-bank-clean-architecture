@@ -1,5 +1,5 @@
-import { layout } from "@/src/theme";
-import { colors } from "@/src/theme/colors";
+
+import { colors, layout } from "@presentation/theme";
 import { Slot } from "expo-router";
 import React from "react";
 import { StyleSheet } from "react-native";

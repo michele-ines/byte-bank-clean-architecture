@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "byte-bank-platform",
+    "name": "Byte Bank",
     "slug": "byte-bank-platform",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -33,7 +33,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

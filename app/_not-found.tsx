@@ -1,4 +1,4 @@
-import { ErrorScreen } from "@/src/components/common/ErrorScreen/ErrorScreen";
+import { ErrorScreen } from "@presentation/components/common/common/ErrorScreen/ErrorScreen";
 import { useRouter } from "expo-router";
 import React from "react";
 
@@ -6,7 +6,6 @@ export default function NotFoundPage() {
   const router = useRouter();
 
   const handleRetry = () => {
-    // Exemplo: voltar para a Home ou Login
     router.replace("/(public)/login/LoginPage");
   };
 

@@ -1,3 +1,3 @@
-import ServicesScreen from "@/src/OtherServices/OtherServicesScreen";
+import ServicesScreen from "@presentation/screens/OtherServices/OtherServicesScreen";
 
 export default ServicesScreen;

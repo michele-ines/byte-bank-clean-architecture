@@ -5,11 +5,11 @@ import { UserInfo } from "firebase/auth";
 import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { useBalanceVisibility } from "@/src/hooks/useBalanceVisibility";
-import { colors } from "@/src/theme/colors";
-import { typography } from "@/src/theme/typography";
-import { getCurrentDate } from "@/src/utils/date";
-import { getFirstName } from "@/src/utils/string";
+
+import { useBalanceVisibility } from "@presentation/hooks/useBalanceVisibility";
+import { colors, typography } from "@presentation/theme";
+import { getCurrentDate } from "@shared/utils/date";
+import { getFirstName } from "@shared/utils/string";
 import { styles } from "./BalanceComponent.styles";
 
 type AccountType = "corrente" | "poupança" | string;
@@ -22,7 +22,6 @@ type BalanceComponentProps = {
 export default function Balance({ balance, user }: BalanceComponentProps) {
   const balanceVisibility = useBalanceVisibility({ balance: balance.value });
 
-  // Calcula a data apenas uma vez no render para evitar inconsistências
   const currentDate = useMemo(() => getCurrentDate(), []);
 
   const firstName = getFirstName(user?.displayName || "");
@@ -46,7 +45,6 @@ export default function Balance({ balance, user }: BalanceComponentProps) {
         </Text>
       </View>
 
-      {/* Seção de saldo - posicionada à direita */}
       <View
         style={styles.balanceSection}
         accessibilityLabel="Informações de saldo da conta"

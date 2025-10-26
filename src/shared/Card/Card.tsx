@@ -1,5 +1,5 @@
-import { colors } from "@/src/theme/colors";
-import { typography } from "@/src/theme/typography";
+
+import { colors, typography } from "@presentation/theme";
 import React from "react";
 import { StyleSheet, Text, View, ViewStyle } from "react-native";
 import { CardProps } from "../ProfileStyles/profile.styles.types";

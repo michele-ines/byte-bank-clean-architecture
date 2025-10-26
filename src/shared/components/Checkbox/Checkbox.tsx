@@ -1,4 +1,4 @@
-import { colors } from '@/src/theme/colors';
+import { colors } from '@presentation/theme';
 import ExpoCheckbox from 'expo-checkbox';
 import React from 'react';
 import { CheckboxProps } from '../../interfaces/auth.interfaces';

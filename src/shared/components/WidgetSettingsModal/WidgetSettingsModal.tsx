@@ -1,6 +1,7 @@
-import { useWidgetPreferences } from "@/src/contexts/WidgetPreferencesContext";
-import { sizes, texts } from "@/src/theme";
+
 import { MaterialIcons } from "@expo/vector-icons";
+import { useWidgetPreferences } from "@presentation/state/WidgetPreferencesContext";
+import { sizes, texts } from "@presentation/theme";
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { WidgetSettingsModalProps } from "../../ProfileStyles/profile.styles.types";

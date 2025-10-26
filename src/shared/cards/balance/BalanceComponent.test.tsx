@@ -2,12 +2,10 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import React from 'react';
 import Balance from './BalanceComponent';
 
-// Mock formatBRL utility
 jest.mock('@/src/utils/currency-formatte', () => ({
   formatBRL: jest.fn((value: number) => `R$ ${value.toFixed(2).replace('.', ',')}`),
 }));
 
-// Mock utility functions
 jest.mock('@/src/utils/string', () => ({
   getFirstName: jest.fn((fullName: string) => fullName?.split(" ")[0] || ""),
 }));
@@ -16,12 +14,10 @@ jest.mock('@/src/utils/date', () => ({
   getCurrentDate: jest.fn(() => "Segunda-feira, 15/01/2024"),
 }));
 
-// Mock Expo Vector Icons to avoid act() warnings
 jest.mock('@expo/vector-icons', () => ({
   Entypo: 'Entypo',
 }));
 
-// Mock image assets
 jest.mock('@/assets/images/dash-card-saldo/card-pixels-1.svg', () => 'card-pixels-1.svg');
 jest.mock('@/assets/images/dash-card-saldo/card-pixels-2.svg', () => 'card-pixels-2.svg');
 
@@ -65,7 +61,6 @@ describe('BalanceComponent', () => {
     it('should render the current formatted date', () => {
       render(<Balance {...defaultProps} />);
       
-      // Check if the mocked date is being rendered
       expect(screen.getByText('Segunda-feira, 15/01/2024')).toBeTruthy();
     });
   });
@@ -93,11 +88,9 @@ describe('BalanceComponent', () => {
       
       const toggleButton = screen.getByLabelText('Ocultar saldo da conta');
       
-      // First press - hide
       fireEvent.press(toggleButton);
       expect(screen.getByText('••••••')).toBeTruthy();
       
-      // Second press - show
       const showButton = screen.getByLabelText('Mostrar saldo da conta');
       fireEvent.press(showButton);
       expect(screen.getByText('R$ 1500,75')).toBeTruthy();
@@ -225,13 +218,11 @@ describe('BalanceComponent', () => {
 
   describe('Date formatting', () => {
     it('should format date in Brazilian Portuguese', () => {
-      // Mock a specific date
       const mockDate = new Date('2024-03-15');
       jest.spyOn(global, 'Date').mockImplementation(() => mockDate as any);
       
       render(<Balance {...defaultProps} />);
       
-      // Check if date is in Brazilian format
       expect(screen.getByLabelText(/Data de hoje:/)).toBeTruthy();
     });
   });
