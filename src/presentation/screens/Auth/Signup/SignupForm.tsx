@@ -3,7 +3,6 @@ import { DefaultButton } from "@presentation/components/common/common/DefaultBut
 import { useAuth } from "@presentation/state/AuthContext";
 import { colors, sizes, texts } from "@presentation/theme";
 import { Checkbox } from "@shared/components/Checkbox/Checkbox";
-// ⬇️ ajuste aqui
 import { ROUTES } from "@shared/constants/routes";
 import { SignupFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
@@ -68,7 +67,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
       await signup(email, password, name);
       onSignupSuccess?.(email);
       showToast("success", toasts.success.title, toasts.success.message);
-      // ⬇️ ajuste aqui
       router.replace(ROUTES.DASHBOARD);
     } catch (error: unknown) {
       let errorMessage = toasts.genericError.message;
@@ -114,7 +112,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             {texts.signupForm.title}
           </Text>
 
-          {/* Nome */}
           <Text style={styles.label}>{texts.signupForm.fields.name}</Text>
           <TextInput
             placeholder={texts.signupForm.placeholders.name}
@@ -124,7 +121,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             accessibilityLabel={texts.signupForm.fields.name}
           />
 
-          {/* Email */}
           <Text style={styles.label}>{texts.signupForm.fields.email}</Text>
           <TextInput
             placeholder={texts.signupForm.placeholders.email}
@@ -141,7 +137,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             </Text>
           ) : null}
 
-          {/* Senha */}
           <Text style={styles.label}>{texts.signupForm.fields.password}</Text>
           <TextInput
             placeholder={texts.signupForm.placeholders.password}
@@ -163,7 +158,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             accessibilityLabel={texts.signupForm.fields.confirmPassword}
           />
 
-          {/* Checkbox */}
           <View style={styles.checkboxContainer}>
             <Checkbox
               style={styles.checkbox}
@@ -179,7 +173,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             </Text>
           </View>
 
-          {/* Botão Criar conta */}
           <DefaultButton
             title={texts.signupForm.buttons.submit}
             loading={isLoading}
@@ -197,8 +190,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             title={texts.signupForm.buttons.back}
             loading={false}
             disabled={false}
-            // ⬇️ ajuste aqui — se quiser voltar ao login, use ROUTES.LOGIN
-            onPress={() => router.push(ROUTES.MAIN)}
+            onPress={() => router.push(ROUTES.HOME)}
             buttonStyle={[styles.button, styles.backButton]}
             textStyle={styles.backText}
             indicatorColor={colors.byteColorWhite}

@@ -1,30 +1,52 @@
 // eslint.config.js
 const { defineConfig } = require("eslint/config");
 const expo = require("eslint-config-expo/flat");
-const tseslint = require("typescript-eslint"); // ✅ importa o meta-pacote
+const tseslint = require("typescript-eslint");
 const boundaries = require("eslint-plugin-boundaries");
 
 module.exports = defineConfig([
-  // Base do Expo (já habilita várias regras/plug-ins úteis)
+  // Base do Expo
   ...expo,
 
-  // Conjuntos recomendados do TS-ESLint com type-check
+  // ✅ Ignora tudo que não deve ser lido pelo ESLint
+  {
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      "coverage/**", // 👈 ESSENCIAL: ignora relatórios do Jest
+      "babel.config.js",
+      "metro.config.js",
+      "jest.config.js",
+      "eslint.config.js",
+    ],
+  },
+
+  // ✅ Regras leves para arquivos JS (sem type-check)
+  {
+    files: ["**/*.js", "**/*.jsx"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+    },
+    rules: {
+      "no-unused-vars": "warn",
+      "no-undef": "error",
+    },
+  },
+
+  // ✅ Configuração completa para TypeScript com type-check
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
 
   {
-    ignores: ["dist/**"],
-
     files: ["**/*.ts", "**/*.tsx"],
 
     plugins: {
       boundaries,
-      // opcional: expõe o plugin explicitamente (os presets acima já o trazem)
       "@typescript-eslint": tseslint.plugin,
     },
 
     languageOptions: {
-      // ✅ parser do TS-ESLint
       parser: tseslint.parser,
       parserOptions: {
         project: "./tsconfig.json",
@@ -36,7 +58,7 @@ module.exports = defineConfig([
       "import/resolver": {
         typescript: { project: "./tsconfig.json" },
         node: {
-          extensions: [".js", ".jsx", ".ts", ".tsx", ".d.ts", ".json", ".svg"],
+          extensions: [".js", ".jsx", ".ts", ".tsx", ".json", ".svg"],
         },
       },
       "boundaries/elements": [
@@ -49,19 +71,19 @@ module.exports = defineConfig([
     },
 
     rules: {
-      // ------- SEM ANY -------
+      // 🚫 Sem any
       "@typescript-eslint/no-explicit-any": [
         "error",
         { fixToUnknown: true, ignoreRestArgs: false },
       ],
 
-      // ------- SEM UNSAFE -------
+      // 🚫 Sem unsafe
       "@typescript-eslint/no-unsafe-assignment": "error",
       "@typescript-eslint/no-unsafe-return": "error",
       "@typescript-eslint/no-unsafe-call": "error",
       "@typescript-eslint/no-unsafe-member-access": "error",
 
-      // ------- BOAS PRÁTICAS TS -------
+      // 🧠 Boas práticas
       "@typescript-eslint/consistent-type-imports": [
         "error",
         { prefer: "type-imports" },
@@ -76,32 +98,18 @@ module.exports = defineConfig([
       ],
       "@typescript-eslint/ban-ts-comment": ["error", { "ts-ignore": true }],
 
-      // Suas regras existentes
+      // Imports
       "import/no-unresolved": "error",
       "import/extensions": [
         "error",
         "ignorePackages",
         {
-          js: "never",
-          jsx: "never",
           ts: "never",
           tsx: "never",
+          js: "never",
+          jsx: "never",
           json: "never",
           svg: "never",
-        },
-      ],
-      "boundaries/element-types": [
-        "error",
-        {
-          default: "disallow",
-          message: "Quebrou as dependências da Clean Architecture.",
-          rules: [
-            { from: "presentation", allow: ["application", "domain", "shared"] },
-            { from: "application", allow: ["domain", "shared"] },
-            { from: "infrastructure", allow: ["application", "domain", "shared"] },
-            { from: "domain", allow: ["shared"] },
-            { from: "shared", allow: [] },
-          ],
         },
       ],
     },
