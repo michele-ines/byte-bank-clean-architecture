@@ -1,7 +1,6 @@
-
 import { Feather } from "@expo/vector-icons";
 import { useTransactions } from "@presentation/state/TransactionsContext";
-import { colors, layout, spacing, texts, typography } from "@presentation/theme";
+import { colors, spacing, texts, typography } from "@presentation/theme";
 import { truncateString } from "@shared/utils/string";
 import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";
@@ -26,7 +25,6 @@ import {
 } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./CardListExtract.styles";
 
-
 export const CardListExtract: React.FC<CardListExtractProps> = ({
   filterFn,
   title,
@@ -49,7 +47,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
-  const filtered = transactions;
+  const filtered = filterFn ? transactions.filter(filterFn) : transactions;
 
   const handleOpenReceipt = async (url: string) => {
     const supported = await Linking.canOpenURL(url);
@@ -64,21 +62,15 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
   };
 
-  const handleLoadMore = () => {
-    if (hasMore && !loadingMore) {
-      loadMoreTransactions();
-    }
-  };
-
   const handleEditClick = () => {
     const initialValues = filtered.reduce((acc, transaction) => {
       if (transaction.id) {
         const valorComDecimais = transaction.valor.toFixed(2);
-        const valorEmCentavosString = valorComDecimais.replace(".", "");
-        acc[transaction.id] = valorEmCentavosString;
+        acc[transaction.id] = valorComDecimais.replace(".", "");
       }
       return acc;
     }, {} as EditedValuesMap);
+
     setEditedValues(initialValues);
     setIsEditing(true);
   };
@@ -90,73 +82,34 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     setSelectedItems(new Set());
   };
 
-  const handleSaveClick = async () => {
-    if (isDeleting) {
-      await handleDeleteSelected();
-      return;
-    }
-
-    const transacoesAlteradas = Object.entries(editedValues).filter(
-      ([id, rawTextCentavos]) => {
-        const transacaoOriginal = transactions.find((t) => t.id === id);
-        const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
-        return (
-          !isNaN(novoValorNumerico) &&
-          transacaoOriginal &&
-          transacaoOriginal.valor !== novoValorNumerico
-        );
-      }
-    );
-
-    if (transacoesAlteradas.length === 0) {
-      setIsEditing(false);
-      setEditedValues({});
-      return;
-    }
-
-    const updatePromises = transacoesAlteradas.map(
-      async ([id, rawTextCentavos]) => {
-        const novoValorNumerico = parseFloat(rawTextCentavos) / 100;
-        return updateTransaction(id, { valor: novoValorNumerico });
-      }
-    );
-
-    try {
-      await Promise.all(updatePromises);
-      showToast(
-        "success",
-        texts.cardList.toasts.saveSuccess.title,
-        texts.cardList.toasts.saveSuccess.message
-      );
-    } catch (error) {
-      showToast(
-        "error",
-        texts.cardList.toasts.saveError.title,
-        texts.cardList.toasts.saveError.message
-      );
-    } finally {
-      setIsEditing(false);
-      setEditedValues({});
-    }
+  const handleValueChange = (id: string, newValue: string) => {
+    setEditedValues((prevValues) => ({ ...prevValues, [id]: newValue }));
   };
 
   const handleAttachFile = async (transactionId: string) => {
     setUploadingId(transactionId);
     try {
       const result = await DocumentPicker.getDocumentAsync({});
-      if (!result.canceled && result.assets && result.assets.length > 0) {
+      if (!result.canceled && result.assets?.length) {
         const file = result.assets[0];
         await uploadAttachmentAndUpdateTransaction(
           transactionId,
           file.uri,
           file.name
         );
-        const toast = texts.cardList.toasts.attachSuccess;
-        showToast("success", toast.title, toast.message);
+        showToast(
+          "success",
+          texts.cardList.toasts.attachSuccess.title,
+          texts.cardList.toasts.attachSuccess.message
+        );
       }
-    } catch (error) {
-      const toast = texts.cardList.toasts.attachError;
-      showToast("error", toast.title, toast.message);
+    } catch (e) {
+      console.error("Erro ao anexar:", e);
+      showToast(
+        "error",
+        texts.cardList.toasts.attachError.title,
+        texts.cardList.toasts.attachError.message
+      );
     } finally {
       setUploadingId(null);
     }
@@ -168,61 +121,110 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
       { text: dialog.cancelButton, style: "cancel" },
       {
         text: dialog.confirmButton,
+        style: "destructive",
         onPress: async () => {
           try {
             await deleteAttachment(transactionId, file);
-            const toast = texts.cardList.toasts.deleteAttachmentSuccess;
-            showToast("success", toast.title, toast.message);
-          } catch (error) {
-            const toast = texts.cardList.toasts.deleteAttachmentError;
-            showToast("error", toast.title, toast.message);
+            showToast(
+              "success",
+              texts.cardList.toasts.deleteAttachmentSuccess.title,
+              texts.cardList.toasts.deleteAttachmentSuccess.message
+            );
+          } catch (e) {
+            console.error("Erro ao deletar anexo:", e);
+            showToast(
+              "error",
+              texts.cardList.toasts.deleteAttachmentError.title,
+              texts.cardList.toasts.deleteAttachmentError.message
+            );
           }
         },
-        style: "destructive",
       },
     ]);
   };
 
-  const handleDelete = () => {
-    setIsDeleting(true);
-  };
-
   const handleItemSelection = (itemId: string, isSelected: boolean) => {
-    setSelectedItems((prevSelected) => {
-      const newSelected = new Set(prevSelected);
-      if (isSelected) {
-        newSelected.add(itemId);
-      } else {
-        newSelected.delete(itemId);
-      }
-      return newSelected;
+    setSelectedItems((prev) => {
+      const updated = new Set(prev);
+      if (isSelected) updated.add(itemId);
+      else updated.delete(itemId);
+      return updated;
     });
   };
 
   const handleDeleteSelected = async () => {
     if (selectedItems.size === 0) {
-      const toast = texts.cardList.toasts.deleteTransactionsWarning;
-      showToast("error", toast.title, toast.message);
+      showToast(
+        "error",
+        texts.cardList.toasts.deleteTransactionsWarning.title,
+        texts.cardList.toasts.deleteTransactionsWarning.message
+      );
       return;
     }
 
     try {
       await deleteTransactions(Array.from(selectedItems));
-      const toast = texts.cardList.toasts.deleteTransactionsSuccess;
-      showToast("success", toast.title, toast.message(selectedItems.size));
-      setIsDeleting(false);
+      showToast(
+        "success",
+        texts.cardList.toasts.deleteTransactionsSuccess.title,
+        texts.cardList.toasts.deleteTransactionsSuccess.message(
+          selectedItems.size
+        )
+      );
       setSelectedItems(new Set());
-    } catch (error) {
-      const toast = texts.cardList.toasts.deleteTransactionsError;
-      showToast("error", toast.title, toast.message);
+      setIsDeleting(false);
+    } catch (e) {
+      console.error("Erro ao deletar transações:", e);
+      showToast(
+        "error",
+        texts.cardList.toasts.deleteTransactionsError.title,
+        texts.cardList.toasts.deleteTransactionsError.message
+      );
     }
   };
 
-  const handleValueChange = (id: string, newValue: string) => {
-    setEditedValues((prevValues) => ({
-      ...prevValues,
-      [id]: newValue,
-    }));
+  const handleSaveClick = async () => {
+    if (isDeleting) {
+      await handleDeleteSelected();
+      return;
+    }
+
+    const transacoesAlteradas = Object.entries(editedValues).filter(
+      ([id, rawTextCentavos]) => {
+        const transacao = transactions.find((t) => t.id === id);
+        const novoValor = parseFloat(rawTextCentavos) / 100;
+        return transacao && transacao.valor !== novoValor;
+      }
+    );
+
+    if (!transacoesAlteradas.length) {
+      setIsEditing(false);
+      setEditedValues({});
+      return;
+    }
+
+    try {
+      await Promise.all(
+        transacoesAlteradas.map(([id, raw]) =>
+          updateTransaction(id, { valor: parseFloat(raw) / 100 })
+        )
+      );
+      showToast(
+        "success",
+        texts.cardList.toasts.saveSuccess.title,
+        texts.cardList.toasts.saveSuccess.message
+      );
+    } catch (e) {
+      console.error("Erro ao salvar alterações:", e);
+      showToast(
+        "error",
+        texts.cardList.toasts.saveError.title,
+        texts.cardList.toasts.saveError.message
+      );
+    } finally {
+      setIsEditing(false);
+      setEditedValues({});
+    }
   };
 
   return (
@@ -238,161 +240,70 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
             onSave={handleSaveClick}
             onCancel={handleCancelClick}
             onEdit={handleEditClick}
-            onDelete={handleDelete}
+            onDelete={() => setIsDeleting(true)}
           />
         }
         renderItem={({ item }) => (
-          <View
-            style={styles.card}
-            accessible={true}
-            accessibilityLabel={
-              !isEditing
-                ? texts.cardList.item.accessibility.cardLabel(
-                    item.tipo,
-                    item.valor,
-                    item.updateAt
-                  )
-                : texts.cardList.item.accessibility.editingCardLabel(item.tipo)
-            }
-          >
-            <View style={styles.row}>
-              {isDeleting ? (
-                <View
-                  style={{
-                    flexDirection: layout.flexRow,
-                    alignItems: typography.alignCenter,
-                    gap: spacing.xs,
-                  }}
-                >
-                  <Checkbox
-                    value={selectedItems.has(item.id!)}
-                    onValueChange={(isSelected) =>
-                      handleItemSelection(item.id!, isSelected)
-                    }
-                    accessibilityLabel={`Selecionar ${item.tipo} para exclusão`}
-                    accessibilityHint="Marque para incluir este item na exclusão"
-                  />
-                  <Text
-                    style={styles.description}
-                    accessibilityElementsHidden={true}
-                  >
-                    {item.tipo}
-                  </Text>
-                </View>
-              ) : (
-                <Text
-                  style={styles.description}
-                  accessibilityElementsHidden={true}
-                >
-                  {item.tipo}
-                </Text>
-              )}
-
-              {isEditing ? (
-                <MaskedTextInput
-                  style={styles.input}
-                  type="currency"
-                  options={{
-                    prefix: "R$ ",
-                    decimalSeparator: ",",
-                    groupSeparator: ".",
-                    precision: 2,
-                  }}
-                  value={editedValues[item.id!]}
-                  onChangeText={(_, rawText) =>
-                    handleValueChange(item.id!, rawText)
-                  }
-                  keyboardType="decimal-pad"
-                  accessibilityLabel={texts.cardList.item.accessibility.amountInputLabel(
-                    item.tipo
-                  )}
-                  accessibilityValue={{
-                    text: texts.cardList.item.accessibility.amountInputValue(
-                      item.valor
-                    ),
-                  }}
-                  accessibilityHint={
-                    texts.cardList.item.accessibility.amountInputHint
-                  }
-                />
-              ) : (
-                <Text 
-                  style={[
-                    styles.amount, 
-                    item.tipo === 'transferencia' && styles.amountNegative
-                  ]} 
-                  accessibilityElementsHidden={true}
-                >
-                  {item.tipo === 'transferencia'
-                    ? `- R$ ${item.valor.toFixed(2).replace('.', ',')}`
-                    : `+ R$ ${item.valor.toFixed(2).replace('.', ',')}`}
-                </Text>
-                )}
-            </View>
-
-            <Text style={styles.date} accessibilityElementsHidden={true}>
-              {texts.cardList.item.updatedAtLabel} {item.updateAt}
-            </Text>
-
-            {item.anexos && item.anexos.length > 0 && (
-              <View style={styles.attachmentsContainer}>
-                <Text style={styles.attachmentsTitle}>
-                  {texts.cardList.item.attachmentsTitle}
-                </Text>
-                {item.anexos.map((file, index = 0) => (
-                  <Fragment key={index}>
-                    <View style={styles.attachmentRow}>
-                      <Pressable onPress={() => handleOpenReceipt(file.url)}>
-                        <Text style={styles.attachmentLink}>
-                         {truncateString(file.name, 20)}
-                        </Text>
-                      </Pressable>
-
-                      {isEditing && (
-                        <Pressable
-                          style={styles.deleteButton}
-                          onPress={() => handleDeleteAttachment(item.id!, file)}
-                        >
-                          <Feather
-                            name="trash-2"
-                            size={spacing.md}
-                            color={colors.byteColorRed500}
-                          />
-                        </Pressable>
-                      )}
-                    </View>
-
-                    {index < item.anexos.length - 1 && (
-                      <View style={styles.separator} />
-                    )}
-                  </Fragment>
-                ))}
-              </View>
+          <View style={styles.card}>
+            <Text style={styles.description}>{item.tipo}</Text>
+            {isEditing ? (
+              <MaskedTextInput
+                style={styles.input}
+                type="currency"
+                options={{
+                  prefix: "R$ ",
+                  decimalSeparator: ",",
+                  groupSeparator: ".",
+                  precision: 2,
+                }}
+                value={editedValues[item.id!] ?? ""}
+                onChangeText={(_, raw) => handleValueChange(item.id!, raw)}
+              />
+            ) : (
+              <Text>R$ {item.valor.toFixed(2).replace(".", ",")}</Text>
             )}
+
+            {item.anexos?.map((file, i) => (
+              <Fragment key={i}>
+                <Pressable onPress={() => handleOpenReceipt(file.url)}>
+                  <Text style={styles.attachmentLink}>
+                    {truncateString(file.name, 20)}
+                  </Text>
+                </Pressable>
+                {isEditing && (
+                  <Pressable
+                    onPress={() => handleDeleteAttachment(item.id!, file)}
+                  >
+                    <Feather
+                      name="trash-2"
+                      size={spacing.md}
+                      color={colors.byteColorRed500}
+                    />
+                  </Pressable>
+                )}
+              </Fragment>
+            ))}
 
             {isEditing && (
               <View style={styles.editActionsContainer}>
                 {uploadingId === item.id ? (
-                  <ActivityIndicator
-                    size="small"
-                    color={colors.byteColorBlue500}
-                  />
+                  <ActivityIndicator color={colors.byteColorBlue500} />
                 ) : (
                   <Pressable
                     onPress={() => handleAttachFile(item.id!)}
-                    style={styles.receiptButton}
                     disabled={!!uploadingId}
-                    accessibilityRole="button"
-                    accessibilityLabel={texts.cardList.item.accessibility.attachButtonLabel(
-                      item.tipo
-                    )}
                   >
-                    <Text style={styles.receiptButtonText}>
-                      {texts.cardList.item.attachButton}
-                    </Text>
+                    <Text>{texts.cardList.item.attachButton}</Text>
                   </Pressable>
                 )}
               </View>
+            )}
+
+            {isDeleting && (
+              <Checkbox
+                value={selectedItems.has(item.id!)}
+                onValueChange={(v) => handleItemSelection(item.id!, v)}
+              />
             )}
           </View>
         )}
@@ -407,7 +318,11 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
           ) : null
         }
         ListFooterComponent={<ListFooter isLoadingMore={loadingMore} />}
-        onEndReached={handleLoadMore}
+        onEndReached={() => {
+          if (hasMore && !loadingMore) {
+            loadMoreTransactions();
+          }
+        }}
         onEndReachedThreshold={0.1}
         keyboardShouldPersistTaps="handled"
       />

@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 
-import { db } from "@infrastructure/config/firebaseConfig";
+import { db } from "@/infrastructure/config/firebaseConfig";
 import { useAuth } from "@presentation/state/AuthContext";
 import { showToast } from "@shared/utils/transactions.utils";
 import { validateEmail, validateName, validatePassword } from "@shared/utils/validation";

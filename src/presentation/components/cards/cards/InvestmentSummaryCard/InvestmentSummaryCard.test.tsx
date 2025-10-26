@@ -1,39 +1,38 @@
 import { texts } from "@presentation/theme";
 import { render } from "@testing-library/react-native";
 import React from "react";
+import { Text, View } from "react-native";
 import { InvestmentSummaryCard } from "./InvestmentSummaryCard";
 import { investmentSummaryMock } from "./Mock/InvestmentSummaryCard.mock";
 
-jest.mock("@/assets/images/dash-card-new-transacao/card-pixels-3.svg", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-  return (props: any) =>
+jest.mock("@assets/images/dash-card-new-transacao/card-pixels-3.svg", () => {
+  const SvgMock = (props: any) =>
     React.createElement(View, {
       accessible: props.accessible,
       accessibilityLabel: props.accessibilityLabel,
+      testID: "TopIllustrationMock",
     });
+  (SvgMock as any).displayName = "TopIllustrationMock";
+  return { __esModule: true, default: SvgMock };
 });
 
+
 jest.mock("react-native-gesture-handler", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-  return {
-    ScrollView: ({ children, ...props }: any) =>
-      React.createElement(View, props, children),
-  };
+  const ScrollViewMock = ({ children, ...props }: any) =>
+    React.createElement(View, props, children);
+  (ScrollViewMock as any).displayName = "ScrollViewMock";
+  return { __esModule: true, ScrollView: ScrollViewMock };
 });
 
 jest.mock("../../DonutChart/DonutChart", () => {
-  const React = require("react");
-  const { View, Text } = require("react-native");
-  return {
-    DonutChart: ({ accessibilityLabel, data }: any) =>
-      React.createElement(
-        View,
-        { accessible: true, accessibilityLabel, testID: "DonutChart" },
-        React.createElement(Text, null, `donut(${Array.isArray(data) ? data.length : 0})`)
-      ),
-  };
+  const DonutChartMock = ({ accessibilityLabel, data }: any) =>
+    React.createElement(
+      View,
+      { accessible: true, accessibilityLabel, testID: "DonutChart" },
+      React.createElement(Text, null, `donut(${Array.isArray(data) ? data.length : 0})`)
+    );
+  (DonutChartMock as any).displayName = "DonutChartMock";
+  return { __esModule: true, DonutChart: DonutChartMock };
 });
 
 describe("InvestmentSummaryCard", () => {
@@ -46,6 +45,7 @@ describe("InvestmentSummaryCard", () => {
       style: "currency",
       currency: "BRL",
     });
+
     expect(
       getByText(`${texts.investmentSummary.totalLabel} ${totalFormatted}`)
     ).toBeTruthy();

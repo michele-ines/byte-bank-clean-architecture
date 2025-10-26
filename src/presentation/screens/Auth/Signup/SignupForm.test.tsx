@@ -1,10 +1,10 @@
-
 import { useAuth } from "@presentation/state/AuthContext";
 import { texts } from "@presentation/theme";
 import { showToast } from "@shared/utils/transactions.utils";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
 import React from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { SignupForm } from "./SignupForm";
 
 beforeAll(() => {
@@ -15,6 +15,7 @@ afterAll(() => {
 });
 
 const mockSignup = jest.fn();
+
 jest.mock("@/src/contexts/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
@@ -38,42 +39,48 @@ jest.mock("@/src/routes", () => ({
   },
 }));
 
-jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => {
-  const { TouchableOpacity, Text } = require("react-native");
-  return {
-    DefaultButton: ({ title, onPress, disabled, loading, accessibilityLabel }: any) => (
-      <TouchableOpacity
-        onPress={onPress}
-        disabled={disabled || loading}
-        accessibilityLabel={accessibilityLabel}
-      >
-        <Text>{loading ? "Loading..." : title}</Text>
-      </TouchableOpacity>
-    ),
-  };
-});
+jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
+  DefaultButton: ({ title, onPress, disabled, loading, accessibilityLabel }: any) => (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled || loading}
+      accessibilityLabel={accessibilityLabel}
+    >
+      <Text>{loading ? "Loading..." : title}</Text>
+    </TouchableOpacity>
+  ),
+}));
+(Object.assign(
+  jest.requireMock("@/src/components/common/DefaultButton/DefaultButton"),
+  { displayName: "MockDefaultButton" }
+));
 
-jest.mock("@/src/shared/components/Checkbox/Checkbox", () => {
-  const { TouchableOpacity, Text } = require("react-native");
-  return {
-    Checkbox: ({ value, onValueChange, accessibilityLabel }: any) => (
-      <TouchableOpacity
-        onPress={() => onValueChange(!value)}
-        accessibilityLabel={accessibilityLabel}
-        accessibilityRole="checkbox"
-      >
-        <Text>{value ? "☑" : "☐"}</Text>
-      </TouchableOpacity>
-    ),
-  };
-});
+jest.mock("@/src/shared/components/Checkbox/Checkbox", () => ({
+  Checkbox: ({ value, onValueChange, accessibilityLabel }: any) => (
+    <TouchableOpacity
+      onPress={() => onValueChange(!value)}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="checkbox"
+    >
+      <Text>{value ? "☑" : "☐"}</Text>
+    </TouchableOpacity>
+  ),
+}));
+(Object.assign(
+  jest.requireMock("@/src/shared/components/Checkbox/Checkbox"),
+  { displayName: "MockCheckbox" }
+));
 
-jest.mock("@/assets/images/cadastro/ilustracao-cadastro.svg", () => {
-  const { View } = require("react-native");
-  return ({ accessible, accessibilityLabel, ...props }: any) => (
+jest.mock("@/assets/images/cadastro/ilustracao-cadastro.svg", () => ({
+  __esModule: true,
+  default: ({ accessible, accessibilityLabel, ...props }: any) => (
     <View accessible={accessible} accessibilityLabel={accessibilityLabel} {...props} />
-  );
-});
+  ),
+}));
+(Object.assign(
+  jest.requireMock("@/assets/images/cadastro/ilustracao-cadastro.svg"),
+  { displayName: "MockSignupIllustration" }
+));
 
 describe("SignupForm", () => {
   const mockOnSignupSuccess = jest.fn();
@@ -91,9 +98,9 @@ describe("SignupForm", () => {
       const t = texts.signupForm;
       fireEvent.changeText(getByLabelText(t.fields.name), "João Silva");
       fireEvent.changeText(getByLabelText(t.fields.email), "joao@test.com");
-      fireEvent.changeText(getByLabelText(t.fields.password), "123"); 
+      fireEvent.changeText(getByLabelText(t.fields.password), "123");
       fireEvent.changeText(getByLabelText(t.fields.confirmPassword), "123");
-      fireEvent.press(getByLabelText(t.accessibility.checkbox)); 
+      fireEvent.press(getByLabelText(t.accessibility.checkbox));
 
       const submitButton = getByLabelText(t.buttons.submit);
       fireEvent.press(submitButton);
@@ -136,7 +143,7 @@ describe("SignupForm", () => {
       fireEvent.changeText(getByLabelText(t.fields.email), "joao@test.com");
       fireEvent.changeText(getByLabelText(t.fields.password), "password123");
       fireEvent.changeText(getByLabelText(t.fields.confirmPassword), "password123");
-      fireEvent.press(getByLabelText(t.accessibility.checkbox)); 
+      fireEvent.press(getByLabelText(t.accessibility.checkbox));
 
       const submitButton = getByLabelText(t.buttons.submit);
       fireEvent.press(submitButton);
@@ -214,32 +221,32 @@ describe("SignupForm", () => {
   });
 
   describe("validateEmail function", () => {
-    it("deve mostrar erro quando email é inválido", async () => {
+    it("deve mostrar erro quando email é inválido", () => {
       const { getByLabelText, getByText } = render(<SignupForm onSignupSuccess={mockOnSignupSuccess} />);
       const t = texts.signupForm;
 
       const emailInput = getByLabelText(t.fields.email);
-      fireEvent.changeText(emailInput, "email-invalido"); 
+      fireEvent.changeText(emailInput, "email-invalido");
 
       expect(getByText("Dado incorreto. Revise e digite novamente.")).toBeTruthy();
     });
 
-    it("não deve mostrar erro quando email é válido", async () => {
+    it("não deve mostrar erro quando email é válido", () => {
       const { getByLabelText, queryByText } = render(<SignupForm onSignupSuccess={mockOnSignupSuccess} />);
       const t = texts.signupForm;
 
       const emailInput = getByLabelText(t.fields.email);
-      fireEvent.changeText(emailInput, "joao@test.com"); 
+      fireEvent.changeText(emailInput, "joao@test.com");
 
       expect(queryByText("Dado incorreto. Revise e digite novamente.")).toBeNull();
     });
 
-    it("deve mostrar toast de erro no submit quando email tem erro de validação", async () => {
+    it("deve mostrar toast de erro no submit quando email tem erro de validação", () => {
       const { getByLabelText } = render(<SignupForm onSignupSuccess={mockOnSignupSuccess} />);
       const t = texts.signupForm;
 
       fireEvent.changeText(getByLabelText(t.fields.name), "João Silva");
-      fireEvent.changeText(getByLabelText(t.fields.email), "email-invalido"); 
+      fireEvent.changeText(getByLabelText(t.fields.email), "email-invalido");
       fireEvent.changeText(getByLabelText(t.fields.password), "password123");
       fireEvent.changeText(getByLabelText(t.fields.confirmPassword), "password123");
       fireEvent.press(getByLabelText(t.accessibility.checkbox));

@@ -1,9 +1,8 @@
-import LoginIllustration from "@/assets/images/login/ilustracao-login.svg";
-
+import LoginIllustration from "@assets/images/login/ilustracao-login.svg";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useAuth } from "@presentation/state/AuthContext";
 import { texts } from "@presentation/theme";
-import { routes } from "@shared/constants/routes";
+import { ROUTES } from "@shared/constants/routes";
 import { LoginFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
 import { Link, router } from "expo-router";
@@ -38,7 +37,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     try {
       await login(email, password);
       onLoginSuccess?.(email);
-      router.replace(routes.dashboard);
+      router.replace(ROUTES.DASHBOARD);
     } catch (error: unknown) {
       console.error(error);
       const message =
@@ -52,7 +51,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   };
 
   const handleCreateAccount = () => {
-    router.push(routes.signup);
+    router.push(ROUTES.SIGNUP);
   };
 
   const isFormInvalid = !email || !password || isLoading;
@@ -101,7 +100,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         />
 
         <Link
-          href={routes.forgotPassword}
+          href={ROUTES.FORGOT_PASSWORD}
           accessibilityRole="link"
           accessibilityLabel={texts.loginForm.accessibility.forgotLink}
         >

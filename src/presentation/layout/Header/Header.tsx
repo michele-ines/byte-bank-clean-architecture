@@ -5,7 +5,7 @@ import React from "react";
 import { GestureResponderEvent, Pressable, View } from "react-native";
 import { styles } from "./Header.styles";
 
-import HeaderLogo from "@/assets/images/header/header-logo.svg";
+import HeaderLogo from "@assets/images/header/header-logo.svg";
 import { useAuth } from "@presentation/state/AuthContext";
 import { colors, sizes, spacing, typography } from "@presentation/theme";
 

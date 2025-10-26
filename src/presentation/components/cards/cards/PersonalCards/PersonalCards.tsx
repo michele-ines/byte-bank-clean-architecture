@@ -1,6 +1,5 @@
-
-import CartaoDigitalImg from "@/assets/images/dash-card-my-cards/cartao-digital.svg";
-import CartaoFisicoImg from "@/assets/images/dash-card-my-cards/cartao-fisico.svg";
+import CartaoDigitalImg from "@assets/images/dash-card-my-cards/cartao-digital.svg";
+import CartaoFisicoImg from "@assets/images/dash-card-my-cards/cartao-fisico.svg";
 import ConfirmModal from "@presentation/components/common/common/ConfirmModal/ConfirmModal";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { apiToggleCardState, CardState } from "@presentation/screens/OtherServices/cards";
@@ -119,8 +118,6 @@ export default function PersonalCards() {
           </View>
 
           <View style={styles.actions}>
-
-            {/* Botão bloquear/desbloquear */}
             <DefaultButton
               title={btnToggleTitle}
               onPress={onToggle}

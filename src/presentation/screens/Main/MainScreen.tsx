@@ -1,22 +1,20 @@
-
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, StyleProp, Text, TextStyle, View } from "react-native";
 import { SvgProps } from "react-native-svg";
 
-import BannerIlustracao from "@/assets/images/page/banner-ilustracao.svg";
-import IconDispositivos from "@/assets/images/page/icon-dispositivos.svg";
-import IconPontos from "@/assets/images/page/icon-pontos.svg";
-import IconPresente from "@/assets/images/page/icon-presente.svg";
-import IconSaque from "@/assets/images/page/icon-saque.svg";
-
+import BannerIlustracao from "@assets/images/page/banner-ilustracao.svg";
+import IconDispositivos from "@assets/images/page/icon-dispositivos.svg";
+import IconPontos from "@assets/images/page/icon-pontos.svg";
+import IconPresente from "@assets/images/page/icon-presente.svg";
+import IconSaque from "@assets/images/page/icon-saque.svg";
 
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { Footer } from "@presentation/layout/Footer/Footer";
 import { Header } from "@presentation/layout/Header/Header";
 import { colors, sizes, texts } from "@presentation/theme";
-import { routes } from "@shared/constants/routes";
+import { ROUTES } from "@shared/constants/routes";
 import { styles } from "./MainScreen.styles";
 
 const MainScreen: React.FC = () => {
@@ -47,7 +45,7 @@ const MainScreen: React.FC = () => {
               <View style={styles.buttonsRow}>
                 <DefaultButton
                   title={texts.mainScreen.buttons.openAccount}
-                  onPress={() => router.push(routes.signup)}
+                  onPress={() => router.push(ROUTES.SIGNUP)}
                   buttonStyle={[styles.btn, styles.btnPrimary]}
                   textStyle={styles.btnPrimaryText}
                   accessibilityLabel={texts.mainScreen.buttons.openAccount}
@@ -55,7 +53,7 @@ const MainScreen: React.FC = () => {
 
                 <DefaultButton
                   title={texts.mainScreen.buttons.login}
-                  onPress={() => router.push(routes.login)}
+                  onPress={() => router.push(ROUTES.LOGIN)}
                   buttonStyle={[styles.btn, styles.btnSecondary]}
                   textStyle={styles.btnSecondaryText}
                   accessibilityLabel={texts.mainScreen.buttons.login}
@@ -123,7 +121,7 @@ type FeatureCardProps = {
   Icon: React.FC<SvgProps>;
   title: string;
   description: string;
-  descriptionStyle?: object;
+  descriptionStyle?: StyleProp<TextStyle>;
 };
 
 const FeatureCard: React.FC<FeatureCardProps> = ({
@@ -139,8 +137,6 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       accessibilityLabel={title}
     />
     <Text style={styles.cardTitle}>{title}</Text>
-    <Text style={[styles.cardDescription, descriptionStyle]}>
-      {description}
-    </Text>
+    <Text style={[styles.cardDescription, descriptionStyle]}>{description}</Text>
   </View>
 );

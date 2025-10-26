@@ -4,6 +4,7 @@ import { showToast } from "@shared/utils/transactions.utils";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
 import React from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { LoginForm } from "./LoginForm";
 
 beforeAll(() => {
@@ -28,11 +29,11 @@ jest.mock("expo-router", () => ({
     replace: jest.fn(),
     push: jest.fn(),
   },
-  Link: ({ children, ...props }: any) => {
-    const { TouchableOpacity } = require("react-native");
-    return <TouchableOpacity {...props}>{children}</TouchableOpacity>;
-  },
+  Link: (props: any) => (
+    <TouchableOpacity {...props}>{props.children}</TouchableOpacity>
+  ),
 }));
+(Object.assign(jest.requireMock("expo-router").Link, { displayName: "MockLink" }));
 
 jest.mock("@/src/routes", () => ({
   routes: {
@@ -42,32 +43,31 @@ jest.mock("@/src/routes", () => ({
   },
 }));
 
-jest.mock("react-native-gesture-handler", () => {
-  const { ScrollView } = require("react-native");
-  return { ScrollView };
-});
+jest.mock("react-native-gesture-handler", () => ({
+  ScrollView,
+}));
+(Object.assign(jest.requireMock("react-native-gesture-handler"), { displayName: "MockScrollView" }));
 
-jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => {
-  const { TouchableOpacity, Text } = require("react-native");
-  return {
-    DefaultButton: ({ title, onPress, disabled, loading, accessibilityLabel }: any) => (
-      <TouchableOpacity
-        onPress={onPress}
-        disabled={disabled || loading}
-        accessibilityLabel={accessibilityLabel}
-      >
-        <Text>{loading ? "Loading..." : title}</Text>
-      </TouchableOpacity>
-    ),
-  };
-});
+jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
+  DefaultButton: ({ title, onPress, disabled, loading, accessibilityLabel }: any) => (
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={disabled || loading}
+      accessibilityLabel={accessibilityLabel}
+    >
+      <Text>{loading ? "Loading..." : title}</Text>
+    </TouchableOpacity>
+  ),
+}));
+(Object.assign(jest.requireMock("@/src/components/common/DefaultButton/DefaultButton"), { displayName: "MockDefaultButton" }));
 
-jest.mock("@/assets/images/login/ilustracao-login.svg", () => {
-  const { View } = require("react-native");
-  return ({ accessible, accessibilityLabel, ...props }: any) => (
+jest.mock("@/assets/images/login/ilustracao-login.svg", () => ({
+  __esModule: true,
+  default: ({ accessible, accessibilityLabel, ...props }: any) => (
     <View accessible={accessible} accessibilityLabel={accessibilityLabel} {...props} />
-  );
-});
+  ),
+}));
+(Object.assign(jest.requireMock("@/assets/images/login/ilustracao-login.svg"), { displayName: "MockSvgImage" }));
 
 describe("LoginForm", () => {
   const mockOnLoginSuccess = jest.fn();
@@ -87,7 +87,7 @@ describe("LoginForm", () => {
 
       const emailInput = getByLabelText(t.accessibility.emailInput);
       const passwordInput = getByLabelText(t.accessibility.passwordInput);
-      
+
       fireEvent.changeText(emailInput, "test@example.com");
       fireEvent.changeText(passwordInput, "password123");
 
@@ -110,7 +110,7 @@ describe("LoginForm", () => {
 
       const emailInput = getByLabelText(t.accessibility.emailInput);
       const passwordInput = getByLabelText(t.accessibility.passwordInput);
-      
+
       fireEvent.changeText(emailInput, "test@example.com");
       fireEvent.changeText(passwordInput, "wrongpassword");
 
@@ -137,7 +137,7 @@ describe("LoginForm", () => {
 
       const emailInput = getByLabelText(t.accessibility.emailInput);
       const passwordInput = getByLabelText(t.accessibility.passwordInput);
-      
+
       fireEvent.changeText(emailInput, "test@example.com");
       fireEvent.changeText(passwordInput, "password123");
 
@@ -173,10 +173,9 @@ describe("LoginForm", () => {
       const { getByLabelText } = render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
       const t = texts.loginForm;
 
-      // Preenche os campos
       const emailInput = getByLabelText(t.accessibility.emailInput);
       const passwordInput = getByLabelText(t.accessibility.passwordInput);
-      
+
       fireEvent.changeText(emailInput, "test@example.com");
       fireEvent.changeText(passwordInput, "password123");
 

@@ -1,4 +1,4 @@
-import CardPixelsTop from "@/assets/images/dash-card-new-transacao/card-pixels-3.svg";
+import CardPixelsTop from "@assets/images/dash-card-new-transacao/card-pixels-3.svg";
 import { DonutChart } from "@presentation/components/charts/DonutChart";
 import { texts } from "@presentation/theme";
 import React from "react";

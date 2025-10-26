@@ -1,13 +1,13 @@
-import { Href } from "expo-router";
+import type { Href } from "expo-router";
 
-export const routes = {
-  home: "/" as Href,
-  login: "/(public)/login/LoginPage" as Href,
-  forgotPassword: "/(public)/esqueci-senha/ForgotPage" as Href,
-  signup: "/(public)/cadastro/CadastroPage" as Href,
-  dashboard: "/(private)/dashboard" as Href,
-  investments: "/(private)/investments" as Href,
-  meusCartoes: "/(private)/meus-cartoes" as Href,
-  outrosServicos: "/(private)/outros-servicos" as Href,
-  minhaConta: "/(private)/minha-conta" as Href,
-};
+export const ROUTES = {
+  HOME: "/" as Href,
+  LOGIN: "/(public)/login/LoginPage" as Href,
+  FORGOT_PASSWORD: "/(public)/esqueci-senha/ForgotPage" as Href,
+  SIGNUP: "/(public)/cadastro/CadastroPage" as Href,
+  DASHBOARD: "/(private)/dashboard" as Href,
+  INVESTMENTS: "/(private)/investments" as Href,
+  MEUS_CARTOES: "/(private)/meus-cartoes" as Href,
+  OUTROS_SERVICOS: "/(private)/outros-servicos" as Href,
+  MINHA_CONTA: "/(private)/minha-conta" as Href,
+} as const;

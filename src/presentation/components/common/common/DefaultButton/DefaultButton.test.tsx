@@ -1,5 +1,6 @@
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
+import { ActivityIndicator } from "react-native";
 import { DefaultButton } from "./DefaultButton";
 
 describe("DefaultButton", () => {
@@ -23,10 +24,9 @@ describe("DefaultButton", () => {
 
   it("renderiza ActivityIndicator quando loading=true", () => {
     const { UNSAFE_getByType, queryByText } = render(
-      <DefaultButton {...baseProps} loading={true} />
+      <DefaultButton {...baseProps} loading />
     );
-    // procura diretamente pelo componente ActivityIndicator
-    expect(UNSAFE_getByType(require("react-native").ActivityIndicator)).toBeTruthy();
+    expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
     expect(queryByText("Clique Aqui")).toBeNull();
   });
 
@@ -42,7 +42,7 @@ describe("DefaultButton", () => {
   it("não chama onPress quando disabled=true", () => {
     const onPress = jest.fn();
     const { getByLabelText } = render(
-      <DefaultButton {...baseProps} onPress={onPress} disabled={true} />
+      <DefaultButton {...baseProps} onPress={onPress} disabled />
     );
     fireEvent.press(getByLabelText("botao-clique"));
     expect(onPress).not.toHaveBeenCalled();
@@ -51,7 +51,7 @@ describe("DefaultButton", () => {
   it("não chama onPress quando loading=true", () => {
     const onPress = jest.fn();
     const { getByLabelText } = render(
-      <DefaultButton {...baseProps} onPress={onPress} loading={true} />
+      <DefaultButton {...baseProps} onPress={onPress} loading />
     );
     fireEvent.press(getByLabelText("botao-clique"));
     expect(onPress).not.toHaveBeenCalled();

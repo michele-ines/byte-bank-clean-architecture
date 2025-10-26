@@ -1,4 +1,4 @@
-import { toastConfig } from "@infrastructure/config/Toast.config";
+import { toastConfig } from "@/presentation/config/Toast.config";
 import { GlobalContextProvider } from "@presentation/state";
 import { WidgetPreferencesProvider } from "@presentation/state/WidgetPreferencesContext";
 import { layout } from "@presentation/theme";

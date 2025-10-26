@@ -1,5 +1,5 @@
-import PixelImage from "@/assets/images/dash-card-saldo/card-pixels-1.svg";
-import PixelImage2 from "@/assets/images/dash-card-saldo/card-pixels-2.svg";
+import PixelImage from "@assets/images/dash-card-saldo/card-pixels-1.svg";
+import PixelImage2 from "@assets/images/dash-card-saldo/card-pixels-2.svg";
 import { Entypo } from "@expo/vector-icons";
 import { UserInfo } from "firebase/auth";
 import { useMemo } from "react";

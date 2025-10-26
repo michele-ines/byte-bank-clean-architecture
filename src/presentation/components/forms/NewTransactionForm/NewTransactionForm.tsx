@@ -1,6 +1,6 @@
-import CardPixelsTop from "@/assets/images/dash-card-new-transacao/card-pixels-3.svg";
-import CardPixelBotton from "@/assets/images/dash-card-new-transacao/card-pixels-4.svg";
-import TransactionIllustration from "@/assets/images/dash-card-new-transacao/Ilustracao-2.svg";
+import CardPixelsTop from "@assets/images/dash-card-new-transacao/card-pixels-3.svg";
+import CardPixelBotton from "@assets/images/dash-card-new-transacao/card-pixels-4.svg";
+import TransactionIllustration from "@assets/images/dash-card-new-transacao/Ilustracao-2.svg";
 
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useTransactions } from "@presentation/state/TransactionsContext";
@@ -88,7 +88,6 @@ export const NewTransactionForm: React.FC = () => {
             accessibilityLabel={t.accessibility.cardTopIllustration}
           />
 
-          {/* ⬇️ Substituí ScrollView por KeyboardAwareScrollView */}
           <KeyboardAwareScrollView
             contentContainerStyle={styles.scrollContentContainer}
             enableOnAndroid={true}

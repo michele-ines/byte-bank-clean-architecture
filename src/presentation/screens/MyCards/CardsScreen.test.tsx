@@ -1,24 +1,29 @@
 import { texts } from "@presentation/theme";
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
+import { Text, View } from "react-native";
 import CardsScreen from "./CardsScreen";
 
-jest.mock("@/src/components/common/ScreenWrapper/ScreenWrapper", () => {
-  const { View, Text } = require("react-native");
-  return {
-    ScreenWrapper: ({ children }: any) => (
-      <View>
-        <Text testID="mock-screen-wrapper">ScreenWrapper</Text>
-        {children}
-      </View>
-    ),
-  };
-});
+jest.mock("@/src/components/common/ScreenWrapper/ScreenWrapper", () => ({
+  ScreenWrapper: ({ children }: any) => (
+    <View>
+      <Text testID="mock-screen-wrapper">ScreenWrapper</Text>
+      {children}
+    </View>
+  ),
+}));
+(Object.assign(
+  jest.requireMock("@/src/components/common/ScreenWrapper/ScreenWrapper"),
+  { displayName: "MockScreenWrapper" }
+));
 
-jest.mock("@/src/components/cards/PersonalCards/PersonalCards", () => {
-  const { Text } = require("react-native");
-  return () => <Text testID="mock-personal-cards">PersonalCards</Text>;
-});
+jest.mock("@/src/components/cards/PersonalCards/PersonalCards", () => ({
+  PersonalCards: () => <Text testID="mock-personal-cards">PersonalCards</Text>,
+}));
+(Object.assign(
+  jest.requireMock("@/src/components/cards/PersonalCards/PersonalCards"),
+  { displayName: "MockPersonalCards" }
+));
 
 describe("CardsScreen", () => {
   it("renderiza ScreenWrapper, título, subtítulo e PersonalCards", () => {
@@ -28,7 +33,6 @@ describe("CardsScreen", () => {
     expect(screen.getByRole("header")).toBeTruthy();
     expect(screen.getByText(texts.textMeusCartoes)).toBeTruthy();
     expect(screen.getByText(texts.textConfigCardsSubtitle)).toBeTruthy();
-
     expect(screen.getByTestId("mock-personal-cards")).toBeTruthy();
   });
 });

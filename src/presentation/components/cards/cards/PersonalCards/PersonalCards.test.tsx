@@ -1,24 +1,29 @@
 import { texts } from "@presentation/theme";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import React from "react";
+import { Pressable, Text, View } from "react-native";
 import PersonalCards from "./PersonalCards";
 
 jest.mock("@/assets/images/dash-card-my-cards/cartao-fisico.svg", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-  return (props: any) => <View {...props} testID="CartaoFisicoImg" />;
+  const CartaoFisicoImg = (props: any) => <View {...props} testID="CartaoFisicoImg" />;
+  (CartaoFisicoImg as any).displayName = "CartaoFisicoImgMock";
+  return CartaoFisicoImg;
 });
 
 jest.mock("@/assets/images/dash-card-my-cards/cartao-digital.svg", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-  return (props: any) => <View {...props} testID="CartaoDigitalImg" />;
+  const CartaoDigitalImg = (props: any) => <View {...props} testID="CartaoDigitalImg" />;
+  (CartaoDigitalImg as any).displayName = "CartaoDigitalImgMock";
+  return CartaoDigitalImg;
 });
 
 jest.mock("@/src/components/common/ConfirmModal/ConfirmModal", () => {
-  const React = require("react");
-  const { View, Text, Pressable } = require("react-native");
-  const ConfirmModal = ({ visible, title, message, onConfirm, onCancel }: any) =>
+  const ConfirmModal = ({
+    visible,
+    title,
+    message,
+    onConfirm,
+    onCancel,
+  }: any) =>
     visible ? (
       <View testID="ConfirmModal">
         <Text>{title}</Text>
@@ -31,32 +36,32 @@ jest.mock("@/src/components/common/ConfirmModal/ConfirmModal", () => {
         </Pressable>
       </View>
     ) : null;
+
+  (ConfirmModal as any).displayName = "ConfirmModalMock";
   return ConfirmModal;
 });
 
 jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => {
-  const React = require("react");
-  const { Pressable, Text } = require("react-native");
   const DefaultButton = ({ title, onPress, accessibilityLabel }: any) => (
     <Pressable accessibilityLabel={accessibilityLabel} onPress={onPress}>
       <Text>{title}</Text>
     </Pressable>
   );
+  (DefaultButton as any).displayName = "DefaultButtonMock";
   return { DefaultButton };
 });
 
 const mockToggle = jest.fn();
-jest.mock("@/src/OtherServices/cards", () => ({
-  apiToggleCardState: (...args: any[]) =>
-    (global as any).__mockToggle__(...args),
-}));
-
 const impactAsync = jest.fn();
 const notificationAsync = jest.fn();
+
+jest.mock("@/src/OtherServices/cards", () => ({
+  apiToggleCardState: (...args: any[]) => (global as any).__mockToggle__(...args),
+}));
+
 jest.mock("expo-haptics", () => ({
   impactAsync: (...args: any[]) => (global as any).__impactAsync__(...args),
-  notificationAsync: (...args: any[]) =>
-    (global as any).__notificationAsync__(...args),
+  notificationAsync: (...args: any[]) => (global as any).__notificationAsync__(...args),
   ImpactFeedbackStyle: { Medium: "medium" },
   NotificationFeedbackType: { Error: "error", Success: "success" },
 }));
@@ -82,9 +87,7 @@ describe("PersonalCards", () => {
   it("abre o modal ao clicar em Bloquear Cartão Físico", async () => {
     const { getByLabelText, getByTestId, getByText } = render(<PersonalCards />);
 
-    fireEvent.press(
-      getByLabelText(`${texts.textBloquear} ${texts.textCartaoFisico}`)
-    );
+    fireEvent.press(getByLabelText(`${texts.textBloquear} ${texts.textCartaoFisico}`));
 
     const modal = await waitFor(() => getByTestId("ConfirmModal"));
     expect(modal).toBeTruthy();
@@ -97,9 +100,7 @@ describe("PersonalCards", () => {
 
     const { getByLabelText, getByTestId, getByText } = render(<PersonalCards />);
 
-    fireEvent.press(
-      getByLabelText(`${texts.textBloquear} ${texts.textCartaoFisico}`)
-    );
+    fireEvent.press(getByLabelText(`${texts.textBloquear} ${texts.textCartaoFisico}`));
 
     await waitFor(() => getByTestId("ConfirmModal"));
     fireEvent.press(getByLabelText("confirm"));
@@ -119,9 +120,7 @@ describe("PersonalCards", () => {
   it("cancela ação no modal", async () => {
     const { getByLabelText, getByTestId, queryByTestId } = render(<PersonalCards />);
 
-    fireEvent.press(
-      getByLabelText(`${texts.textBloquear} ${texts.textCartaoFisico}`)
-    );
+    fireEvent.press(getByLabelText(`${texts.textBloquear} ${texts.textCartaoFisico}`));
 
     await waitFor(() => getByTestId("ConfirmModal"));
     fireEvent.press(getByLabelText("cancel"));
@@ -137,18 +136,14 @@ describe("PersonalCards", () => {
 
     const { getByLabelText, getByTestId, getByText } = render(<PersonalCards />);
 
-    fireEvent.press(
-      getByLabelText(`${texts.textBloquear} ${texts.textCartaoDigital}`)
-    );
+    fireEvent.press(getByLabelText(`${texts.textBloquear} ${texts.textCartaoDigital}`));
     await waitFor(() => getByTestId("ConfirmModal"));
     fireEvent.press(getByLabelText("confirm"));
     await waitFor(() => {
       expect(getByText(texts.textBloqueado)).toBeTruthy();
     });
 
-    fireEvent.press(
-      getByLabelText(`${texts.textDesbloquear} ${texts.textCartaoDigital}`)
-    );
+    fireEvent.press(getByLabelText(`${texts.textDesbloquear} ${texts.textCartaoDigital}`));
     await waitFor(() => getByTestId("ConfirmModal"));
     fireEvent.press(getByLabelText("confirm"));
     await waitFor(() => {

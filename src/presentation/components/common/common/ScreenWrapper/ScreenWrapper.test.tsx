@@ -1,15 +1,14 @@
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
+import { Text, View } from "react-native";
 import { ScreenWrapper } from "./ScreenWrapper";
 
-// mock do AuthContext
 jest.mock("@/src/contexts/AuthContext", () => ({
   useAuth: () => ({
     userData: { name: "Michele", uuid: "user-123" },
   }),
 }));
 
-// mock do TransactionsContext para evitar Firebase
 jest.mock("@/src/contexts/TransactionsContext", () => ({
   useTransactions: () => ({
     transactions: [],
@@ -19,26 +18,24 @@ jest.mock("@/src/contexts/TransactionsContext", () => ({
   }),
 }));
 
-// mock do Balance
 jest.mock("@/src/shared/cards/balance/BalanceComponent", () => {
-  const { View, Text } = require("react-native");
-  return ({ user }: any) => (
+  const BalanceMock = ({ user }: any) => (
     <View testID="balance">
       <Text>{`Balance para ${user?.displayName || user?.name}`}</Text>
     </View>
   );
+  (BalanceMock as any).displayName = "BalanceComponentMock";
+  return BalanceMock;
 });
 
-// mock do CardListExtract
 jest.mock("@/src/shared/cards/CardListExtract/CardListExtract", () => {
-  const { View, Text } = require("react-native");
-  return {
-    CardListExtract: ({ title }: { title: string }) => (
-      <View testID="extract">
-        <Text>{`Extrato: ${title}`}</Text>
-      </View>
-    ),
-  };
+  const CardListExtract = ({ title }: { title: string }) => (
+    <View testID="extract">
+      <Text>{`Extrato: ${title}`}</Text>
+    </View>
+  );
+  (CardListExtract as any).displayName = "CardListExtractMock";
+  return { CardListExtract };
 });
 
 describe("ScreenWrapper", () => {

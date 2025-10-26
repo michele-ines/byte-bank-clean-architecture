@@ -1,4 +1,3 @@
-
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
@@ -6,7 +5,7 @@ import { Text, TextInput, View } from "react-native";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useAuth } from "@presentation/state/AuthContext";
 import { texts } from "@presentation/theme";
-import { routes } from "@shared/constants/routes";
+import { ROUTES } from "@shared/constants/routes";
 import { ForgotPasswordFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
 import { styles } from "./ForgotPasswordForm.styles";
@@ -37,7 +36,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
         texts.forgotPasswordForm.toasts.success.message
       );
       onSubmitSuccess?.(email);
-      router.replace(routes.login);
+      router.replace(ROUTES.LOGIN); // <-- aqui
     } catch (error: unknown) {
       console.error(error);
       const message =
@@ -89,7 +88,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
         title={texts.forgotPasswordForm.buttons.back}
         loading={false}
         disabled={false}
-        onPress={() => router.push(routes.login)}
+        onPress={() => router.push(ROUTES.LOGIN)} 
         buttonStyle={styles.backButton}
         textStyle={styles.backText}
         accessibilityLabel={texts.forgotPasswordForm.accessibility.backButton}

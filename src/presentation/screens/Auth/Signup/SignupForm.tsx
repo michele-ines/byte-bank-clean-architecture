@@ -1,9 +1,10 @@
-import SignupIllustration from "@/assets/images/cadastro/ilustracao-cadastro.svg";
+import SignupIllustration from "@assets/images/cadastro/ilustracao-cadastro.svg";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useAuth } from "@presentation/state/AuthContext";
 import { colors, sizes, texts } from "@presentation/theme";
 import { Checkbox } from "@shared/components/Checkbox/Checkbox";
-import { routes } from "@shared/constants/routes";
+// ⬇️ ajuste aqui
+import { ROUTES } from "@shared/constants/routes";
 import { SignupFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
 import { router } from "expo-router";
@@ -46,35 +47,19 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
       return;
     }
     if (password.length < 8) {
-      showToast(
-        "error",
-        toasts.passwordWeak.title,
-        toasts.passwordWeak.message
-      );
+      showToast("error", toasts.passwordWeak.title, toasts.passwordWeak.message);
       return;
     }
     if (password !== confirmPassword) {
-      showToast(
-        "error",
-        toasts.passwordMismatch.title,
-        toasts.passwordMismatch.message
-      );
+      showToast("error", toasts.passwordMismatch.title, toasts.passwordMismatch.message);
       return;
     }
     if (!isChecked) {
-      showToast(
-        "error",
-        toasts.termsNotAccepted.title,
-        toasts.termsNotAccepted.message
-      );
+      showToast("error", toasts.termsNotAccepted.title, toasts.termsNotAccepted.message);
       return;
     }
     if (emailError) {
-      showToast(
-        "error",
-        toasts.emailInvalid.title,
-        toasts.emailInvalid.message
-      );
+      showToast("error", toasts.emailInvalid.title, toasts.emailInvalid.message);
       return;
     }
 
@@ -83,15 +68,13 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
       await signup(email, password, name);
       onSignupSuccess?.(email);
       showToast("success", toasts.success.title, toasts.success.message);
-      router.replace(routes.dashboard);
+      // ⬇️ ajuste aqui
+      router.replace(ROUTES.DASHBOARD);
     } catch (error: unknown) {
       let errorMessage = toasts.genericError.message;
       let errorTitle = toasts.genericError.title;
 
-      if (
-        error instanceof Error &&
-        (error as any).code === "auth/email-already-in-use"
-      ) {
+      if (error instanceof Error && (error as any).code === "auth/email-already-in-use") {
         errorMessage = toasts.emailInUse.message;
         errorTitle = toasts.emailInUse.title;
       }
@@ -170,9 +153,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           />
 
           {/* Confirmar Senha */}
-          <Text style={styles.label}>
-            {texts.signupForm.fields.confirmPassword}
-          </Text>
+          <Text style={styles.label}>{texts.signupForm.fields.confirmPassword}</Text>
           <TextInput
             placeholder={texts.signupForm.placeholders.confirmPassword}
             value={confirmPassword}
@@ -216,7 +197,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             title={texts.signupForm.buttons.back}
             loading={false}
             disabled={false}
-            onPress={() => router.push(routes.home)}
+            // ⬇️ ajuste aqui — se quiser voltar ao login, use ROUTES.LOGIN
+            onPress={() => router.push(ROUTES.MAIN)}
             buttonStyle={[styles.button, styles.backButton]}
             textStyle={styles.backText}
             indicatorColor={colors.byteColorWhite}

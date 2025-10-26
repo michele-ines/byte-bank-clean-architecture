@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react-native";
-import React from "react";
+import * as React from "react";
 import { CardListExtract } from "./CardListExtract";
 
-jest.mock("@/src/contexts/TransactionsContext", () => ({
+jest.mock("@/presentation/state/TransactionsContext", () => ({
   useTransactions: () => ({
     transactions: [
       {
@@ -24,18 +24,11 @@ jest.mock("@/src/contexts/TransactionsContext", () => ({
   }),
 }));
 
-jest.mock("@/src/utils/transactions.utils", () => ({
+jest.mock("@/shared/utils/transactions.utils", () => ({
   showToast: jest.fn(),
 }));
 
-jest.mock("@expo/vector-icons", () => {
-  const React = require("react");
-  return {
-    Feather: (props: any) => React.createElement("Icon", props, props.name),
-  };
-});
-
-jest.mock("@/src/theme", () => ({
+jest.mock("@/presentation/theme", () => ({
   texts: {
     cardList: {
       toasts: {
@@ -67,7 +60,6 @@ jest.mock("@/src/theme", () => ({
         },
         updatedAtLabel: "Atualizado em",
         attachmentsTitle: "Anexos",
-        attachmentLink: (n: number) => `Recibo ${n}`,
         attachButton: "Anexar Recibo",
       },
       list: { empty: "Nenhuma transação encontrada" },
@@ -81,29 +73,31 @@ jest.mock("@/src/theme", () => ({
       },
     },
   },
-  colors: {
-    byteColorRed500: "red",
-    byteColorBlue500: "blue",
-    byteColorWhite: "white",
-    byteColorDash: "gray",
-  },
-  layout: { flexRow: "row", width36: 36, height36: 36 },
+  colors: { byteColorRed500: "red", byteColorBlue500: "blue" },
   spacing: { xs: 4, md: 8 },
   typography: {
     alignCenter: "center",
     justifyCenter: "center",
     liveRegionPolite: "polite",
   },
-  radius: { sm: 2, md: 4, lg: 8, xl: 16 },
-  sizes: { iconSm: 12, iconMd: 16, iconLg: 24 },
+}));
+
+jest.mock("@expo/vector-icons", () => ({
+  Feather: (props: any) => React.createElement("Icon", props, props.name),
 }));
 
 describe("CardListExtract", () => {
   it("deve renderizar a transação com acessibilidade", () => {
-    render(<CardListExtract title="Minhas Transações" filterFn={() => true} />);
+    render(
+      <CardListExtract
+        title="Minhas Transações"
+        filterFn={() => true}
+      />
+    );
 
     const label =
       "Transação do tipo Compra. Valor de R$ 120.50. Data: 2025-10-03.";
+
     expect(screen.getByLabelText(label)).toBeTruthy();
   });
 });

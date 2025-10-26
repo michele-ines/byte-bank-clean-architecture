@@ -2,10 +2,10 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { styles } from "./Footer.styles";
 
-import InstaSvg from "@/assets/images/footer/ft-instagram.svg";
-import LogoSvg from "@/assets/images/footer/ft-logo.svg";
-import WaSvg from "@/assets/images/footer/ft-whatsapp.svg";
-import YtSvg from "@/assets/images/footer/ft-youtube.svg";
+import InstaSvg from "@assets/images/footer/ft-instagram.svg";
+import LogoSvg from "@assets/images/footer/ft-logo.svg";
+import WaSvg from "@assets/images/footer/ft-whatsapp.svg";
+import YtSvg from "@assets/images/footer/ft-youtube.svg";
 import { sizes, spacing } from "@presentation/theme";
 
 export const Footer: React.FC = () => {

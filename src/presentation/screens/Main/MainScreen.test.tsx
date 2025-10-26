@@ -1,52 +1,83 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { router } from "expo-router";
 import React from "react";
+import { Text, TouchableOpacity } from "react-native";
 import MainScreen from "./MainScreen";
 
 jest.mock("expo-router", () => ({
   router: { push: jest.fn() },
 }));
 
-jest.mock("@/src/shared/Header/Header", () => {
-  const { Text } = require("react-native");
-  return { Header: () => <Text testID="mock-header">Header</Text> };
-});
-jest.mock("@/src/shared/Footer/Footer", () => {
-  const { Text } = require("react-native");
-  return { Footer: () => <Text testID="mock-footer">Footer</Text> };
-});
+jest.mock("@/src/shared/Header/Header", () => ({
+  Header: () => <Text testID="mock-header">Header</Text>,
+}));
+(Object.assign(jest.requireMock("@/src/shared/Header/Header"), {
+  displayName: "MockHeader",
+}));
 
-jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => {
-  const { Text, TouchableOpacity } = require("react-native");
-  return {
-    DefaultButton: ({ title, onPress }: any) => (
-      <TouchableOpacity onPress={onPress} testID={`btn-${title}`}>
-        <Text>{title}</Text>
-      </TouchableOpacity>
-    ),
-  };
-});
+jest.mock("@/src/shared/Footer/Footer", () => ({
+  Footer: () => <Text testID="mock-footer">Footer</Text>,
+}));
+(Object.assign(jest.requireMock("@/src/shared/Footer/Footer"), {
+  displayName: "MockFooter",
+}));
 
-jest.mock("@/assets/images/page/banner-ilustracao.svg", () => {
-  const { Text } = require("react-native");
-  return () => <Text testID="banner-svg">Banner</Text>;
-});
-jest.mock("@/assets/images/page/icon-dispositivos.svg", () => {
-  const { Text } = require("react-native");
-  return () => <Text testID="icon-dispositivos">IconDispositivos</Text>;
-});
-jest.mock("@/assets/images/page/icon-pontos.svg", () => {
-  const { Text } = require("react-native");
-  return () => <Text testID="icon-pontos">IconPontos</Text>;
-});
-jest.mock("@/assets/images/page/icon-presente.svg", () => {
-  const { Text } = require("react-native");
-  return () => <Text testID="icon-presente">IconPresente</Text>;
-});
-jest.mock("@/assets/images/page/icon-saque.svg", () => {
-  const { Text } = require("react-native");
-  return () => <Text testID="icon-saque">IconSaque</Text>;
-});
+jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
+  DefaultButton: ({ title, onPress }: any) => (
+    <TouchableOpacity onPress={onPress} testID={`btn-${title}`}>
+      <Text>{title}</Text>
+    </TouchableOpacity>
+  ),
+}));
+(Object.assign(
+  jest.requireMock("@/src/components/common/DefaultButton/DefaultButton"),
+  { displayName: "MockDefaultButton" }
+));
+
+jest.mock("@/assets/images/page/banner-ilustracao.svg", () => ({
+  __esModule: true,
+  default: () => <Text testID="banner-svg">Banner</Text>,
+}));
+(Object.assign(
+  jest.requireMock("@/assets/images/page/banner-ilustracao.svg"),
+  { displayName: "MockBannerSvg" }
+));
+
+jest.mock("@/assets/images/page/icon-dispositivos.svg", () => ({
+  __esModule: true,
+  default: () => <Text testID="icon-dispositivos">IconDispositivos</Text>,
+}));
+(Object.assign(
+  jest.requireMock("@/assets/images/page/icon-dispositivos.svg"),
+  { displayName: "MockIconDispositivos" }
+));
+
+jest.mock("@/assets/images/page/icon-pontos.svg", () => ({
+  __esModule: true,
+  default: () => <Text testID="icon-pontos">IconPontos</Text>,
+}));
+(Object.assign(
+  jest.requireMock("@/assets/images/page/icon-pontos.svg"),
+  { displayName: "MockIconPontos" }
+));
+
+jest.mock("@/assets/images/page/icon-presente.svg", () => ({
+  __esModule: true,
+  default: () => <Text testID="icon-presente">IconPresente</Text>,
+}));
+(Object.assign(
+  jest.requireMock("@/assets/images/page/icon-presente.svg"),
+  { displayName: "MockIconPresente" }
+));
+
+jest.mock("@/assets/images/page/icon-saque.svg", () => ({
+  __esModule: true,
+  default: () => <Text testID="icon-saque">IconSaque</Text>,
+}));
+(Object.assign(
+  jest.requireMock("@/assets/images/page/icon-saque.svg"),
+  { displayName: "MockIconSaque" }
+));
 
 describe("MainScreen", () => {
   beforeEach(() => {

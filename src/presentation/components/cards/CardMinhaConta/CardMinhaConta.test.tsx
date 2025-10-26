@@ -1,25 +1,23 @@
+import { useAuth } from "@/presentation/state/AuthContext";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { CardMinhaConta } from "./CardMinhaConta";
 
-// Mock do AuthContext
+// Mocks
 jest.mock("@/src/contexts/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
-// Mock dos ícones para não dar warning de act
-jest.mock("@expo/vector-icons", () => {
-  const React = require("react");
-  const { Text } = require("react-native");
-  return {
-    MaterialIcons: (props: any) => <Text testID="icon-mock" {...props}>IconMock</Text>,
-  };
-});
+jest.mock("@expo/vector-icons", () => ({
+  MaterialIcons: (props: any) => (
+    <Text testID="icon-mock" {...props}>
+      IconMock
+    </Text>
+  ),
+}));
 
-// Mock do Modal
 jest.mock("../../modal/EditFieldModal/EditFieldModal", () => {
-  const React = require("react");
-  const { Text, TouchableOpacity, View } = require("react-native");
   const MockModal: React.FC<any> = ({ visible, field, initialValue, onClose }) =>
     visible ? (
       <View>
@@ -31,15 +29,14 @@ jest.mock("../../modal/EditFieldModal/EditFieldModal", () => {
         </TouchableOpacity>
       </View>
     ) : null;
+
   return { EditFieldModal: MockModal };
 });
 
 describe("📌 CardMinhaConta", () => {
-  const { useAuth } = require("@/src/contexts/AuthContext");
-
   beforeEach(() => {
     jest.clearAllMocks();
-    useAuth.mockReturnValue({
+    (useAuth as jest.Mock).mockReturnValue({
       userData: { name: "Usuário Teste", email: "teste@exemplo.com" },
     });
   });
@@ -64,7 +61,7 @@ describe("📌 CardMinhaConta", () => {
   it("abre modal de edição de e-mail", () => {
     render(<CardMinhaConta />);
     const icons = screen.getAllByTestId("icon-mock");
-    fireEvent.press(icons[1]); 
+    fireEvent.press(icons[1]);
 
     expect(screen.getByTestId("modal-field").props.children).toBe("email");
     expect(screen.getByTestId("modal-initial").props.children).toBe("teste@exemplo.com");
@@ -73,7 +70,7 @@ describe("📌 CardMinhaConta", () => {
   it("abre modal de edição de senha", () => {
     render(<CardMinhaConta />);
     const icons = screen.getAllByTestId("icon-mock");
-    fireEvent.press(icons[2]); 
+    fireEvent.press(icons[2]);
 
     expect(screen.getByTestId("modal-field").props.children).toBe("password");
     expect(screen.getByTestId("modal-initial").props.children).toBe("");
@@ -84,7 +81,7 @@ describe("📌 CardMinhaConta", () => {
     const icons = screen.getAllByTestId("icon-mock");
     fireEvent.press(icons[0]);
 
-    fireEvent.press(screen.getByTestId("modal-onClose")); 
+    fireEvent.press(screen.getByTestId("modal-onClose"));
     expect(screen.queryByTestId("modal-visible")).toBeNull();
   });
 });

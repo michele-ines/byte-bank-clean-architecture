@@ -28,13 +28,9 @@ jest.mock("@/src/hooks/useEditField", () => ({
 }));
 
 jest.mock("@expo/vector-icons", () => {
-  const React = require("react");
-  const { Text } = require("react-native");
-  return {
-    MaterialIcons: (props: any) => (
-      <Text testID="mock-icon">{props.name}</Text>
-    ),
-  };
+  const MaterialIcons = (_props: any) => null;
+  (MaterialIcons as any).displayName = "MaterialIconsMock";
+  return { MaterialIcons };
 });
 
 describe("EditFieldModal", () => {
