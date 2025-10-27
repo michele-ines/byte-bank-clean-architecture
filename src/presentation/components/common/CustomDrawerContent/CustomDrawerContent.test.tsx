@@ -1,4 +1,5 @@
 import { useAuth } from "@presentation/state/AuthContext";
+import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { CustomDrawerContent } from "./CustomDrawerContent";
@@ -9,20 +10,23 @@ jest.mock("@/src/contexts/AuthContext", () => ({
 
 jest.mock("@react-navigation/drawer", () => {
   return {
-    DrawerContentScrollView: ({ children }: unknown) => <>{children}</>,
+    DrawerContentScrollView: ({
+      children,
+    }: React.PropsWithChildren<Partial<DrawerContentComponentProps>>) => (
+      <>{children}</>
+    ),
     DrawerItemList: jest.fn(() => <></>),
   };
 });
 
-
 describe("CustomDrawerContent", () => {
   const mockSignOut = jest.fn();
 
-  const baseProps: unknown = {
+  const baseProps = {
     state: { routes: [] },
     navigation: { navigate: jest.fn() },
     descriptors: {},
-  };
+  } as unknown as DrawerContentComponentProps;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -39,12 +43,9 @@ describe("CustomDrawerContent", () => {
       <CustomDrawerContent {...baseProps} />
     );
 
-    // Nome e email
     expect(getByText("João Teste")).toBeTruthy();
     expect(getByText("teste@example.com")).toBeTruthy();
-
     expect(getByText("JT")).toBeTruthy();
-
     expect(getByLabelText("Avatar de João Teste")).toBeTruthy();
   });
 
@@ -57,9 +58,9 @@ describe("CustomDrawerContent", () => {
 
     const { getByText } = render(<CustomDrawerContent {...baseProps} />);
 
-    expect(getByText("fulano")).toBeTruthy(); 
+    expect(getByText("fulano")).toBeTruthy();
     expect(getByText("fulano@dominio.com")).toBeTruthy();
-    expect(getByText("F")).toBeTruthy(); 
+    expect(getByText("F")).toBeTruthy();
   });
 
   it("chama signOut ao clicar no botão 'Sair'", () => {

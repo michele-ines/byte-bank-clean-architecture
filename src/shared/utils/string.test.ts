@@ -12,6 +12,6 @@ describe("getFirstName", () => {
   });
 
   it("Deve retornar uma string vazia se a entrada for indefinida", () => {
-    expect(getFirstName(undefined as unknown)).toBe("");
+    expect(getFirstName(undefined)).toBe("");
   });
 });
