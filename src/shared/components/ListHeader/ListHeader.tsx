@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { colors, sizes } from "@presentation/theme";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
-import { ListHeaderProps } from "../../ProfileStyles/profile.styles.types";
+import type { ListHeaderProps } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./ListHeader.styles";
 import { headerTexts } from "./ListHeader.texts";
 

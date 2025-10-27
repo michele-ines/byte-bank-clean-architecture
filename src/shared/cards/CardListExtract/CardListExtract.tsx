@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Feather } from "@expo/vector-icons";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { colors, spacing, texts, typography } from "@presentation/theme";
@@ -18,8 +19,8 @@ import { MaskedTextInput } from "react-native-mask-text";
 import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
-import { IAnexo } from "../../interfaces/auth.interfaces";
-import {
+import type { IAnexo } from "../../interfaces/auth.interfaces";
+import type {
   CardListExtractProps,
   EditedValuesMap,
 } from "../../ProfileStyles/profile.styles.types";
@@ -49,7 +50,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
 
   const filtered = filterFn ? transactions.filter(filterFn) : transactions;
 
-  const handleOpenReceipt = async (url: string) => {
+  // -------------------- Funções auxiliares --------------------
+
+  const handleOpenReceipt = async (url: string): Promise<void> => {
     const supported = await Linking.canOpenURL(url);
     if (supported) {
       await Linking.openURL(url);
@@ -62,7 +65,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
   };
 
-  const handleEditClick = () => {
+  const handleEditClick = (): void => {
     const initialValues = filtered.reduce((acc, transaction) => {
       if (transaction.id) {
         const valorComDecimais = transaction.valor.toFixed(2);
@@ -75,18 +78,18 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     setIsEditing(true);
   };
 
-  const handleCancelClick = () => {
+  const handleCancelClick = (): void => {
     setIsEditing(false);
     setIsDeleting(false);
     setEditedValues({});
     setSelectedItems(new Set());
   };
 
-  const handleValueChange = (id: string, newValue: string) => {
+  const handleValueChange = (id: string, newValue: string): void => {
     setEditedValues((prevValues) => ({ ...prevValues, [id]: newValue }));
   };
 
-  const handleAttachFile = async (transactionId: string) => {
+  const handleAttachFile = async (transactionId: string): Promise<void> => {
     setUploadingId(transactionId);
     try {
       const result = await DocumentPicker.getDocumentAsync({});
@@ -115,35 +118,41 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
   };
 
-  const handleDeleteAttachment = (transactionId: string, file: IAnexo) => {
+  const handleDeleteAttachment = (
+    transactionId: string,
+    file: IAnexo
+  ): void => {
     const dialog = texts.cardList.dialogs.deleteAttachment;
     Alert.alert(dialog.title, dialog.message, [
       { text: dialog.cancelButton, style: "cancel" },
       {
         text: dialog.confirmButton,
         style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteAttachment(transactionId, file);
-            showToast(
-              "success",
-              texts.cardList.toasts.deleteAttachmentSuccess.title,
-              texts.cardList.toasts.deleteAttachmentSuccess.message
-            );
-          } catch (e) {
-            console.error("Erro ao deletar anexo:", e);
-            showToast(
-              "error",
-              texts.cardList.toasts.deleteAttachmentError.title,
-              texts.cardList.toasts.deleteAttachmentError.message
-            );
-          }
+        onPress: () => {
+          // ✅ Corrigido: executa async com void
+          void (async () => {
+            try {
+              await deleteAttachment(transactionId, file);
+              showToast(
+                "success",
+                texts.cardList.toasts.deleteAttachmentSuccess.title,
+                texts.cardList.toasts.deleteAttachmentSuccess.message
+              );
+            } catch (e) {
+              console.error("Erro ao deletar anexo:", e);
+              showToast(
+                "error",
+                texts.cardList.toasts.deleteAttachmentError.title,
+                texts.cardList.toasts.deleteAttachmentError.message
+              );
+            }
+          })();
         },
       },
     ]);
   };
 
-  const handleItemSelection = (itemId: string, isSelected: boolean) => {
+  const handleItemSelection = (itemId: string, isSelected: boolean): void => {
     setSelectedItems((prev) => {
       const updated = new Set(prev);
       if (isSelected) updated.add(itemId);
@@ -152,7 +161,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     });
   };
 
-  const handleDeleteSelected = async () => {
+  const handleDeleteSelected = async (): Promise<void> => {
     if (selectedItems.size === 0) {
       showToast(
         "error",
@@ -183,7 +192,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
   };
 
-  const handleSaveClick = async () => {
+  const handleSaveClick = async (): Promise<void> => {
     if (isDeleting) {
       await handleDeleteSelected();
       return;
@@ -227,6 +236,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
   };
 
+  // -------------------- Render --------------------
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -246,6 +257,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Text style={styles.description}>{item.tipo}</Text>
+
             {isEditing ? (
               <MaskedTextInput
                 style={styles.input}
@@ -265,14 +277,21 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
 
             {item.anexos?.map((file, i) => (
               <Fragment key={i}>
-                <Pressable onPress={() => handleOpenReceipt(file.url)}>
+                <Pressable
+                  onPress={() => {
+                    void handleOpenReceipt(file.url);
+                  }}
+                >
                   <Text style={styles.attachmentLink}>
                     {truncateString(file.name, 20)}
                   </Text>
                 </Pressable>
+
                 {isEditing && (
                   <Pressable
-                    onPress={() => handleDeleteAttachment(item.id!, file)}
+                    onPress={() => {
+                      handleDeleteAttachment(item.id!, file);
+                    }}
                   >
                     <Feather
                       name="trash-2"
@@ -290,7 +309,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
                   <ActivityIndicator color={colors.byteColorBlue500} />
                 ) : (
                   <Pressable
-                    onPress={() => handleAttachFile(item.id!)}
+                    onPress={() => {
+                      void handleAttachFile(item.id!);
+                    }}
                     disabled={!!uploadingId}
                   >
                     <Text>{texts.cardList.item.attachButton}</Text>
@@ -320,7 +341,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         ListFooterComponent={<ListFooter isLoadingMore={loadingMore} />}
         onEndReached={() => {
           if (hasMore && !loadingMore) {
-            loadMoreTransactions();
+            void loadMoreTransactions(); 
           }
         }}
         onEndReachedThreshold={0.1}

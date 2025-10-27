@@ -6,17 +6,18 @@ import React, {
   useMemo,
   useRef,
   useState,
+  type JSX,
 } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { EditFieldModal } from "../../modal/EditFieldModal/EditFieldModal";
 import { styles } from "./CardMinhaConta.styles";
 
-export function CardMinhaConta() {
+export function CardMinhaConta(): JSX.Element {
   const { userData } = useAuth();
 
   const [localUser, setLocalUser] = useState({
-    name: userData?.name || "",
-    email: userData?.email || "",
+    name: userData?.name ?? "",
+    email: userData?.email ?? "",
     password: "",
   });
 
@@ -37,7 +38,7 @@ export function CardMinhaConta() {
     []
   );
 
-  const resetValues = useCallback(() => {
+  const resetValues = useCallback((): void => {
     if (userData) {
       setLocalUser({
         name: userData.name,
@@ -55,7 +56,7 @@ export function CardMinhaConta() {
     label: string,
     field: keyof typeof localUser,
     secure?: boolean
-  ) => (
+  ): JSX.Element => (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputWrapper}>

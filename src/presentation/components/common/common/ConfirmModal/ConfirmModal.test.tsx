@@ -51,11 +51,13 @@ describe("ConfirmModal", () => {
       <ConfirmModal {...baseProps} loading={true} />
     );
     const confirmButton = getByLabelText("Sim");
-    expect(confirmButton.props.accessibilityState.disabled).toBe(true);
+    expect(confirmButton).toBeDisabled();
   });
 
   it("não renderiza nada quando visible=false", () => {
-    const { queryByText } = render(<ConfirmModal {...baseProps} visible={false} />);
+    const { queryByText } = render(
+      <ConfirmModal {...baseProps} visible={false} />
+    );
     expect(queryByText("Confirmação")).toBeNull();
   });
 
@@ -63,8 +65,8 @@ describe("ConfirmModal", () => {
     const { getByLabelText } = render(
       <ConfirmModal
         {...baseProps}
-        confirmText={undefined as any}
-        cancelText={undefined as any}
+        confirmText={undefined}
+        cancelText={undefined}
       />
     );
     expect(getByLabelText(texts.textConfirmar)).toBeTruthy();

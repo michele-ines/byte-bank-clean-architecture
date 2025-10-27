@@ -1,9 +1,8 @@
-
 import { MaterialIcons } from "@expo/vector-icons";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useEditField } from "@presentation/hooks/useEditField";
 import { texts } from "@presentation/theme";
-import { EditFieldModalProps } from "@shared/ProfileStyles/profile.styles.types";
+import type { EditFieldModalProps } from "@shared/ProfileStyles/profile.styles.types";
 import React, { useEffect, useRef } from "react";
 import {
   KeyboardAvoidingView,
@@ -22,7 +21,7 @@ export function EditFieldModal({
   field,
   initialValue,
   onClose,
-}: Readonly<EditFieldModalProps>) {
+}: Readonly<EditFieldModalProps>): React.ReactElement | null {
   const {
     value,
     setValue,
@@ -73,14 +72,14 @@ export function EditFieldModal({
 
   if (!field) return null;
 
-  const getLabel = () =>
+  const getLabel = (): string | undefined =>
     ({
       name: "Editar nome",
       email: "Editar e-mail",
       password: "Alterar senha",
     }[field]);
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     setLoading(true);
 
     try {
@@ -95,7 +94,7 @@ export function EditFieldModal({
   const renderPasswordToggle = (
     visible: boolean,
     setVisible: (v: boolean) => void
-  ) => (
+  ): React.ReactElement => (
     <TouchableOpacity
       onPress={() => setVisible(!visible)}
       style={styles.showPasswordBtn}
@@ -114,7 +113,7 @@ export function EditFieldModal({
     setFieldValue: (v: string) => void,
     secureText: boolean,
     refProp?: React.RefObject<TextInput>
-  ) => {
+  ): React.ReactElement => {
     let passwordToggle = null;
     if (isPasswordField && label === "Nova senha") {
       passwordToggle = renderPasswordToggle(
@@ -128,7 +127,7 @@ export function EditFieldModal({
       );
     }
 
-    const handleChange = (v: string) => {
+    const handleChange = (v: string): void => {
       setFieldValue(v);
       if (error.field) setError({ field: "", message: "" });
     };
@@ -218,7 +217,9 @@ export function EditFieldModal({
             />
             <DefaultButton
               title={texts.modal.buttons.save}
-              onPress={handleSave}
+              onPress={() => {
+                void handleSave();
+              }}
               loading={loading}
               disabled={loading}
               buttonStyle={styles.saveButton}

@@ -1,10 +1,11 @@
 import { colors, spacing, typography } from "@presentation/theme";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import type { TextStyle, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 
-type Styles = {
+interface Styles {
   loadingFooter: ViewStyle;
   loadingText: TextStyle;
-};
+}
 
 export const styles = StyleSheet.create<Styles>({
   loadingFooter: {

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
+import type { FC } from "react";
 import React from "react";
 import { EditFieldModal } from "./EditFieldModal";
 
@@ -7,7 +8,8 @@ const mockUpdateEmail = jest.fn();
 const mockUpdatePassword = jest.fn();
 const mockOnClose = jest.fn();
 
-jest.mock("@/src/hooks/useEditField", () => ({
+// ✅ use o MESMO alias que o componente usa
+jest.mock("@presentation/hooks/useEditField", () => ({
   useEditField: () => ({
     value: "valor-inicial",
     setValue: jest.fn(),
@@ -27,11 +29,26 @@ jest.mock("@/src/hooks/useEditField", () => ({
   }),
 }));
 
+// ✅ corrige ts(2571) sem usar "as unknown"
 jest.mock("@expo/vector-icons", () => {
-  const MaterialIcons = (_props: any) => null;
-  (MaterialIcons as any).displayName = "MaterialIconsMock";
+  const MaterialIcons: FC = () => null;
+  MaterialIcons.displayName = "MaterialIconsMock";
   return { MaterialIcons };
 });
+
+// ✅ garante strings estáveis para os botões/labels
+jest.mock("@presentation/theme", () => ({
+  texts: {
+    modal: {
+      buttons: {
+        cancel: "Cancelar",
+        save: "Salvar",
+        accessibilityCancel: "Cancelar",
+        accessibilitySave: "Salvar",
+      },
+    },
+  },
+}));
 
 describe("EditFieldModal", () => {
   beforeEach(() => {

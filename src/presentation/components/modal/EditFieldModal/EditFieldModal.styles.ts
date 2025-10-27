@@ -1,6 +1,6 @@
 
 import { border, colors, layout, radius, sizes, spacing, typography } from "@presentation/theme";
-import { EditFieldModalStyles } from "@shared/ProfileStyles/profile.styles.types";
+import type { EditFieldModalStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
 
 

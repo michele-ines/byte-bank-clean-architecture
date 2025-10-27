@@ -3,7 +3,7 @@ import { DefaultButton } from "@presentation/components/common/common/DefaultBut
 import { useAuth } from "@presentation/state/AuthContext";
 import { texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
-import { LoginFormProps } from "@shared/ProfileStyles/profile.styles.types";
+import type { LoginFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
@@ -24,7 +24,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   const { login } = useAuth();
 
-  const handleLogin = async () => {
+  // ✅ Adicionando tipo de retorno explícito
+  const handleLogin = async (): Promise<void> => {
     if (!email || !password) {
       showToast(
         "error",
@@ -33,7 +34,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       );
       return;
     }
+
     setIsLoading(true);
+
     try {
       await login(email, password);
       onLoginSuccess?.(email);
@@ -50,7 +53,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleCreateAccount = () => {
+  // ✅ Adicionando tipo de retorno explícito
+  const handleCreateAccount = (): void => {
     router.push(ROUTES.SIGNUP);
   };
 
@@ -67,7 +71,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         accessibilityLabel={texts.loginForm.accessibility.form}
       >
         <LoginIllustration
-          width={"100%"}
+          width="100%"
           style={styles.illustration}
           accessible
           accessibilityLabel={texts.loginForm.accessibility.illustration}
@@ -112,7 +116,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             title={texts.loginForm.buttons.submit}
             loading={isLoading}
             disabled={isFormInvalid}
-            onPress={handleLogin}
+            // ✅ Corrigido: evita erro no-misused-promises
+            onPress={() => {
+              void handleLogin();
+            }}
             buttonStyle={[styles.button, styles.submitButton]}
             textStyle={styles.buttonText}
             accessibilityLabel={texts.loginForm.accessibility.submitButton}

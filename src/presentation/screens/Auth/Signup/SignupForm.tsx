@@ -4,7 +4,7 @@ import { useAuth } from "@presentation/state/AuthContext";
 import { colors, sizes, texts } from "@presentation/theme";
 import { Checkbox } from "@shared/components/Checkbox/Checkbox";
 import { ROUTES } from "@shared/constants/routes";
-import { SignupFormProps } from "@shared/ProfileStyles/profile.styles.types";
+import type { SignupFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -29,7 +29,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
 
   const { signup } = useAuth();
 
-  const validateEmail = (text: string) => {
+  // ✅ Adicionado tipo de retorno explícito: void
+  const validateEmail = (text: string): void => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regex.test(text) && text.length > 0) {
       setEmailError("Dado incorreto. Revise e digite novamente.");
@@ -39,7 +40,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     setEmail(text);
   };
 
-  const handleSubmit = async () => {
+  // ✅ Adicionado tipo de retorno explícito: Promise<void>
+  const handleSubmit = async (): Promise<void> => {
     const { toasts } = texts.signupForm;
     if (!name || !email || !password || !confirmPassword) {
       showToast("error", toasts.emptyFields.title, toasts.emptyFields.message);
@@ -72,7 +74,11 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
       let errorMessage = toasts.genericError.message;
       let errorTitle = toasts.genericError.title;
 
-      if (error instanceof Error && (error as any).code === "auth/email-already-in-use") {
+      // ✅ Tipagem de erro aprimorada
+      if (
+        error instanceof Error &&
+        (error as { code?: string }).code === "auth/email-already-in-use"
+      ) {
         errorMessage = toasts.emailInUse.message;
         errorTitle = toasts.emailInUse.title;
       }
@@ -177,7 +183,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             title={texts.signupForm.buttons.submit}
             loading={isLoading}
             disabled={isFormInvalid}
-            onPress={handleSubmit}
+            // ✅ Corrigido para evitar no-misused-promises
+            onPress={() => void handleSubmit()}
             buttonStyle={[styles.button, styles.submitButton]}
             textStyle={styles.buttonText}
             indicatorColor={colors.byteColorWhite}

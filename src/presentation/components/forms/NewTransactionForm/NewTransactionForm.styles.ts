@@ -1,6 +1,6 @@
 
 import { border, colors, layout, radius, shadows, spacing, typography } from "@presentation/theme";
-import { NewTransactionFormStyle } from "@shared/ProfileStyles/profile.styles.types";
+import type { NewTransactionFormStyle } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
 import { sharedStyles } from "src/styles/shared.styles";
 

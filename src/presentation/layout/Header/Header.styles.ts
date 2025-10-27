@@ -1,5 +1,5 @@
 import { layout, spacing, typography } from "@presentation/theme";
-import { HeaderStyles } from "@shared/ProfileStyles/profile.styles.types";
+import type { HeaderStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { Platform, StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create<HeaderStyles>({

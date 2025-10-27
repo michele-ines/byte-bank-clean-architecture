@@ -1,6 +1,6 @@
 
 import { colors, radius, spacing, typography } from "@presentation/theme";
-import { ForgotPasswordFormStyles } from "@shared/ProfileStyles/profile.styles.types";
+import type { ForgotPasswordFormStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
 import { sharedStyles } from "src/styles/shared.styles";
 

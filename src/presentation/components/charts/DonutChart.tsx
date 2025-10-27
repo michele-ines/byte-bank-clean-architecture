@@ -1,6 +1,6 @@
 
 import { layout, radius } from "@presentation/theme";
-import { DonutChartProps } from "@shared/ProfileStyles/profile.styles.types";
+import type { DonutChartProps } from "@shared/ProfileStyles/profile.styles.types";
 import React from "react";
 import { View } from "react-native";
 import Svg, { Circle, G } from "react-native-svg";

@@ -1,11 +1,12 @@
-
 import { colors, layout, spacing, texts } from "@presentation/theme";
-import React from "react";
+import React, { type JSX } from "react";
 import { Dimensions, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { styles } from "./FinancialChart.styles";
 
-export default function FinancialChart() {
+export default function FinancialChart(): JSX.Element {
+  const width = Dimensions.get("window").width - spacing.xl;
+
   return (
     <View
       style={styles.container}
@@ -17,7 +18,7 @@ export default function FinancialChart() {
 
       <LineChart
         data={texts.financialChartData}
-        width={Dimensions.get("window").width - spacing.xl}
+        width={width}
         height={layout.chartHeight}
         yAxisLabel={texts.currencyPrefix}
         chartConfig={{

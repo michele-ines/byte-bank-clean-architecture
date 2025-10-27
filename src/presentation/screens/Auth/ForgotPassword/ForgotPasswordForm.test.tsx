@@ -1,5 +1,6 @@
 // ✅ Todos os imports no topo
 import { fireEvent, render, screen } from "@testing-library/react-native";
+import type { JSX } from "react";
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
@@ -33,7 +34,7 @@ jest.mock("@/src/routes", () => ({
   },
 }));
 
-// 🔹 Mock do componente DefaultButton (sem require)
+// ✅ Tipagem explícita e uso seguro do operador `??`
 jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
   DefaultButton: ({
     title,
@@ -42,10 +43,17 @@ jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
     loading,
     accessibilityLabel,
     accessibilityHint,
-  }: any) => (
+  }: {
+    title: string;
+    onPress: () => void;
+    disabled?: boolean;
+    loading?: boolean;
+    accessibilityLabel?: string;
+    accessibilityHint?: string;
+  }): JSX.Element => (
     <TouchableOpacity
       onPress={onPress}
-      disabled={disabled || loading}
+      disabled={(disabled ?? false) || (loading ?? false)}
       testID={title === "Enviar" ? "button-enviar" : "button-voltar"}
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
@@ -106,12 +114,12 @@ jest.mock("./ForgotPasswordForm.styles", () => ({
 describe("ForgotPasswordForm", () => {
   const mockOnSubmitSuccess = jest.fn();
 
-  beforeEach(() => {
+  beforeEach((): void => {
     jest.clearAllMocks();
   });
 
   describe("Renderização", () => {
-    it("renderiza todos os elementos do formulário", () => {
+    it("renderiza todos os elementos do formulário", (): void => {
       render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
 
       expect(screen.getByText("Esqueci minha senha")).toBeTruthy();
@@ -123,7 +131,7 @@ describe("ForgotPasswordForm", () => {
       expect(screen.getByText("Voltar")).toBeTruthy();
     });
 
-    it("renderiza com acessibilidade correta", () => {
+    it("renderiza com acessibilidade correta", (): void => {
       render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
 
       const form = screen.getByLabelText("Formulário de recuperação de senha");
@@ -135,7 +143,7 @@ describe("ForgotPasswordForm", () => {
   });
 
   describe("Interações do usuário", () => {
-    it("permite digitar no campo de e-mail", () => {
+    it("permite digitar no campo de e-mail", (): void => {
       render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
 
       const emailInput = screen.getByPlaceholderText("Digite seu e-mail");
@@ -146,7 +154,8 @@ describe("ForgotPasswordForm", () => {
   });
 
   describe("Validação de formulário", () => {
-    it("não chama resetPassword quando e-mail está vazio", async () => {
+    // ✅ Removido async desnecessário — não há `await` dentro
+    it("não chama resetPassword quando e-mail está vazio", (): void => {
       render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
 
       const submitButton = screen.getByTestId("button-enviar");

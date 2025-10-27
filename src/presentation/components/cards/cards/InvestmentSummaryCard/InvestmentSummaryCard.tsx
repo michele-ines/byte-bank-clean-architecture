@@ -10,7 +10,7 @@ import { investmentSummaryMock } from "./Mock/InvestmentSummaryCard.mock";
 const investmentTexts = texts.investmentSummary;
 
 export const InvestmentSummaryCard: React.FC = () => {
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number): string => {
     return value.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",

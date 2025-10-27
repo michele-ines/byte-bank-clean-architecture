@@ -1,10 +1,12 @@
-import { UserInfo } from "firebase/auth";
-import { ReactNode } from "react";
-import { StyleProp, TextStyle, ViewStyle } from "react-native";
-import { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
-import { ITransaction } from "../interfaces/auth.interfaces";
+import type { CreateTransaction } from "@/application/use-cases/CreateTransaction";
+import type { ListUserTransactions } from "@/application/use-cases/ListUserTransactions";
+import type { UserInfo } from "firebase/auth";
+import type { ReactNode } from "react";
+import type { StyleProp, TextStyle, ViewStyle } from "react-native";
+import type { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
+import type { ITransaction } from "../interfaces/auth.interfaces";
 
-export type ProfileStyles = {
+export interface ProfileStyles {
   container: ViewStyle;
   header: ViewStyle;
   avatarCircle: ViewStyle;
@@ -14,9 +16,9 @@ export type ProfileStyles = {
   scrollContent: ViewStyle;
   logoutButton: ViewStyle;
   logoutButtonText: TextStyle;
-};
+}
 
-export type ConfirmModalProps = {
+export interface ConfirmModalProps {
   visible: boolean;
   title: string;
   message: string;
@@ -26,9 +28,9 @@ export type ConfirmModalProps = {
   loading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
-};
+}
 
-export type DashboardStyles = {
+export interface DashboardStyles {
   container: ViewStyle;
   content: ViewStyle;
   headerTitle: TextStyle;
@@ -46,21 +48,20 @@ export type DashboardStyles = {
   legendText: TextStyle;
   cardPixelsTop: ViewStyle;
   cardPixelsBotton: ViewStyle;
-};
+}
 
-
-export type AppLayoutStyles = {
+export interface AppLayoutStyles {
   loaderContainer: ViewStyle;
   drawerStyle: ViewStyle;
   drawerLabel: TextStyle;
   drawerItem: ViewStyle;
-};
+}
 
-export type ChartStyles = {
+export interface ChartStyles {
   chartContainer: ViewStyle;
-};
+}
 
-export type TransactionsStyles = {
+export interface TransactionsStyles {
   container: ViewStyle;
   title: TextStyle;
   input: TextStyle;
@@ -74,18 +75,18 @@ export type TransactionsStyles = {
   receiptButtonText: TextStyle;
   loadingFooter: ViewStyle;
   loadingText: TextStyle;
-  attachmentsTitle:TextStyle;
-  attachmentsContainer:ViewStyle;
-  attachmentLink:TextStyle
-  editActionsContainer:ViewStyle;
-  deleteButton:ViewStyle;
-  deleteButtonText:TextStyle;
-  attachmentRow:ViewStyle;
-  separator:ViewStyle;
-  amountNegative:TextStyle;
-};
+  attachmentsTitle: TextStyle;
+  attachmentsContainer: ViewStyle;
+  attachmentLink: TextStyle;
+  editActionsContainer: ViewStyle;
+  deleteButton: ViewStyle;
+  deleteButtonText: TextStyle;
+  attachmentRow: ViewStyle;
+  separator: ViewStyle;
+  amountNegative: TextStyle;
+}
 
-export type EditFieldModalStyles = {
+export interface EditFieldModalStyles {
   field: ViewStyle;
   label: TextStyle;
   input: TextStyle;
@@ -102,15 +103,15 @@ export type EditFieldModalStyles = {
   saveButtonText: TextStyle;
   inputWrapper: ViewStyle;
   errorText: TextStyle;
-};
+}
 
-export type HeaderStyles = {
+export interface HeaderStyles {
   container: ViewStyle;
   row: ViewStyle;
   centerLogo: ViewStyle;
-};
+}
 
-export type DashboardExtraStyles = {
+export interface DashboardExtraStyles {
   wrapper: ViewStyle;
   row: ViewStyle;
   card: ViewStyle;
@@ -119,9 +120,9 @@ export type DashboardExtraStyles = {
   balance: ViewStyle;
   balanceLabel: TextStyle;
   balanceValue: TextStyle;
-};
+}
 
-export type NewTransactionFormStyle = {
+export interface NewTransactionFormStyle {
   safeArea: ViewStyle;
   container: ViewStyle;
   keyboardAvoiding: ViewStyle;
@@ -137,24 +138,24 @@ export type NewTransactionFormStyle = {
   illustration: ViewStyle;
   bottomIllustrationsContainer: ViewStyle;
   dropdownPicker: ViewStyle;
-};
+}
 
-export type WidgetPreferences = {
+export interface WidgetPreferences {
   spendingAlert: boolean;
   savingsGoal: boolean;
-};
+}
 
-export type InvestmentsScreenStyles = {
+export interface InvestmentsScreenStyles {
   container: ViewStyle;
   title: TextStyle;
-};
+}
 
-export type WidgetPreferencesContextType = {
+export interface WidgetPreferencesContextType {
   preferences: WidgetPreferences;
   updatePreferences: (newPrefs: WidgetPreferences) => void;
-};
+}
 
-export type ForgotPasswordFormStyles = {
+export interface ForgotPasswordFormStyles {
   card: ViewStyle;
   title: TextStyle;
   label: TextStyle;
@@ -164,9 +165,9 @@ export type ForgotPasswordFormStyles = {
   backButton: ViewStyle;
   backText: TextStyle;
   submitDisabled: ViewStyle;
-};
+}
 
-export type BalanceComponentStyle = {
+export interface BalanceComponentStyle {
   container: ViewStyle;
   greetingSection: ViewStyle;
   nameTitle: TextStyle;
@@ -181,66 +182,62 @@ export type BalanceComponentStyle = {
   pixelsImage1: ViewStyle;
   pixelsImage2: ViewStyle;
   whiteLine: ViewStyle;
-};
+}
+
 export type BalanceValue = number | null;
 
-export type ForgotPasswordFormProps = {
+export interface ForgotPasswordFormProps {
   onSubmitSuccess?: (email: string) => void;
-};
+}
 
-export type LoginFormProps = {
+export interface LoginFormProps {
   onLoginSuccess?: (email: string) => void;
-};
+}
 
-export type SignupFormProps = {
+export interface SignupFormProps {
   onSignupSuccess?: (email: string) => void;
-};
+}
 
-export type CardListExtractProps = {
+export interface CardListExtractProps {
   filterFn?: (transaction: ITransaction) => boolean;
   title?: string;
-};
+}
 
-export type EditedValuesMap = {
-  [key: string]: string;
-};
+export type EditedValuesMap = Record<string, string>;
 
-
-export type Transaction = {
+export interface Transaction {
   tipo: "entrada" | "saida";
   valor: number;
-};
+}
 
-export type CardProps = {
+export interface CardProps {
   title: string;
   subtitle?: string;
   children?: ReactNode;
   variant?: "elevated" | "outlined";
-};
+}
 
+export type AccountType = "corrente" | "poupança" | (string & {});
 
-
-export type AccountType = "corrente" | "poupança" | string;
-
-export type BalanceComponentProps = {
+export interface BalanceComponentProps {
   balance: { account: AccountType; value: number | null };
   user: UserInfo;
-};
+}
 
-export type Props = {
+export interface Props {
   style?: StyleProp<ViewStyle>;
-};
+}
 
-export type WidgetSettingsModalProps = {
+export interface WidgetSettingsModalProps {
   open: boolean;
   onClose: () => void;
-};
+}
 
-export type ForgotPageStyles = {
+export interface ForgotPageStyles {
   container: ViewStyle;
-};
+}
 
-export type SharedStyles = {
+export interface SharedStyles {
   keyboardView: ViewStyle;
   scrollView: ViewStyle;
   scrollViewContent: ViewStyle;
@@ -251,40 +248,41 @@ export type SharedStyles = {
   button: ViewStyle;
   buttonText: TextStyle;
   buttonDisabled: ViewStyle;
-  backgroundPixelsTop : ViewStyle;
+  backgroundPixelsTop: ViewStyle;
   backgroundPixelsBottom: ViewStyle;
-};
+}
 
-export type ToastStyles = {
+export interface ToastStyles {
   baseToast: ViewStyle;
   errorToast: ViewStyle;
   successToast: ViewStyle;
   text1: TextStyle;
   text2: TextStyle;
-};
+}
 
 export type ToastType = "success" | "error";
 export type TransactionType = "deposito" | "cambio" | "transferencia";
+
 export const TransactionTypeItems = [
   { label: "Depósito", value: "deposito" },
   { label: "Câmbio", value: "cambio" },
   { label: "Transferência", value: "transferencia" },
 ];
 
-export type EditFieldModalProps = {
+export interface EditFieldModalProps {
   visible: boolean;
   field: "name" | "email" | "password" | null;
   initialValue: string;
   onClose: () => void;
-};
+}
 
-export type PortfolioItem = {
+export interface PortfolioItem {
   name: string;
   value: number;
   color: string;
-};
+}
 
-export type ListHeaderProps = {
+export interface ListHeaderProps {
   title?: string;
   isEditing: boolean;
   isDeleting: boolean;
@@ -292,11 +290,15 @@ export type ListHeaderProps = {
   onCancel: () => void;
   onEdit: () => void;
   onDelete: () => void;
-};
-
+}
 
 export type DonutChartProps = {
   data: PortfolioItem[];
   radius?: number;
   strokeWidth?: number;
-} & ViewProps; 
+} & ViewProps;
+
+export interface DI {
+  createTransaction: CreateTransaction;
+  listUserTransactions: ListUserTransactions;
+}

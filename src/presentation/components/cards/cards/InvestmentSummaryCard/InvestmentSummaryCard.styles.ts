@@ -1,6 +1,5 @@
-
 import { colors, layout, radius, spacing, typography } from "@presentation/theme";
-import { DashboardStyles } from "@shared/ProfileStyles/profile.styles.types";
+import type { DashboardStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
 import { sharedStyles } from "src/styles/shared.styles";
 
@@ -78,7 +77,6 @@ export const styles = StyleSheet.create<DashboardStyles>({
     fontSize: typography.textBase,
     color: colors.byteColorWhite,
   },
-
   cardPixelsTop: {
     ...sharedStyles.backgroundPixelsTop,
   },

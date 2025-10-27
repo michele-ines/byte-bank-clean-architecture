@@ -1,8 +1,9 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, StyleProp, Text, TextStyle, View } from "react-native";
-import { SvgProps } from "react-native-svg";
+import type { StyleProp, TextStyle} from "react-native";
+import { ScrollView, Text, View } from "react-native";
+import type { SvgProps } from "react-native-svg";
 
 import BannerIlustracao from "@assets/images/page/banner-ilustracao.svg";
 import IconDispositivos from "@assets/images/page/icon-dispositivos.svg";
@@ -117,12 +118,12 @@ const MainScreen: React.FC = () => {
 export default MainScreen;
 
 /* ============================ Feature Card ============================ */
-type FeatureCardProps = {
+interface FeatureCardProps {
   Icon: React.FC<SvgProps>;
   title: string;
   description: string;
   descriptionStyle?: StyleProp<TextStyle>;
-};
+}
 
 const FeatureCard: React.FC<FeatureCardProps> = ({
   Icon,

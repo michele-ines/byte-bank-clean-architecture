@@ -1,8 +1,11 @@
 import { toastStyles } from "@presentation/styles/Toast.styles";
-import { View, ViewStyle } from "react-native";
-import { BaseToast, BaseToastProps } from "react-native-toast-message";
+import type { JSX } from "react";
+import type { ViewStyle } from "react-native";
+import { View } from "react-native";
+import type { BaseToastProps } from "react-native-toast-message";
+import { BaseToast } from "react-native-toast-message";
 
-const getAccessibilityLabel = (props: BaseToastProps) => {
+const getAccessibilityLabel = (props: BaseToastProps): string => {
   const { text1, text2 } = props;
   return [text1, text2].filter(Boolean).join(". ");
 };
@@ -26,14 +29,14 @@ const ToastVariants: Record<
 const CustomToast = ({
   variant,
   ...props
-}: BaseToastProps & { variant: ToastVariant }) => {
+}: BaseToastProps & { variant: ToastVariant }): JSX.Element => {
   const variantConfig = ToastVariants[variant];
   return (
     <View
       accessible={true}
-      accessibilityLabel={`${
-        variantConfig.accessibilityPrefix
-      }: ${getAccessibilityLabel(props)}`}
+      accessibilityLabel={`${variantConfig.accessibilityPrefix}: ${getAccessibilityLabel(
+        props
+      )}`}
       accessibilityRole="alert"
     >
       <BaseToast
@@ -48,8 +51,10 @@ const CustomToast = ({
 };
 
 export const toastConfig = {
-  success: (props: BaseToastProps) => (
+  success: (props: BaseToastProps): JSX.Element => (
     <CustomToast {...props} variant="success" />
   ),
-  error: (props: BaseToastProps) => <CustomToast {...props} variant="error" />,
+  error: (props: BaseToastProps): JSX.Element => (
+    <CustomToast {...props} variant="error" />
+  ),
 };

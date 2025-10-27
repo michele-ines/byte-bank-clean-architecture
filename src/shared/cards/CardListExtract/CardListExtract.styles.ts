@@ -1,6 +1,6 @@
 import { border, colors, layout, radius, shadows, spacing, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
-import { TransactionsStyles } from "../../ProfileStyles/profile.styles.types";
+import type { TransactionsStyles } from "../../ProfileStyles/profile.styles.types";
 
 export const styles = StyleSheet.create<TransactionsStyles>({
   container: {

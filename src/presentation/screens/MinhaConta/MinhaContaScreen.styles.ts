@@ -1,14 +1,15 @@
 import { colors, layout, radius, spacing, typography } from "@presentation/theme";
-import { StyleSheet, ViewStyle } from "react-native";
+import type { ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 
-type MinhaContaStyles = {
+interface MinhaContaStyles {
   wrapper: ViewStyle;
   cardContainer: ViewStyle;
   illustration: ViewStyle;
   pixelBottom: ViewStyle;
   pixelTop: ViewStyle;
   IllustrationsContainer: ViewStyle;
-};
+}
 
 export const styles = StyleSheet.create<MinhaContaStyles>({
   wrapper: {

@@ -4,9 +4,9 @@ import { Text, View } from 'react-native';
 import { styles } from './ListFooter.styles';
 import { footerTexts } from './ListFooter.texts';
 
-type ListFooterProps = {
+interface ListFooterProps {
   isLoadingMore: boolean;
-};
+}
 
 export const ListFooter: React.FC<ListFooterProps> = ({ isLoadingMore }) => {
   if (!isLoadingMore) return null;

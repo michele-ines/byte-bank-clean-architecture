@@ -1,7 +1,7 @@
-import { colors } from '@presentation/theme';
-import ExpoCheckbox from 'expo-checkbox';
-import React from 'react';
-import { CheckboxProps } from '../../interfaces/auth.interfaces';
+import { colors } from "@presentation/theme";
+import ExpoCheckbox from "expo-checkbox";
+import React from "react";
+import type { CheckboxProps } from "../../interfaces/auth.interfaces";
 
 export const Checkbox: React.FC<CheckboxProps> = ({
   value,
@@ -9,7 +9,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   style,
   color,
   accessibilityLabel,
-  accessibilityRole = 'checkbox',
+  accessibilityRole = "checkbox",
   accessibilityHint,
   accessibilityState,
 }) => {
@@ -18,11 +18,11 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       style={style}
       value={value}
       onValueChange={onValueChange}
-      color={color || (value ? colors.byteColorGreen500 : undefined)}
+      color={color ?? (value ? colors.byteColorGreen500 : undefined)}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
-      accessibilityState={accessibilityState || { checked: value }}
+      accessibilityState={accessibilityState ?? { checked: value }}
     />
   );
 };

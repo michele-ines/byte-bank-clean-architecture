@@ -1,17 +1,8 @@
-
+import type { CardMinhaContaStyles } from "@/shared/interfaces/auth.interfaces";
 import { border, colors, layout, radius, sizes, spacing, typography } from "@presentation/theme";
-import { StyleSheet, TextStyle, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native";
 import { sharedStyles } from "src/styles/shared.styles";
 
-type CardMinhaContaStyles = {
-  title: TextStyle;
-  field: ViewStyle;
-  label: TextStyle;
-  inputWrapper: ViewStyle;
-  input: TextStyle;
-  inputEditing: ViewStyle;
-  icon: TextStyle;
-};
 export const styles = StyleSheet.create<CardMinhaContaStyles>({
   title: {
     ...sharedStyles.title,

@@ -1,6 +1,6 @@
 import { border, colors, layout, radius, spacing, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
-import { SharedStyles } from "../shared/ProfileStyles/profile.styles.types";
+import type { SharedStyles } from "../shared/ProfileStyles/profile.styles.types";
 
 export const sharedStyles = StyleSheet.create<SharedStyles>({
   keyboardView: {
@@ -43,7 +43,7 @@ export const sharedStyles = StyleSheet.create<SharedStyles>({
     color: colors.byteGray800,
   },
   button: {
-    paddingVertical:spacing.md, 
+    paddingVertical: spacing.md,
     borderRadius: radius.sm,
     alignItems: typography.alignCenter,
     marginTop: spacing.xs,
@@ -57,20 +57,20 @@ export const sharedStyles = StyleSheet.create<SharedStyles>({
   buttonDisabled: {
     backgroundColor: colors.byteGray400,
   },
-  backgroundPixelsTop : {
+  backgroundPixelsTop: {
     position: layout.positionAbsolute,
     top: layout.width0,
     left: layout.width0,
     width: layout.width90Percent,
     height: layout.widthFull,
-    opacity: layout.opacityImage, 
+    opacity: layout.opacityImage,
   },
   backgroundPixelsBottom: {
     position: layout.positionAbsolute,
     bottom: layout.width0,
     right: layout.width0,
-    width: layout.width45Percent, 
-    height: layout.height50Percent, 
-    opacity: layout.opacityImage, 
+    width: layout.width45Percent,
+    height: layout.height50Percent,
+    opacity: layout.opacityImage,
   },
 });

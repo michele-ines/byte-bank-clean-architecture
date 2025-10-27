@@ -1,5 +1,5 @@
 
-import { ErrorScreenProps } from "@shared/interfaces/auth.interfaces";
+import type { ErrorScreenProps } from "@shared/interfaces/auth.interfaces";
 import React from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

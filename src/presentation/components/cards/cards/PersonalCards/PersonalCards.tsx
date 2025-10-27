@@ -1,37 +1,39 @@
+import type { CardPanelProps } from "@/shared/interfaces/auth.interfaces";
 import CartaoDigitalImg from "@assets/images/dash-card-my-cards/cartao-digital.svg";
 import CartaoFisicoImg from "@assets/images/dash-card-my-cards/cartao-fisico.svg";
 import ConfirmModal from "@presentation/components/common/common/ConfirmModal/ConfirmModal";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
-import { apiToggleCardState, CardState } from "@presentation/screens/OtherServices/cards";
+import type { CardState } from "@presentation/screens/OtherServices/cards";
+import { apiToggleCardState } from "@presentation/screens/OtherServices/cards";
 import { colors, layout, sizes, texts } from "@presentation/theme";
 import * as Haptics from "expo-haptics";
+import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 import { Text, useWindowDimensions, View } from "react-native";
 import { styles } from "./PersonalCards.styles";
 
-export default function PersonalCards() {
+export default function PersonalCards(): JSX.Element {
   const { width } = useWindowDimensions();
   const isLg = width >= layout.breakpointLg;
 
   const [fisicoState, setFisicoState] = useState<CardState>("active");
   const [digitalState, setDigitalState] = useState<CardState>("active");
-  const [loading, setLoading] = useState<{
-    fisico?: boolean;
-    digital?: boolean;
-  }>({});
+  const [loading, setLoading] = useState<{ fisico?: boolean; digital?: boolean }>({});
   const [modal, setModal] = useState<
     | { visible: true; kind: "fisico" | "digital"; willBlock: boolean }
     | { visible: false }
   >({ visible: false });
 
-  const openConfirm = (kind: "fisico" | "digital") => {
+
+  const openConfirm = (kind: "fisico" | "digital"): void => {
     const current = kind === "fisico" ? fisicoState : digitalState;
     setModal({ visible: true, kind, willBlock: current === "active" });
   };
 
-  const closeConfirm = () => setModal({ visible: false });
+  const closeConfirm = (): void => setModal({ visible: false });
 
-  const confirmToggle = async () => {
+
+  const confirmToggle = async (): Promise<void> => {
     if (!modal.visible) return;
     const kind = modal.kind;
     const current = kind === "fisico" ? fisicoState : digitalState;
@@ -58,16 +60,6 @@ export default function PersonalCards() {
     }
   };
 
-  type CardPanelProps = {
-    title: string;
-    state: CardState;
-    onConfigure: () => void;
-    onToggle: () => void;
-    image: React.ComponentType<any>;
-    functionText: string;
-    loading?: boolean;
-  };
-
   const CardPanel = ({
     title,
     state,
@@ -76,7 +68,7 @@ export default function PersonalCards() {
     image: ImageCmp,
     functionText,
     loading,
-  }: CardPanelProps) => {
+  }: CardPanelProps): JSX.Element => {
     const btnToggleTitle =
       state === "active" ? texts.textBloquear : texts.textDesbloquear;
 
@@ -140,17 +132,21 @@ export default function PersonalCards() {
     );
   };
 
-  const modalTitle = useMemo(() => {
+  /* ---------------------------------------------------------------------- */
+  /* 🧠 Memos para título e mensagem do modal                                */
+  /* ---------------------------------------------------------------------- */
+  const modalTitle = useMemo((): string => {
     if (!modal.visible) return "";
     return modal.willBlock
       ? texts.textBloquearCartao
       : texts.textDesbloquearCartao;
   }, [modal]);
 
-  const modalMessage = useMemo(() => {
+  const modalMessage = useMemo((): string => {
     if (!modal.visible) return "";
     return modal.willBlock ? texts.textMsgBloqueio : texts.textMsgDesbloqueio;
   }, [modal]);
+
 
   return (
     <View
@@ -165,7 +161,7 @@ export default function PersonalCards() {
           state={fisicoState}
           image={CartaoFisicoImg}
           functionText={texts.textFuncaoFisico}
-          onConfigure={() => {}}
+          onConfigure={() => undefined}
           onToggle={() => openConfirm("fisico")}
           loading={loading.fisico}
         />
@@ -175,7 +171,7 @@ export default function PersonalCards() {
           state={digitalState}
           image={CartaoDigitalImg}
           functionText={texts.textFuncaoDigital}
-          onConfigure={() => {}}
+          onConfigure={() => undefined}
           onToggle={() => openConfirm("digital")}
           loading={loading.digital}
         />
@@ -191,9 +187,12 @@ export default function PersonalCards() {
             : texts.textDesbloquear
         }
         isDestructive={modal.visible && modal.willBlock}
-        loading={(modal.visible && loading[modal.kind]) || false}
+        loading={modal.visible ? loading[modal.kind] ?? false : false}
         onCancel={closeConfirm}
-        onConfirm={confirmToggle}
+        /* ✅ encapsula Promise-returning em void */
+        onConfirm={() => {
+          void confirmToggle();
+        }}
       />
     </View>
   );

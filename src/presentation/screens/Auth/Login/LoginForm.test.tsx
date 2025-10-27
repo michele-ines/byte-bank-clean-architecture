@@ -3,37 +3,53 @@ import { texts } from "@presentation/theme";
 import { showToast } from "@shared/utils/transactions.utils";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
+import type { JSX } from "react";
 import React from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { LoginForm } from "./LoginForm";
 
-beforeAll(() => {
-  jest.spyOn(console, "error").mockImplementation(() => {});
+// ✅ Evita arrow function vazia — adiciona comentário interno
+beforeAll((): void => {
+  jest.spyOn(console, "error").mockImplementation(() => {
+    /* silence console.error */
+  });
 });
-afterAll(() => {
+afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
 const mockLogin = jest.fn();
-jest.mock("@/src/contexts/AuthContext", () => ({
+
+// ✅ Corrige path e tipagem do mock
+jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("@/src/utils/transactions.utils", () => ({
+jest.mock("@shared/utils/transactions.utils", () => ({
   showToast: jest.fn(),
   formatTransactionDescription: jest.fn(),
 }));
 
-jest.mock("expo-router", () => ({
-  router: {
-    replace: jest.fn(),
-    push: jest.fn(),
-  },
-  Link: (props: any) => (
-    <TouchableOpacity {...props}>{props.children}</TouchableOpacity>
-  ),
-}));
-(Object.assign(jest.requireMock("expo-router").Link, { displayName: "MockLink" }));
+// ✅ Tipagem explícita e nullish coalescing (`??`)
+jest.mock("expo-router", () => {
+  const Link = ({
+    children,
+    ...props
+  }: {
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }): JSX.Element => <TouchableOpacity {...props}>{children}</TouchableOpacity>;
+
+  (Link as unknown as { displayName: string }).displayName = "MockLink";
+
+  return {
+    router: {
+      replace: jest.fn(),
+      push: jest.fn(),
+    },
+    Link,
+  };
+});
 
 jest.mock("@/src/routes", () => ({
   routes: {
@@ -46,43 +62,81 @@ jest.mock("@/src/routes", () => ({
 jest.mock("react-native-gesture-handler", () => ({
   ScrollView,
 }));
-(Object.assign(jest.requireMock("react-native-gesture-handler"), { displayName: "MockScrollView" }));
+(Object.assign(
+  jest.requireMock("react-native-gesture-handler"),
+  { displayName: "MockScrollView" }
+));
 
+// ✅ Tipagem segura e uso de ?? no disabled
 jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
-  DefaultButton: ({ title, onPress, disabled, loading, accessibilityLabel }: any) => (
+  DefaultButton: ({
+    title,
+    onPress,
+    disabled,
+    loading,
+    accessibilityLabel,
+  }: {
+    title: string;
+    onPress: () => void;
+    disabled?: boolean;
+    loading?: boolean;
+    accessibilityLabel?: string;
+  }): JSX.Element => (
     <TouchableOpacity
       onPress={onPress}
-      disabled={disabled || loading}
+      disabled={(disabled ?? false) || (loading ?? false)}
       accessibilityLabel={accessibilityLabel}
     >
       <Text>{loading ? "Loading..." : title}</Text>
     </TouchableOpacity>
   ),
 }));
-(Object.assign(jest.requireMock("@/src/components/common/DefaultButton/DefaultButton"), { displayName: "MockDefaultButton" }));
+(Object.assign(
+  jest.requireMock("@/src/components/common/DefaultButton/DefaultButton"),
+  { displayName: "MockDefaultButton" }
+));
 
 jest.mock("@/assets/images/login/ilustracao-login.svg", () => ({
   __esModule: true,
-  default: ({ accessible, accessibilityLabel, ...props }: any) => (
-    <View accessible={accessible} accessibilityLabel={accessibilityLabel} {...props} />
+  default: ({
+    accessible,
+    accessibilityLabel,
+    ...props
+  }: {
+    accessible?: boolean;
+    accessibilityLabel?: string;
+  }): JSX.Element => (
+    <View
+      accessible={accessible}
+      accessibilityLabel={accessibilityLabel}
+      {...props}
+    />
   ),
 }));
-(Object.assign(jest.requireMock("@/assets/images/login/ilustracao-login.svg"), { displayName: "MockSvgImage" }));
+(Object.assign(
+  jest.requireMock("@/assets/images/login/ilustracao-login.svg"),
+  { displayName: "MockSvgImage" }
+));
 
 describe("LoginForm", () => {
   const mockOnLoginSuccess = jest.fn();
 
-  beforeEach(() => {
+  beforeEach((): void => {
     (useAuth as jest.Mock).mockReturnValue({
       login: mockLogin,
     });
     jest.clearAllMocks();
   });
 
+  // ==============================================================
+  // handleLogin function
+  // ==============================================================
   describe("handleLogin function", () => {
-    it("deve fazer login com sucesso quando campos estão preenchidos", async () => {
+    it("deve fazer login com sucesso quando campos estão preenchidos", async (): Promise<void> => {
       mockLogin.mockResolvedValueOnce(undefined);
-      const { getByLabelText } = render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
+      const { getByLabelText } = render(
+        <LoginForm onLoginSuccess={mockOnLoginSuccess} />
+      );
       const t = texts.loginForm;
 
       const emailInput = getByLabelText(t.accessibility.emailInput);
@@ -103,9 +157,11 @@ describe("LoginForm", () => {
       expect(showToast).not.toHaveBeenCalled();
     });
 
-    it("deve mostrar toast de erro quando login falha", async () => {
+    it("deve mostrar toast de erro quando login falha", async (): Promise<void> => {
       mockLogin.mockRejectedValueOnce(new Error("Invalid credentials"));
-      const { getByLabelText } = render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
+      const { getByLabelText } = render(
+        <LoginForm onLoginSuccess={mockOnLoginSuccess} />
+      );
       const t = texts.loginForm;
 
       const emailInput = getByLabelText(t.accessibility.emailInput);
@@ -130,9 +186,14 @@ describe("LoginForm", () => {
       expect(router.replace).not.toHaveBeenCalled();
     });
 
-    it("deve mostrar toast de erro inesperado quando login falha com erro desconhecido", async () => {
-      mockLogin.mockRejectedValueOnce("Unknown error");
-      const { getByLabelText } = render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
+    it("deve mostrar toast de erro inesperado quando login falha com erro desconhecido", async (): Promise<void> => {
+      // ✅ Tipagem segura do erro genérico
+      const unknownError: unknown = "Unknown error";
+      mockLogin.mockRejectedValueOnce(unknownError);
+
+      const { getByLabelText } = render(
+        <LoginForm onLoginSuccess={mockOnLoginSuccess} />
+      );
       const t = texts.loginForm;
 
       const emailInput = getByLabelText(t.accessibility.emailInput);
@@ -158,9 +219,14 @@ describe("LoginForm", () => {
     });
   });
 
+  // ==============================================================
+  // handleCreateAccount
+  // ==============================================================
   describe("handleCreateAccount function", () => {
-    it("deve navegar para página de cadastro quando botão criar conta é pressionado", () => {
-      const { getByLabelText } = render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
+    it("deve navegar para página de cadastro quando botão criar conta é pressionado", (): void => {
+      const { getByLabelText } = render(
+        <LoginForm onLoginSuccess={mockOnLoginSuccess} />
+      );
       const t = texts.loginForm;
 
       const createAccountButton = getByLabelText(t.accessibility.createButton);
@@ -169,8 +235,10 @@ describe("LoginForm", () => {
       expect(router.push).toHaveBeenCalledWith("/signup");
     });
 
-    it("deve navegar para página de cadastro independente do estado dos campos", () => {
-      const { getByLabelText } = render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
+    it("deve navegar para página de cadastro independente do estado dos campos", (): void => {
+      const { getByLabelText } = render(
+        <LoginForm onLoginSuccess={mockOnLoginSuccess} />
+      );
       const t = texts.loginForm;
 
       const emailInput = getByLabelText(t.accessibility.emailInput);
@@ -186,9 +254,14 @@ describe("LoginForm", () => {
     });
   });
 
+  // ==============================================================
+  // Renderização e comportamento geral
+  // ==============================================================
   describe("Renderização e comportamento geral", () => {
-    it("renderiza todos os elementos do formulário", () => {
-      const { getByText, getByLabelText } = render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
+    it("renderiza todos os elementos do formulário", (): void => {
+      const { getByText, getByLabelText } = render(
+        <LoginForm onLoginSuccess={mockOnLoginSuccess} />
+      );
       const t = texts.loginForm;
 
       expect(getByText(t.title)).toBeTruthy();
@@ -201,8 +274,10 @@ describe("LoginForm", () => {
       expect(getByText(t.buttons.forgot)).toBeTruthy();
     });
 
-    it("deve permitir digitar nos campos de entrada", () => {
-      const { getByLabelText } = render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
+    it("deve permitir digitar nos campos de entrada", (): void => {
+      const { getByLabelText } = render(
+        <LoginForm onLoginSuccess={mockOnLoginSuccess} />
+      );
       const t = texts.loginForm;
 
       const emailInput = getByLabelText(t.accessibility.emailInput);

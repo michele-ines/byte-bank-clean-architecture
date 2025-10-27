@@ -1,9 +1,10 @@
 import { useAuth } from "@presentation/state/AuthContext";
+import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import {
-  DrawerContentComponentProps,
   DrawerContentScrollView,
   DrawerItemList,
 } from "@react-navigation/drawer";
+import type { JSX } from "react";
 import React from "react";
 import { Text, View } from "react-native";
 import { DefaultButton } from "../common/DefaultButton/DefaultButton";
@@ -11,7 +12,9 @@ import { styles } from "./CustomDrawerContent.styles";
 
 type CustomDrawerContentProps = DrawerContentComponentProps;
 
-export function CustomDrawerContent(props: Readonly<CustomDrawerContentProps>) {
+export function CustomDrawerContent(
+  props: Readonly<CustomDrawerContentProps>
+): JSX.Element {
   const { user, userData, signOut } = useAuth();
 
   const handleLogout = (): void => {
@@ -28,7 +31,7 @@ export function CustomDrawerContent(props: Readonly<CustomDrawerContentProps>) {
 
   const initials = displayName
     .split(" ")
-    .map((n: string) => n[0] ?? "") 
+    .map((n: string) => n[0] ?? "")
     .join("")
     .toUpperCase();
 

@@ -1,6 +1,6 @@
-
 import { colors, texts } from "@presentation/theme";
-import { ConfirmModalProps } from "@shared/ProfileStyles/profile.styles.types";
+import type { ConfirmModalProps } from "@shared/ProfileStyles/profile.styles.types";
+import type { JSX } from "react";
 import React from "react";
 import { Modal, Text, View } from "react-native";
 import { DefaultButton } from "../DefaultButton/DefaultButton";
@@ -12,18 +12,20 @@ export default function ConfirmModal({
   message,
   confirmText = texts.textConfirmar,
   cancelText = texts.textCancelar,
-  isDestructive,
-  loading,
+  isDestructive = false,
+  loading = false,
   onConfirm,
   onCancel,
-}: Readonly<ConfirmModalProps>) {
+}: Readonly<ConfirmModalProps>): JSX.Element | null {
+  if (!visible) return null;
+
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
       onRequestClose={onCancel}
-      accessibilityViewIsModal={true}
+      accessibilityViewIsModal
       accessibilityLabel={title}
     >
       <View style={styles.backdrop} />
@@ -34,11 +36,9 @@ export default function ConfirmModal({
         accessibilityLabel={title}
       >
         <Text style={styles.title}>{title}</Text>
-
         <Text style={styles.msg}>{message}</Text>
 
         <View style={styles.row}>
-          {/* Cancelar */}
           <DefaultButton
             title={cancelText}
             onPress={onCancel}

@@ -5,7 +5,7 @@ import { Text, View } from "react-native";
 import CardsScreen from "./CardsScreen";
 
 jest.mock("@/src/components/common/ScreenWrapper/ScreenWrapper", () => ({
-  ScreenWrapper: ({ children }: any) => (
+  ScreenWrapper: ({ children }: unknown) => (
     <View>
       <Text testID="mock-screen-wrapper">ScreenWrapper</Text>
       {children}

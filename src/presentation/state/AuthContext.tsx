@@ -1,9 +1,8 @@
-
 import { auth, db } from "@infrastructure/config/firebaseConfig";
-import { AuthContextData, UserData } from "@shared/interfaces/auth.interfaces";
+import type { AuthContextData, UserData } from "@shared/interfaces/auth.interfaces";
 import { router } from "expo-router";
+import type { User, UserCredential } from "firebase/auth";
 import {
-  User,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
@@ -11,8 +10,8 @@ import {
   signOut,
 } from "firebase/auth";
 import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import type { ReactNode } from "react";
 import React, {
-  ReactNode,
   createContext,
   useCallback,
   useContext,
@@ -20,7 +19,6 @@ import React, {
   useMemo,
   useState,
 } from "react";
-
 
 const AUTH_ROUTES = {
   login: "/",
@@ -33,25 +31,22 @@ const AUTH_MESSAGES = {
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    let unsubscribeUser = () => {};
+  useEffect((): (() => void) => {
+    let unsubscribeUser: () => void = (): void => {
+      // função inicial vazia para evitar erro antes da definição real
+    };
 
-    const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser: User | null): void => {
       setUser(currentUser);
-
-
       unsubscribeUser();
 
       if (currentUser) {
         const docRef = doc(db, "users", currentUser.uid);
-        
         unsubscribeUser = onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
             setUserData(docSnap.data() as UserData);
@@ -66,20 +61,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setLoading(false);
     });
 
-  
-    return () => {
+    return (): void => {
       unsubscribeAuth();
       unsubscribeUser();
     };
-  }, []); 
+  }, []);
 
+  // 🔹 Cria usuário e retorna o UserCredential
   const signup = useCallback(
-    async (email: string, password: string, name: string) => {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+    async (email: string, password: string, name: string): Promise<UserCredential> => {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
 
       await setDoc(doc(db, "users", newUser.uid), {
@@ -94,18 +85,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     []
   );
 
+  // 🔹 Login do usuário
   const login = useCallback(
-    (email: string, password: string) =>
+    (email: string, password: string): Promise<UserCredential> =>
       signInWithEmailAndPassword(auth, email, password),
     []
   );
 
+  // 🔹 Reset de senha
   const resetPassword = useCallback(
-    (email: string) => sendPasswordResetEmail(auth, email),
+    (email: string): Promise<void> => sendPasswordResetEmail(auth, email),
     []
   );
 
-  const handleSignOut = async () => {
+  // 🔹 Logout do usuário
+  const handleSignOut = async (): Promise<void> => {
     try {
       await signOut(auth);
       router.replace(AUTH_ROUTES.login);
@@ -114,7 +108,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const contextValue = useMemo(
+  // 🔹 Contexto com função síncrona que chama o async internamente
+  const contextValue = useMemo<AuthContextData>(
     () => ({
       user,
       userData,
@@ -123,14 +118,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       signup,
       login,
       resetPassword,
-      signOut: handleSignOut,
+      // ✅ Corrigido: evita o erro no-misused-promises
+      signOut: (): void => {
+        void handleSignOut();
+      },
     }),
     [user, userData, loading, signup, login, resetPassword]
   );
 
-  return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
 export function useAuth(): AuthContextData {

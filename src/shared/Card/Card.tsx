@@ -1,8 +1,9 @@
 
 import { colors, typography } from "@presentation/theme";
 import React from "react";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
-import { CardProps } from "../ProfileStyles/profile.styles.types";
+import type { ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import type { CardProps } from "../ProfileStyles/profile.styles.types";
 
 export const Card: React.FC<CardProps> = ({
   title,

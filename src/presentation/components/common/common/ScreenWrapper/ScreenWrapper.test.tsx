@@ -1,16 +1,21 @@
 import { render, screen } from "@testing-library/react-native";
-import React from "react";
+import type { FC, JSX } from "react";
 import { Text, View } from "react-native";
 import { ScreenWrapper } from "./ScreenWrapper";
 
 jest.mock("@/src/contexts/AuthContext", () => ({
-  useAuth: () => ({
+  useAuth: (): { userData: { name: string; uuid: string } } => ({
     userData: { name: "Michele", uuid: "user-123" },
   }),
 }));
 
 jest.mock("@/src/contexts/TransactionsContext", () => ({
-  useTransactions: () => ({
+  useTransactions: (): {
+    transactions: unknown[];
+    loading: boolean;
+    addTransaction: jest.Mock;
+    removeTransaction: jest.Mock;
+  } => ({
     transactions: [],
     loading: false,
     addTransaction: jest.fn(),
@@ -18,24 +23,43 @@ jest.mock("@/src/contexts/TransactionsContext", () => ({
   }),
 }));
 
+interface BalanceProps {
+  user?: { displayName?: string; name?: string };
+}
+
+// ✅ Tipo auxiliar seguro para mocks de componentes
+type MockedFC<P = Record<string, unknown>> = FC<P> & { displayName?: string };
+
+// Mock do componente de Balance (default export)
 jest.mock("@/src/shared/cards/balance/BalanceComponent", () => {
-  const BalanceMock = ({ user }: any) => (
+  const BalanceMock: MockedFC<BalanceProps> = ({ user }): JSX.Element => (
     <View testID="balance">
-      <Text>{`Balance para ${user?.displayName || user?.name}`}</Text>
+      <Text>{`Balance para ${user?.displayName ?? user?.name ?? ""}`}</Text>
     </View>
   );
-  (BalanceMock as any).displayName = "BalanceComponentMock";
-  return BalanceMock;
+
+  BalanceMock.displayName = "BalanceComponentMock";
+
+  return { __esModule: true, default: BalanceMock };
 });
 
+interface CardListExtractProps {
+  title: string;
+}
+
+// Mock do CardListExtract (named export)
 jest.mock("@/src/shared/cards/CardListExtract/CardListExtract", () => {
-  const CardListExtract = ({ title }: { title: string }) => (
+  const CardListExtract: MockedFC<CardListExtractProps> = ({
+    title,
+  }): JSX.Element => (
     <View testID="extract">
       <Text>{`Extrato: ${title}`}</Text>
     </View>
   );
-  (CardListExtract as any).displayName = "CardListExtractMock";
-  return { CardListExtract };
+
+  CardListExtract.displayName = "CardListExtractMock";
+
+  return { __esModule: true, CardListExtract };
 });
 
 describe("ScreenWrapper", () => {

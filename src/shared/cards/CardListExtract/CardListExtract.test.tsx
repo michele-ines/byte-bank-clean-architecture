@@ -82,18 +82,15 @@ jest.mock("@/presentation/theme", () => ({
   },
 }));
 
+// ✅ Correção do mock tipado
 jest.mock("@expo/vector-icons", () => ({
-  Feather: (props: any) => React.createElement("Icon", props, props.name),
+  Feather: (props: { name: string }) =>
+    React.createElement("Icon", props, props.name),
 }));
 
 describe("CardListExtract", () => {
   it("deve renderizar a transação com acessibilidade", () => {
-    render(
-      <CardListExtract
-        title="Minhas Transações"
-        filterFn={() => true}
-      />
-    );
+    render(<CardListExtract title="Minhas Transações" filterFn={() => true} />);
 
     const label =
       "Transação do tipo Compra. Valor de R$ 120.50. Data: 2025-10-03.";

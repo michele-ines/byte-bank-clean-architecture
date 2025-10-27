@@ -17,13 +17,16 @@ describe("formatTransactionDescription", () => {
 
 describe("showToast", () => {
   it("Deve chamar Toast.show com os parâmetros corretos", () => {
-    const spy = jest.spyOn(Toast, "show").mockImplementation(() => {});
+    const spy = jest.spyOn(Toast, "show").mockImplementation(jest.fn());
+
     showToast("success", "Título", "Mensagem");
+
     expect(spy).toHaveBeenCalledWith({
       type: "success",
       text1: "Título",
       text2: "Mensagem",
     });
+
     spy.mockRestore();
   });
 });

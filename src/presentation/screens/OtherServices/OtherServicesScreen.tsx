@@ -5,7 +5,7 @@ import { useWidgetPreferences } from "@presentation/state/WidgetPreferencesConte
 import SavingsGoalWidget from "@shared/components/SavingsGoalWidget/SavingsGoalWidget";
 import SpendingAlertWidget from "@shared/components/SpendingAlertWidget/SpendingAlertWidget";
 import WidgetPreferencesButton from "@shared/components/WidgetPreferencesButton/WidgetPreferencesButton";
-import { Transaction } from "@shared/ProfileStyles/profile.styles.types";
+import type { Transaction } from "@shared/ProfileStyles/profile.styles.types";
 import React from "react";
 import { Text, View } from "react-native";
 import { styles } from "./OtherServicesScreen.styles";

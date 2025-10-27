@@ -1,5 +1,5 @@
 import { useDI } from '@presentation/providers/di';
-import { Transaction } from '@domain/transactions/Transaction';
+import type { Transaction } from '@domain/transactions/Transaction';
 
 export function useCreateTransaction() {
   const { createTransaction } = useDI();

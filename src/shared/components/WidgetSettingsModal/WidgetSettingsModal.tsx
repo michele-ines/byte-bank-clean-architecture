@@ -1,28 +1,28 @@
-
 import { MaterialIcons } from "@expo/vector-icons";
 import { useWidgetPreferences } from "@presentation/state/WidgetPreferencesContext";
 import { sizes, texts } from "@presentation/theme";
+import type { JSX } from "react";
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, Switch, Text, View } from "react-native";
-import { WidgetSettingsModalProps } from "../../ProfileStyles/profile.styles.types";
+import type { WidgetSettingsModalProps } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./WidgetSettingsModal.styles";
 
 export default function WidgetSettingsModal({
   open,
   onClose,
-}: Readonly<WidgetSettingsModalProps>) {
+}: Readonly<WidgetSettingsModalProps>): JSX.Element {
   const { preferences, updatePreferences } = useWidgetPreferences();
   const [tempPrefs, setTempPrefs] = useState(preferences);
 
-  useEffect(() => {
+  useEffect((): void => {
     if (open) setTempPrefs(preferences);
   }, [open, preferences]);
 
-  function toggleTemp(key: keyof typeof tempPrefs) {
+  function toggleTemp(key: keyof typeof tempPrefs): void {
     setTempPrefs((prev) => ({ ...prev, [key]: !prev[key] }));
   }
 
-  function handleConfirm() {
+  function handleConfirm(): void {
     updatePreferences(tempPrefs);
     onClose();
   }

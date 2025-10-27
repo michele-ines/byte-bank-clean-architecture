@@ -1,14 +1,17 @@
-import { User, UserCredential } from "firebase/auth";
-import { DocumentData } from "firebase/firestore";
-import { AccessibilityRole, StyleProp, TextStyle, ViewStyle } from "react-native";
-import { BalanceValue, TransactionType } from "../ProfileStyles/profile.styles.types";
+import type { CardState } from "@/presentation/screens/OtherServices/cards";
+import type { User, UserCredential } from "firebase/auth";
+import type { DocumentData } from "firebase/firestore";
+import type { AccessibilityRole, StyleProp, TextStyle, ViewStyle } from "react-native";
+import type { SvgProps } from "react-native-svg";
+import type { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
+import type { BalanceValue, TransactionType } from "../ProfileStyles/profile.styles.types";
 
 export interface UserData {
   uuid: string; 
   name: string;
   email: string;
   photoURL?: string | null;
-  createdAt?: any;
+  createdAt?: unknown;
 }
 
 export interface IAnexo {
@@ -124,4 +127,46 @@ export interface ErrorScreenProps {
   title?: string;
   message?: string;
   onRetry: () => void;
+}
+
+export interface CardMinhaContaStyles {
+  title: TextStyle;
+  field: ViewStyle;
+  label: TextStyle;
+  inputWrapper: ViewStyle;
+  input: TextStyle;
+  inputEditing: ViewStyle;
+  icon: TextStyle;
+}
+
+export interface SvgMockProps extends ViewProps {
+  accessible?: boolean;
+  accessibilityLabel?: string;
+  testID?: string;
+}
+
+export interface ScrollViewMockProps extends ViewProps {
+  children?: React.ReactNode;
+}
+
+export interface DonutChartMockProps {
+  accessibilityLabel: string;
+  data: unknown[];
+}
+
+export interface CardPanelProps {
+    title: string;
+    state: CardState;
+    onConfigure: () => void;
+    onToggle: () => void;
+    image: React.ComponentType<SvgProps>; // ✅ usa SvgProps (RN)
+    functionText: string;
+    loading?: boolean;
+  }
+ export interface ToggleResponse {
+  state: string;
+}
+
+export interface CadastroPageStyles {
+  container: ViewStyle;
 }

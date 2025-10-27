@@ -1,9 +1,6 @@
+import type { CadastroPageStyles } from "@/shared/interfaces/auth.interfaces";
 import { colors, layout, typography } from "@presentation/theme";
-import { StyleSheet, ViewStyle } from "react-native";
-
-type CadastroPageStyles = {
-  container: ViewStyle;
-};
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create<CadastroPageStyles>({
   container: { 

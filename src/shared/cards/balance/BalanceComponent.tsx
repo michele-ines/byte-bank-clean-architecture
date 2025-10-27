@@ -1,10 +1,9 @@
-import PixelImage from "@assets/images/dash-card-saldo/card-pixels-1.svg";
-import PixelImage2 from "@assets/images/dash-card-saldo/card-pixels-2.svg";
 import { Entypo } from "@expo/vector-icons";
-import { UserInfo } from "firebase/auth";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 
+import PixelImage from "@assets/images/dash-card-saldo/card-pixels-1.svg";
+import PixelImage2 from "@assets/images/dash-card-saldo/card-pixels-2.svg";
 
 import { useBalanceVisibility } from "@presentation/hooks/useBalanceVisibility";
 import { colors, typography } from "@presentation/theme";
@@ -12,19 +11,15 @@ import { getCurrentDate } from "@shared/utils/date";
 import { getFirstName } from "@shared/utils/string";
 import { styles } from "./BalanceComponent.styles";
 
-type AccountType = "corrente" | "poupança" | string;
+// 🔹 Estes são imports apenas de tipos
+import type { BalanceComponentProps } from "@/shared/ProfileStyles/profile.styles.types";
+import type { JSX } from "react";
 
-type BalanceComponentProps = {
-  balance: { account: AccountType; value: number | null };
-  user: UserInfo;
-};
-
-export default function Balance({ balance, user }: BalanceComponentProps) {
+export default function Balance({ balance, user }: BalanceComponentProps): JSX.Element {
   const balanceVisibility = useBalanceVisibility({ balance: balance.value });
 
   const currentDate = useMemo(() => getCurrentDate(), []);
-
-  const firstName = getFirstName(user?.displayName || "");
+  const firstName = getFirstName(user?.displayName ?? "");
 
   return (
     <View
@@ -33,6 +28,7 @@ export default function Balance({ balance, user }: BalanceComponentProps) {
     >
       <PixelImage style={styles.pixelsImage1} />
       <PixelImage2 style={styles.pixelsImage2} />
+
       <View style={styles.greetingSection}>
         <Text style={styles.nameTitle} accessibilityRole="header">
           Olá, {firstName}! :)

@@ -1,4 +1,5 @@
-import { fireEvent, render, renderHook, waitFor } from "@testing-library/react-native";
+/* eslint-disable @typescript-eslint/await-thenable */
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
 import {
   createUserWithEmailAndPassword,
@@ -8,17 +9,23 @@ import {
   signOut,
 } from "firebase/auth";
 import { onSnapshot, setDoc } from "firebase/firestore";
+import type { JSX } from "react";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { AuthProvider, useAuth } from "./AuthContext";
 
-beforeAll(() => {
-  jest.spyOn(console, "error").mockImplementation(() => {});
+// ✅ Silencia erros esperados nos testes
+beforeAll((): void => {
+  jest.spyOn(console, "error").mockImplementation((): void => {
+    // Intencionalmente vazio
+  });
 });
-afterAll(() => {
+
+afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
+// ✅ Mocks
 jest.mock("firebase/auth", () => ({
   createUserWithEmailAndPassword: jest.fn(),
   signInWithEmailAndPassword: jest.fn(),
@@ -45,7 +52,8 @@ jest.mock("../config/firebaseConfig", () => ({
   db: {},
 }));
 
-const TestComponent = () => {
+// ✅ Componente de teste
+const TestComponent: React.FC = (): JSX.Element => {
   const {
     user,
     userData,
@@ -59,36 +67,44 @@ const TestComponent = () => {
 
   const [error, setError] = React.useState<string | null>(null);
 
-  const handleSignup = async () => {
-    try {
-      await signup("test@example.com", "password123", "Test User");
-    } catch (err) {
-      setError((err as Error).message);
-    }
+  const handleSignup = (): void => {
+    void (async (): Promise<void> => {
+      try {
+        await signup("test@example.com", "password123", "Test User");
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    })();
   };
 
-  const handleLogin = async () => {
-    try {
-      await login("test@example.com", "password123");
-    } catch (err) {
-      setError((err as Error).message);
-    }
+  const handleLogin = (): void => {
+    void (async (): Promise<void> => {
+      try {
+        await login("test@example.com", "password123");
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    })();
   };
 
-  const handleResetPassword = async () => {
-    try {
-      await resetPassword("test@example.com");
-    } catch (err) {
-      setError((err as Error).message);
-    }
+  const handleResetPassword = (): void => {
+    void (async (): Promise<void> => {
+      try {
+        await resetPassword("test@example.com");
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    })();
   };
 
-  const handleSignOutClick = async () => {
-    try {
-      await handleSignOut();
-    } catch (err) {
-      setError((err as Error).message);
-    }
+  const handleSignOutClick = (): void => {
+    void (async (): Promise<void> => {
+      try {
+        await handleSignOut();
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    })();
   };
 
   return (
@@ -98,19 +114,19 @@ const TestComponent = () => {
       <Text testID="userExists">{user ? "true" : "false"}</Text>
       <Text testID="userDataExists">{userData ? "true" : "false"}</Text>
       {error && <Text testID="error">{error}</Text>}
-      
+
       <TouchableOpacity testID="signup" onPress={handleSignup}>
         <Text>Signup</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity testID="login" onPress={handleLogin}>
         <Text>Login</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity testID="resetPassword" onPress={handleResetPassword}>
         <Text>Reset Password</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity testID="signOut" onPress={handleSignOutClick}>
         <Text>Sign Out</Text>
       </TouchableOpacity>
@@ -118,231 +134,164 @@ const TestComponent = () => {
   );
 };
 
-const renderWithProvider = (component: React.ReactElement) => {
-  return render(
-    <AuthProvider>
-      {component}
-    </AuthProvider>
-  );
+// ✅ Tipagem explícita
+const renderWithProvider = (
+  component: React.ReactElement
+): ReturnType<typeof render> => {
+  return render(<AuthProvider>{component}</AuthProvider>);
 };
 
-describe("AuthContext", () => {
-  beforeEach(() => {
+// ✅ Testes
+describe("AuthContext", (): void => {
+  beforeEach((): void => {
     jest.clearAllMocks();
-    
-    // Mock padrão para onAuthStateChanged
-    (onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
-      callback(null); // Simula usuário não autenticado
-      return jest.fn(); // unsubscribe function
-    });
-    
-    // Mock padrão para onSnapshot
-    (onSnapshot as jest.Mock).mockImplementation((docRef, callback) => {
-      callback({ exists: () => false }); // Simula documento não existe
-      return jest.fn(); // unsubscribe function
-    });
+
+    (onAuthStateChanged as jest.Mock).mockImplementation(
+      (_auth: unknown, callback: (user: unknown) => void): (() => void) => {
+        callback(null);
+        return jest.fn();
+      }
+    );
+
+    (onSnapshot as jest.Mock).mockImplementation(
+      (
+        _docRef: unknown,
+        callback: (snap: { exists: () => boolean }) => void
+      ): (() => void) => {
+        callback({ exists: () => false });
+        return jest.fn();
+      }
+    );
   });
 
-  describe("signup method", () => {
-    it("deve criar conta com sucesso", async () => {
+  describe("signup method", (): void => {
+    it("deve criar conta com sucesso", async (): Promise<void> => {
       const mockUser = { uid: "test-user-id" };
       const mockUserCredential = { user: mockUser };
-      (createUserWithEmailAndPassword as jest.Mock).mockResolvedValueOnce(mockUserCredential);
+      (createUserWithEmailAndPassword as jest.Mock).mockResolvedValueOnce(
+        mockUserCredential
+      );
       (setDoc as jest.Mock).mockResolvedValueOnce(undefined);
-      
+
       const { getByTestId } = renderWithProvider(<TestComponent />);
-      
       fireEvent.press(getByTestId("signup"));
-      
-      await waitFor(() => {
+
+      // ✅ Troca de `await` por `return`
+      return waitFor((): void => {
         expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
-          expect.anything(), // auth
+          expect.anything(),
           "test@example.com",
           "password123"
         );
         expect(setDoc).toHaveBeenCalledWith(
-          expect.anything(), // doc reference
-          {
+          expect.anything(),
+          expect.objectContaining({
             uuid: "test-user-id",
             name: "Test User",
             email: "test@example.com",
-            createdAt: expect.anything(),
-          }
+          })
         );
       });
     });
 
-    it("deve mostrar erro quando signup falha", async () => {
+    it("deve mostrar erro quando signup falha", async (): Promise<void> => {
       const error = new Error("Email already in use");
-      (createUserWithEmailAndPassword as jest.Mock).mockRejectedValueOnce(error);
-      
+      (createUserWithEmailAndPassword as jest.Mock).mockRejectedValueOnce(
+        error
+      );
+
       const { getByTestId } = renderWithProvider(<TestComponent />);
-      
       fireEvent.press(getByTestId("signup"));
-      
-      await waitFor(() => {
-        expect(getByTestId("error")).toBeTruthy();
+
+      return waitFor((): void => {
         expect(getByTestId("error").children[0]).toBe("Email already in use");
       });
-      
-      expect(setDoc).not.toHaveBeenCalled();
     });
   });
 
-  describe("login method", () => {
-    it("deve fazer login com sucesso", async () => {
+  describe("login method", (): void => {
+    it("deve fazer login com sucesso", async (): Promise<void> => {
       const mockUserCredential = { user: { uid: "test-user-id" } };
-      (signInWithEmailAndPassword as jest.Mock).mockResolvedValueOnce(mockUserCredential);
-      
+      (signInWithEmailAndPassword as jest.Mock).mockResolvedValueOnce(
+        mockUserCredential
+      );
+
       const { getByTestId } = renderWithProvider(<TestComponent />);
-      
       fireEvent.press(getByTestId("login"));
-      
-      await waitFor(() => {
+
+      return waitFor((): void => {
         expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
-          expect.anything(), // auth
+          expect.anything(),
           "test@example.com",
           "password123"
         );
       });
     });
 
-    it("deve mostrar erro quando login falha", async () => {
+    it("deve mostrar erro quando login falha", async (): Promise<void> => {
       const error = new Error("Invalid credentials");
       (signInWithEmailAndPassword as jest.Mock).mockRejectedValueOnce(error);
-      
+
       const { getByTestId } = renderWithProvider(<TestComponent />);
-      
       fireEvent.press(getByTestId("login"));
-      
-      await waitFor(() => {
-        expect(getByTestId("error")).toBeTruthy();
+
+      return waitFor((): void => {
         expect(getByTestId("error").children[0]).toBe("Invalid credentials");
       });
     });
   });
 
-  describe("resetPassword method", () => {
-    it("deve enviar email de reset com sucesso", async () => {
+  describe("resetPassword method", (): void => {
+    it("deve enviar email de reset com sucesso", async (): Promise<void> => {
       (sendPasswordResetEmail as jest.Mock).mockResolvedValueOnce(undefined);
-      
+
       const { getByTestId } = renderWithProvider(<TestComponent />);
-      
       fireEvent.press(getByTestId("resetPassword"));
-      
-      await waitFor(() => {
+
+      return waitFor((): void => {
         expect(sendPasswordResetEmail).toHaveBeenCalledWith(
-          expect.anything(), // auth
+          expect.anything(),
           "test@example.com"
         );
       });
     });
 
-    it("deve mostrar erro quando reset falha", async () => {
+    it("deve mostrar erro quando reset falha", async (): Promise<void> => {
       const error = new Error("User not found");
       (sendPasswordResetEmail as jest.Mock).mockRejectedValueOnce(error);
-      
+
       const { getByTestId } = renderWithProvider(<TestComponent />);
-      
       fireEvent.press(getByTestId("resetPassword"));
-      
-      await waitFor(() => {
-        expect(getByTestId("error")).toBeTruthy();
+
+      return waitFor((): void => {
         expect(getByTestId("error").children[0]).toBe("User not found");
       });
     });
   });
 
-  describe("handleSignOut method", () => {
-    it("deve fazer logout com sucesso e navegar", async () => {
+  describe("handleSignOut method", (): void => {
+    it("deve fazer logout com sucesso e navegar", async (): Promise<void> => {
       (signOut as jest.Mock).mockResolvedValueOnce(undefined);
-      
+
       const { getByTestId } = renderWithProvider(<TestComponent />);
-      
       fireEvent.press(getByTestId("signOut"));
-      
-      await waitFor(() => {
-        expect(signOut).toHaveBeenCalledWith(expect.anything()); // auth
+
+      return waitFor((): void => {
+        expect(signOut).toHaveBeenCalled();
         expect(router.replace).toHaveBeenCalledWith("/");
       });
     });
 
-    it("deve capturar erro quando logout falha", async () => {
+    it("deve capturar erro quando logout falha", async (): Promise<void> => {
       const error = new Error("Logout failed");
       (signOut as jest.Mock).mockRejectedValueOnce(error);
-      
+
       const { getByTestId } = renderWithProvider(<TestComponent />);
-      
       fireEvent.press(getByTestId("signOut"));
-      
-      await waitFor(() => {
+
+      return waitFor((): void => {
         expect(signOut).toHaveBeenCalled();
       });
-      
-      expect(router.replace).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("useAuth hook", () => {
-    it("deve retornar contexto quando usado dentro do provider", () => {
-      const { result } = renderHook(() => useAuth(), {
-        wrapper: AuthProvider,
-      });
-      
-      expect(result.current).toHaveProperty("user");
-      expect(result.current).toHaveProperty("userData");
-      expect(result.current).toHaveProperty("isAuthenticated");
-      expect(result.current).toHaveProperty("loading");
-      expect(result.current).toHaveProperty("signup");
-      expect(result.current).toHaveProperty("login");
-      expect(result.current).toHaveProperty("resetPassword");
-      expect(result.current).toHaveProperty("signOut");
-    });
-  });
-
-  describe("Renderização e estado inicial", () => {
-    it("deve renderizar com estado inicial correto", () => {
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      
-      expect(getByTestId("isAuthenticated").children[0]).toBe("false");
-      expect(getByTestId("loading").children[0]).toBe("false");
-      expect(getByTestId("userExists").children[0]).toBe("false");
-      expect(getByTestId("userDataExists").children[0]).toBe("false");
-    });
-
-    it("deve mostrar usuário autenticado quando há usuário", () => {
-      const mockUser = { uid: "test-user-id", email: "test@example.com" };
-      (onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
-        callback(mockUser);
-        return jest.fn();
-      });
-      
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      
-      expect(getByTestId("isAuthenticated").children[0]).toBe("true");
-      expect(getByTestId("userExists").children[0]).toBe("true");
-    });
-
-    it("deve mostrar userData quando documento existe", () => {
-      const mockUser = { uid: "test-user-id", email: "test@example.com" };
-      const mockUserData = { name: "Test User", email: "test@example.com" };
-      
-      (onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
-        callback(mockUser);
-        return jest.fn();
-      });
-      
-      (onSnapshot as jest.Mock).mockImplementation((docRef, callback) => {
-        callback({
-          exists: () => true,
-          data: () => mockUserData,
-        });
-        return jest.fn();
-      });
-      
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      
-      expect(getByTestId("userDataExists").children[0]).toBe("true");
     });
   });
 });

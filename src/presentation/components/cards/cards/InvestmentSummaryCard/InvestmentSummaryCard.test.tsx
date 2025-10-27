@@ -1,37 +1,45 @@
+import type {
+  DonutChartMockProps,
+  ScrollViewMockProps,
+  SvgMockProps,
+} from "@/shared/interfaces/auth.interfaces";
 import { texts } from "@presentation/theme";
 import { render } from "@testing-library/react-native";
+import type { JSX } from "react";
 import React from "react";
 import { Text, View } from "react-native";
 import { InvestmentSummaryCard } from "./InvestmentSummaryCard";
 import { investmentSummaryMock } from "./Mock/InvestmentSummaryCard.mock";
 
 jest.mock("@assets/images/dash-card-new-transacao/card-pixels-3.svg", () => {
-  const SvgMock = (props: any) =>
+  const SvgMock = (props: SvgMockProps): JSX.Element =>
     React.createElement(View, {
       accessible: props.accessible,
       accessibilityLabel: props.accessibilityLabel,
       testID: "TopIllustrationMock",
     });
-  (SvgMock as any).displayName = "TopIllustrationMock";
+
+  (SvgMock as React.FC).displayName = "TopIllustrationMock";
   return { __esModule: true, default: SvgMock };
 });
 
-
 jest.mock("react-native-gesture-handler", () => {
-  const ScrollViewMock = ({ children, ...props }: any) =>
+  const ScrollViewMock = ({ children, ...props }: ScrollViewMockProps): JSX.Element =>
     React.createElement(View, props, children);
-  (ScrollViewMock as any).displayName = "ScrollViewMock";
+
+  (ScrollViewMock as React.FC).displayName = "ScrollViewMock";
   return { __esModule: true, ScrollView: ScrollViewMock };
 });
 
 jest.mock("../../DonutChart/DonutChart", () => {
-  const DonutChartMock = ({ accessibilityLabel, data }: any) =>
+  const DonutChartMock = ({ accessibilityLabel, data }: DonutChartMockProps): JSX.Element =>
     React.createElement(
       View,
       { accessible: true, accessibilityLabel, testID: "DonutChart" },
       React.createElement(Text, null, `donut(${Array.isArray(data) ? data.length : 0})`)
     );
-  (DonutChartMock as any).displayName = "DonutChartMock";
+
+  (DonutChartMock as React.FC).displayName = "DonutChartMock";
   return { __esModule: true, DonutChart: DonutChartMock };
 });
 

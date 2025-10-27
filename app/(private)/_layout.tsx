@@ -1,21 +1,22 @@
 import { Redirect } from "expo-router";
 import { Drawer } from "expo-router/drawer";
-import React, { JSX } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   StyleSheet,
-  View
+  View,
 } from "react-native";
-
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { CustomDrawerContent } from "@presentation/components/common/CustomDrawerContent/CustomDrawerContent";
 import { Header } from "@presentation/layout/Header/Header";
 import { useAuth } from "@presentation/state/AuthContext";
 import { colors, radius, spacing, typography } from "@presentation/theme";
-import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { AppLayoutStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import type { DrawerContentComponentProps } from "@react-navigation/drawer";
+import type { AppLayoutStyles } from "@shared/ProfileStyles/profile.styles.types";
+import type { JSX } from "react";
 
 const drawerIcons = {
   home: "home",
@@ -135,7 +136,7 @@ export default function AppLayout(): JSX.Element {
                 name={drawerIcons.account}
                 size={size}
                 color={color}
-                accessibilityLabel="Abrir seção minha conta"
+                accessibilityLabel="Abrir seção Minha Conta"
               />
             ),
           }}

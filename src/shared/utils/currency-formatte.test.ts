@@ -6,8 +6,11 @@ import {
   parseBRL,
 } from "./currency-formatte";
 
-const normalizeCurrency = (value: string) => value.replace(/\s/g, " ");
+const normalizeCurrency = (value: string): string => value.replace(/\s/g, " ");
 
+// ----------------------
+// 📌 formatBRL
+// ----------------------
 describe("📌 formatBRL", () => {
   it.each([
     { input: 1000, expected: "R$ 1.000,00" },
@@ -19,6 +22,9 @@ describe("📌 formatBRL", () => {
   });
 });
 
+// ----------------------
+// 📌 parseBRL
+// ----------------------
 describe("📌 parseBRL", () => {
   it.each([
     { input: "R$ 1.234,56", expected: 1234.56 },
@@ -32,6 +38,9 @@ describe("📌 parseBRL", () => {
   });
 });
 
+// ----------------------
+// 📌 formatTipo
+// ----------------------
 describe("📌 formatTipo", () => {
   it.each([
     { input: "deposito", expected: "Depósito" },
@@ -42,10 +51,16 @@ describe("📌 formatTipo", () => {
     { input: "", expected: "" },
     { input: undefined, expected: "" },
   ])("deve formatar '$input' como '$expected'", ({ input, expected }) => {
-    expect(formatTipo(input as any)).toBe(expected);
+    // ✅ Faz o narrowing de tipo antes de chamar
+    const valor =
+      typeof input === "string" || typeof input === "undefined" ? input : "";
+    expect(formatTipo(valor)).toBe(expected);
   });
 });
 
+// ----------------------
+// 📌 maskCurrency
+// ----------------------
 describe("📌 maskCurrency", () => {
   it.each([
     { input: "1234", expected: "12,34" },
@@ -57,10 +72,16 @@ describe("📌 maskCurrency", () => {
     { input: "1", expected: "0,01" },
     { input: "10", expected: "0,10" },
   ])("deve aplicar máscara para '$input' => '$expected'", ({ input, expected }) => {
-    expect(maskCurrency(input as any)).toBe(expected);
+    // ✅ Faz a checagem antes de passar
+    const valor =
+      typeof input === "string" || typeof input === "undefined" ? input : "";
+    expect(maskCurrency(valor)).toBe(expected);
   });
 });
 
+// ----------------------
+// 📌 formatCurrencyToBRL
+// ----------------------
 describe("📌 formatCurrencyToBRL", () => {
   it.each([
     { input: 1234.56, expected: "R$ 1.234,56" },

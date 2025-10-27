@@ -1,4 +1,4 @@
-import { Transaction, TransactionId } from './Transaction';
+import type { Transaction, TransactionId } from './Transaction';
 
 export interface TransactionsRepository {
   listByUser(userId: string): Promise<Transaction[]>;

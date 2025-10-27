@@ -1,6 +1,6 @@
 import { colors, layout, radius, spacing, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
-import { BalanceComponentStyle } from "../../ProfileStyles/profile.styles.types";
+import type { BalanceComponentStyle } from "../../ProfileStyles/profile.styles.types";
 
 export const styles = StyleSheet.create<BalanceComponentStyle>({
   container: {

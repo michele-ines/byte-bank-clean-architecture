@@ -2,8 +2,9 @@ import { useAuth } from "@presentation/state/AuthContext";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import Balance from "@shared/cards/balance/BalanceComponent";
 import { CardListExtract } from "@shared/cards/CardListExtract/CardListExtract";
-import { ITransaction, ScreenWrapperProps } from "@shared/interfaces/auth.interfaces";
-import { UserInfo } from "firebase/auth";
+import type { ITransaction, ScreenWrapperProps } from "@shared/interfaces/auth.interfaces";
+import type { UserInfo } from "firebase/auth";
+import type { JSX } from "react";
 import React from "react";
 import { FlatList, View } from "react-native";
 import { styles } from "./ScreenWrapper.styles";
@@ -17,6 +18,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
 }) => {
   const { userData } = useAuth();
   const { balance } = useTransactions();
+
   const userInfo = {
     displayName: userData?.name,
   } as UserInfo;
@@ -26,7 +28,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
     value: balance,
   };
 
-  const defaultFilter = (transaction: ITransaction) => {
+  const defaultFilter = (transaction: ITransaction): boolean => {
     const isUserTransaction = transaction.userId === userData?.uuid;
 
     if (!extractFilter) {
@@ -36,14 +38,14 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
     return isUserTransaction && extractFilter(transaction);
   };
 
-  const renderHeader = () => (
+  const renderHeader = (): JSX.Element => (
     <View style={styles.header}>
       {showBalance && <Balance balance={balanceText} user={userInfo} />}
       {children}
     </View>
   );
 
-  const renderFooter = () => {
+  const renderFooter = (): JSX.Element | null => {
     if (!showExtract) return null;
 
     return (
@@ -57,7 +59,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
     <View style={styles.wrapper}>
       <FlatList
         data={[]}
-        renderItem={() => null}
+        renderItem={(): null => null}
         ListHeaderComponent={renderHeader}
         ListFooterComponent={renderFooter}
         showsVerticalScrollIndicator={false}

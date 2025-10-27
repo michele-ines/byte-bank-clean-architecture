@@ -1,16 +1,15 @@
-import { TransactionsRepository } from '@domain/transactions/TransactionsRepository';
-import { Transaction, TransactionId } from '@domain/transactions/Transaction';
-
-// Troque por sua SDK/config real
+import type { Transaction, TransactionId } from '@domain/transactions/Transaction';
+import type { TransactionsRepository } from '@domain/transactions/TransactionsRepository';
 export class FirebaseTransactionsRepository implements TransactionsRepository {
-  async listByUser(userId: string) {
-    // TODO: buscar no Firebase/Firestore
-    return [];
+  listByUser(userId: string): Promise<Transaction[]> {
+    return Promise.resolve([]);
   }
-  async findById(id: TransactionId) {
-    return null;
+
+  findById(id: TransactionId): Promise<Transaction | null> {
+    return Promise.resolve(null);
   }
-  async create(tx: Transaction) {
-    // TODO: persistir no Firebase/Firestore
+
+  create(tx: Transaction): Promise<void> {
+    return Promise.resolve();
   }
 }

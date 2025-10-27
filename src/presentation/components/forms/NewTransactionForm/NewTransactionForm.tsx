@@ -5,9 +5,11 @@ import TransactionIllustration from "@assets/images/dash-card-new-transacao/Ilus
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { layout, texts } from "@presentation/theme";
-import { INewTransactionInput } from "@shared/interfaces/auth.interfaces";
-import { TransactionType, TransactionTypeItems } from "@shared/ProfileStyles/profile.styles.types";
+import type { INewTransactionInput } from "@shared/interfaces/auth.interfaces";
+import type { TransactionType } from "@shared/ProfileStyles/profile.styles.types";
+import { TransactionTypeItems } from "@shared/ProfileStyles/profile.styles.types";
 import { formatTransactionDescription, showToast } from "@shared/utils/transactions.utils";
+import type { JSX } from "react";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -22,25 +24,22 @@ import { MaskedTextInput } from "react-native-mask-text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./NewTransactionForm.styles";
 
-// ------------------------------
-// Componente principal
-// ------------------------------
-export const NewTransactionForm: React.FC = () => {
+export const NewTransactionForm: React.FC = (): JSX.Element => {
   const { addTransaction } = useTransactions();
   const [transactionType, setTransactionType] = useState<TransactionType>();
   const [unmaskedAmount, setUnmaskedAmount] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [items, setItems] = useState(TransactionTypeItems);
 
   const t = texts.newTransactionForm;
 
-  const numericAmount = unmaskedAmount ? parseFloat(unmaskedAmount) / 100 : 0;
-  const isFormInvalid =
+  const numericAmount: number = unmaskedAmount ? parseFloat(unmaskedAmount) / 100 : 0;
+  const isFormInvalid: boolean =
     !transactionType || !unmaskedAmount || numericAmount <= 0 || isLoading;
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (!transactionType || numericAmount <= 0) {
       showToast(
         "error",
@@ -66,7 +65,7 @@ export const NewTransactionForm: React.FC = () => {
       showToast("success", t.toasts.success.title, t.toasts.success.message);
       setTransactionType(undefined);
       setUnmaskedAmount("");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Erro ao adicionar transação:", error);
       showToast("error", t.toasts.error.title, t.toasts.error.message);
     } finally {
@@ -90,7 +89,7 @@ export const NewTransactionForm: React.FC = () => {
 
           <KeyboardAwareScrollView
             contentContainerStyle={styles.scrollContentContainer}
-            enableOnAndroid={true}
+            enableOnAndroid
             extraScrollHeight={20}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
@@ -115,10 +114,8 @@ export const NewTransactionForm: React.FC = () => {
                 items={items}
                 setOpen={setOpen}
                 setItems={setItems}
-                setValue={(getValue) => {
-                  const v = getValue(
-                    transactionType ?? null
-                  ) as TransactionType | null;
+                setValue={(getValue: (val: TransactionType | null) => TransactionType | null): void => {
+                  const v = getValue(transactionType ?? null);
                   setTransactionType(v ?? undefined);
                 }}
                 placeholder={t.placeholders.transactionType}
@@ -138,7 +135,7 @@ export const NewTransactionForm: React.FC = () => {
                 precision: 2,
               }}
               value={unmaskedAmount}
-              onChangeText={(_, rawText) => setUnmaskedAmount(rawText)}
+              onChangeText={(_, rawText): void => setUnmaskedAmount(rawText)}
               style={styles.input}
               maxLength={layout.maxLenght}
               keyboardType="decimal-pad"
@@ -151,7 +148,9 @@ export const NewTransactionForm: React.FC = () => {
               title={t.buttons.submit}
               loading={isLoading}
               disabled={isFormInvalid}
-              onPress={handleSubmit}
+              onPress={(): void => {
+                void handleSubmit();
+              }}
               buttonStyle={styles.submitButton}
               textStyle={styles.submitButtonText}
               accessibilityLabel={t.accessibility.submitButton}

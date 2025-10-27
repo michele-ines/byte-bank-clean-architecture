@@ -1,3 +1,4 @@
+import type { DocumentData, QueryDocumentSnapshot, Timestamp } from "firebase/firestore";
 import {
   addDoc,
   arrayRemove,
@@ -11,10 +12,9 @@ import {
   query,
   serverTimestamp,
   startAfter,
-  Timestamp,
   updateDoc,
   where,
-  writeBatch
+  writeBatch,
 } from "firebase/firestore";
 import {
   deleteObject,
@@ -22,16 +22,16 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import type { ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 import { db, storage } from "@infrastructure/config/firebaseConfig";
-import { IAnexo, INewTransactionInput, ITransaction, ITransactionsContextData } from "@shared/interfaces/auth.interfaces";
+import type {
+  IAnexo,
+  INewTransactionInput,
+  ITransaction,
+  ITransactionsContextData,
+} from "@shared/interfaces/auth.interfaces";
 import { useAuth } from "./AuthContext";
 
 const PAGE_SIZE = 5;
@@ -49,14 +49,17 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const [lastVisible, setLastVisible] = useState<any>(null);
+  const [lastVisible, setLastVisible] =
+    useState<QueryDocumentSnapshot<DocumentData> | null>(null);
 
-  useEffect(() => {
+  // 🔹 Efeito 1: Ouve as transações em tempo real
+  useEffect((): (() => void) => {
     if (!user) {
       setTransactions([]);
       setLoading(false);
-      return;
+      return () => undefined;
     }
+
     setLoading(true);
     const q = query(
       collection(db, "transactions"),
@@ -64,48 +67,69 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       orderBy("createdAt", "desc"),
       limit(PAGE_SIZE)
     );
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data = snapshot.docs.map((doc) => {
-        const docData = doc.data();
-        const createdAtTimestamp = docData.createdAt as Timestamp;
-        const updatedAtTimestamp = docData.updateAt as Timestamp;
+      const data: ITransaction[] = snapshot.docs.map((docSnap) => {
+        const docData = docSnap.data() as ITransaction;
+
+        // ✅ Conversão segura para Timestamp
+        const createdAtTimestamp =
+          typeof docData.createdAt === "object" &&
+          docData.createdAt !== null &&
+          "toDate" in docData.createdAt
+            ? (docData.createdAt as Timestamp)
+            : undefined;
+
+        const updatedAtTimestamp =
+          typeof docData.updateAt === "object" &&
+          docData.updateAt !== null &&
+          "toDate" in docData.updateAt
+            ? (docData.updateAt as Timestamp)
+            : undefined;
+
         const convertedCreatedAt = createdAtTimestamp
           ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR")
           : new Date().toLocaleDateString("pt-BR");
+
         const convertedUpdatedAt = updatedAtTimestamp
           ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR")
           : new Date().toLocaleDateString("pt-BR");
+
         return {
-          id: doc.id,
-          ...doc.data(),
+          ...docData,
+          id: docSnap.id,
           createdAt: convertedCreatedAt,
-          tipo: docData.tipo,
           updateAt: convertedUpdatedAt,
-        } as ITransaction;
+        };
       });
+
       setTransactions(data);
       setLoading(false);
+
       if (snapshot.docs.length > 0) {
         setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
       }
       setHasMore(snapshot.docs.length >= PAGE_SIZE);
     });
+
     return () => unsubscribe();
   }, [user]);
 
-  // EFEITO 2: PARA O CÁLCULO DO SALDO TOTAL EM TEMPO REAL
-  useEffect(() => {
+  // 🔹 Efeito 2: Calcula saldo total em tempo real
+  useEffect((): (() => void) => {
     if (!user) {
       setBalance(0);
-      return;
+      return () => undefined;
     }
+
     const balanceQuery = query(
       collection(db, "transactions"),
       where("userId", "==", user.uid)
     );
+
     const unsubscribe = onSnapshot(balanceQuery, (snapshot) => {
-      const total = snapshot.docs.reduce((acc, doc) => {
-        const transaction = doc.data();
+      const total = snapshot.docs.reduce((acc, docSnap) => {
+        const transaction = docSnap.data() as ITransaction;
         if (transaction.tipo === "transferencia") {
           return acc - transaction.valor;
         }
@@ -113,10 +137,12 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       }, 0);
       setBalance(total);
     });
+
     return () => unsubscribe();
   }, [user]);
 
-  const addTransaction = async (transaction: INewTransactionInput) => {
+  // 🔹 Adiciona nova transação
+  const addTransaction = async (transaction: INewTransactionInput): Promise<void> => {
     if (!user) throw new Error("Usuário não autenticado.");
     await addDoc(collection(db, "transactions"), {
       ...transaction,
@@ -127,6 +153,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
 
+  // 🔹 Atualiza transação existente
   const updateTransaction = async (
     id: string,
     data: Partial<ITransaction>
@@ -137,6 +164,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
         ...data,
         updateAt: serverTimestamp(),
       });
+
       const updatedDateString = new Date().toLocaleDateString("pt-BR");
       setTransactions((prev) =>
         prev.map((transaction) =>
@@ -151,8 +179,10 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // 🔹 Carrega mais transações (paginação)
   const loadMoreTransactions = async (): Promise<void> => {
     if (!user || loadingMore || !hasMore || !lastVisible) return;
+
     setLoadingMore(true);
     try {
       const nextPageQuery = query(
@@ -162,16 +192,42 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
         startAfter(lastVisible),
         limit(PAGE_SIZE)
       );
+
       const snapshot = await getDocs(nextPageQuery);
       if (!snapshot.empty) {
-        const newTransactions = snapshot.docs.map((doc) => {
-           const docData = doc.data();
-           const createdAtTimestamp = docData.createdAt as Timestamp;
-           const updatedAtTimestamp = docData.updateAt as Timestamp;
-           const convertedCreatedAt = createdAtTimestamp ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR") : new Date().toLocaleDateString("pt-BR");
-           const convertedUpdatedAt = updatedAtTimestamp ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR") : new Date().toLocaleDateString("pt-BR");
-           return { id: doc.id, ...docData, createdAt: convertedCreatedAt, updateAt: convertedUpdatedAt } as ITransaction;
+        const newTransactions: ITransaction[] = snapshot.docs.map((docSnap) => {
+          const docData = docSnap.data() as ITransaction;
+
+          const createdAtTimestamp =
+            typeof docData.createdAt === "object" &&
+            docData.createdAt !== null &&
+            "toDate" in docData.createdAt
+              ? (docData.createdAt as Timestamp)
+              : undefined;
+
+          const updatedAtTimestamp =
+            typeof docData.updateAt === "object" &&
+            docData.updateAt !== null &&
+            "toDate" in docData.updateAt
+              ? (docData.updateAt as Timestamp)
+              : undefined;
+
+          const convertedCreatedAt = createdAtTimestamp
+            ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR")
+            : new Date().toLocaleDateString("pt-BR");
+
+          const convertedUpdatedAt = updatedAtTimestamp
+            ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR")
+            : new Date().toLocaleDateString("pt-BR");
+
+          return {
+            ...docData,
+            id: docSnap.id,
+            createdAt: convertedCreatedAt,
+            updateAt: convertedUpdatedAt,
+          };
         });
+
         setTransactions((prev) => [...prev, ...newTransactions]);
         setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
         setHasMore(snapshot.docs.length >= PAGE_SIZE);
@@ -185,16 +241,18 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // 🔹 Exclui múltiplas transações
   const deleteTransactions = async (ids: string[]): Promise<void> => {
     if (!user) throw new Error("Usuário não autenticado.");
     const batch = writeBatch(db);
-    ids.forEach(id => {
+    ids.forEach((id) => {
       batch.delete(doc(db, "transactions", id));
     });
     await batch.commit();
     setTransactions((prev) => prev.filter((t) => !ids.includes(t.id!)));
   };
 
+  // 🔹 Upload de anexo e atualização da transação
   const uploadAttachmentAndUpdateTransaction = async (
     transactionId: string,
     fileUri: string,
@@ -207,21 +265,26 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
       const storageRef = ref(storage, `attachments/${Date.now()}-${fileName}`);
       const uploadTask = uploadBytesResumable(storageRef, blob);
       await uploadTask;
+
       const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
       const transactionRef = doc(db, "transactions", transactionId);
       const transactionSnap = await getDoc(transactionRef);
-      const existingAnexos = transactionSnap.data()?.anexos || [];
-      
+
+      // ✅ Tipagem segura para eliminar o erro no-unsafe-assignment
+      const transactionData = transactionSnap.data() as { anexos?: IAnexo[] } | undefined;
+      const existingAnexos: IAnexo[] = transactionData?.anexos ?? [];
+
       const newAttachment: IAnexo = { name: fileName, url: downloadURL };
 
       await updateDoc(transactionRef, {
         anexos: [...existingAnexos, newAttachment],
         updateAt: serverTimestamp(),
       });
+
       setTransactions((prev) =>
         prev.map((t) =>
           t.id === transactionId
-            ? { ...t, anexos: [...(t.anexos || []), newAttachment] }
+            ? { ...t, anexos: [...(t.anexos ?? []), newAttachment] }
             : t
         )
       );
@@ -231,15 +294,21 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  const deleteAttachment = async (transactionId: string, attachmentToDelete: IAnexo) => {
+  // 🔹 Exclui anexo
+  const deleteAttachment = async (
+    transactionId: string,
+    attachmentToDelete: IAnexo
+  ): Promise<void> => {
     if (!user) throw new Error("Usuário não autenticado para excluir.");
     try {
       const fileRef = ref(storage, attachmentToDelete.url);
       await deleteObject(fileRef);
+
       const transactionRef = doc(db, "transactions", transactionId);
       await updateDoc(transactionRef, {
         anexos: arrayRemove(attachmentToDelete),
       });
+
       setTransactions((prev) =>
         prev.map((t) => {
           if (t.id === transactionId) {
@@ -278,6 +347,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
+// 🔹 Hook de consumo do contexto
 export function useTransactions(): ITransactionsContextData {
   const context = useContext(TransactionsContext);
   if (!context) {

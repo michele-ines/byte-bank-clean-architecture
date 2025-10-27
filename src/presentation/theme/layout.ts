@@ -1,5 +1,5 @@
-import { DimensionValue } from "react-native";
-import { Edge } from "react-native-safe-area-context";
+import type { DimensionValue } from "react-native";
+import type { Edge } from "react-native-safe-area-context";
 
 export const layout = {
   one: 1,

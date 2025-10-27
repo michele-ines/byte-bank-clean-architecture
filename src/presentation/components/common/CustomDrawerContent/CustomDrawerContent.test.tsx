@@ -9,7 +9,7 @@ jest.mock("@/src/contexts/AuthContext", () => ({
 
 jest.mock("@react-navigation/drawer", () => {
   return {
-    DrawerContentScrollView: ({ children }: any) => <>{children}</>,
+    DrawerContentScrollView: ({ children }: unknown) => <>{children}</>,
     DrawerItemList: jest.fn(() => <></>),
   };
 });
@@ -18,7 +18,7 @@ jest.mock("@react-navigation/drawer", () => {
 describe("CustomDrawerContent", () => {
   const mockSignOut = jest.fn();
 
-  const baseProps: any = {
+  const baseProps: unknown = {
     state: { routes: [] },
     navigation: { navigate: jest.fn() },
     descriptors: {},

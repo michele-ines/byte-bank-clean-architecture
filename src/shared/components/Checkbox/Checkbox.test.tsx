@@ -1,53 +1,72 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
+import type { ReactTestInstance } from "react-test-renderer";
 import { Checkbox } from "./Checkbox";
 
 describe("Checkbox", () => {
-  it("renderiza com valor inicial false", () => {
+  // Função auxiliar com tipo explícito de retorno
+  const getCheckbox = (label: string): ReactTestInstance => {
+    return screen.getByLabelText(label) as unknown as ReactTestInstance;
+  };
+
+  it("renderiza com valor inicial false", (): void => {
+    const handleChange = jest.fn();
+
     render(
       <Checkbox
         value={false}
-        onValueChange={() => {}}
+        onValueChange={handleChange}
         accessibilityLabel="Aceitar termos"
       />
     );
 
-    const checkbox = screen.getByLabelText("Aceitar termos");
+    const checkbox = getCheckbox("Aceitar termos");
+    const state = checkbox.props.accessibilityState as { checked?: boolean };
+
     expect(checkbox).toBeTruthy();
-    expect(checkbox.props.accessibilityState.checked).toBe(false);
+    expect(state.checked).toBe(false);
   });
 
-  it("renderiza marcado quando value=true", () => {
+  it("renderiza marcado quando value=true", (): void => {
+    const handleChange = jest.fn();
+
     render(
       <Checkbox
-        value={true}
-        onValueChange={() => {}}
+        value
+        onValueChange={handleChange}
         accessibilityLabel="Ativo"
       />
     );
 
-    const checkbox = screen.getByLabelText("Ativo");
+    const checkbox = getCheckbox("Ativo");
+    const state = checkbox.props.accessibilityState as { checked?: boolean };
+
     expect(checkbox).toBeTruthy();
-    expect(checkbox.props.accessibilityState.checked).toBe(true);
+    expect(state.checked).toBe(true);
   });
 
-  it("permite passar cor customizada (não quebra)", () => {
+  it("permite passar cor customizada (não quebra)", (): void => {
+    const handleChange = jest.fn();
+
     render(
       <Checkbox
-        value={true}
-        onValueChange={() => {}}
+        value
+        onValueChange={handleChange}
         color="red"
         accessibilityLabel="Custom"
       />
     );
 
-    const checkbox = screen.getByLabelText("Custom");
+    const checkbox = getCheckbox("Custom");
+    const state = checkbox.props.accessibilityState as { checked?: boolean };
+
     expect(checkbox).toBeTruthy();
-    expect(checkbox.props.accessibilityState.checked).toBe(true);
+    expect(state.checked).toBe(true);
   });
 
-  it("dispara onValueChange quando clicado", () => {
+  it("dispara onValueChange quando clicado", (): void => {
     const mockOnChange = jest.fn();
+
     render(
       <Checkbox
         value={false}
@@ -56,7 +75,7 @@ describe("Checkbox", () => {
       />
     );
 
-    const checkbox = screen.getByLabelText("Clique aqui");
+    const checkbox = getCheckbox("Clique aqui");
     fireEvent(checkbox, "onValueChange", true);
 
     expect(mockOnChange).toHaveBeenCalledWith(true);

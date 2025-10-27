@@ -2,19 +2,20 @@ import { Feather } from "@expo/vector-icons";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 import React from "react";
-import { GestureResponderEvent, Pressable, View } from "react-native";
+import type { GestureResponderEvent } from "react-native";
+import { Pressable, View } from "react-native";
 import { styles } from "./Header.styles";
 
 import HeaderLogo from "@assets/images/header/header-logo.svg";
 import { useAuth } from "@presentation/state/AuthContext";
 import { colors, sizes, spacing, typography } from "@presentation/theme";
 
-
 export const Header: React.FC = () => {
   const navigation = useNavigation();
   const { isAuthenticated } = useAuth();
 
-  const openDrawer = (event: GestureResponderEvent) => {
+  // ✅ Tipagem explícita adicionada
+  const openDrawer = (event: GestureResponderEvent): void => {
     event.preventDefault();
     navigation.dispatch(DrawerActions.openDrawer());
   };

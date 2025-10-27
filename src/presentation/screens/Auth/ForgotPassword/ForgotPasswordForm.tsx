@@ -6,7 +6,7 @@ import { DefaultButton } from "@presentation/components/common/common/DefaultBut
 import { useAuth } from "@presentation/state/AuthContext";
 import { texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
-import { ForgotPasswordFormProps } from "@shared/ProfileStyles/profile.styles.types";
+import type { ForgotPasswordFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
 import { styles } from "./ForgotPasswordForm.styles";
 
@@ -17,7 +17,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { resetPassword } = useAuth();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     if (!email) {
       showToast(
         "error",
@@ -36,7 +36,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
         texts.forgotPasswordForm.toasts.success.message
       );
       onSubmitSuccess?.(email);
-      router.replace(ROUTES.LOGIN); // <-- aqui
+      router.replace(ROUTES.LOGIN);
     } catch (error: unknown) {
       console.error(error);
       const message =
@@ -77,7 +77,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
         title={texts.forgotPasswordForm.buttons.submit}
         loading={isLoading}
         disabled={isButtonDisabled}
-        onPress={handleSubmit}
+        onPress={() => void handleSubmit()} 
         buttonStyle={[styles.submit]}
         textStyle={styles.submitText}
         accessibilityLabel={texts.forgotPasswordForm.accessibility.submitButton}
@@ -88,7 +88,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
         title={texts.forgotPasswordForm.buttons.back}
         loading={false}
         disabled={false}
-        onPress={() => router.push(ROUTES.LOGIN)} 
+        onPress={() => router.push(ROUTES.LOGIN)}
         buttonStyle={styles.backButton}
         textStyle={styles.backText}
         accessibilityLabel={texts.forgotPasswordForm.accessibility.backButton}

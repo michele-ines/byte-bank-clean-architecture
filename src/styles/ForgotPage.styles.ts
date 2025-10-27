@@ -1,7 +1,6 @@
 import { colors, layout } from "@presentation/theme";
 import { StyleSheet } from "react-native";
-import { ForgotPageStyles } from "../shared/ProfileStyles/profile.styles.types";
-
+import type { ForgotPageStyles } from "../shared/ProfileStyles/profile.styles.types";
 
 export const styles = StyleSheet.create<ForgotPageStyles>({
   container: { 

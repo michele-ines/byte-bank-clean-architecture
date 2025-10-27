@@ -7,7 +7,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 
-export default function RootLayout() {
+// ✅ Importando apenas o tipo JSX
+import type { JSX } from "react";
+
+export default function RootLayout(): JSX.Element {
   return (
     <GestureHandlerRootView style={{ flex: layout.flex1 }}>
       <SafeAreaProvider>

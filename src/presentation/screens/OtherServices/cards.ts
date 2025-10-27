@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 export type CardKind = "fisico" | "digital";
 export type CardState = "active" | "blocked";
 
