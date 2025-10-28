@@ -65,11 +65,10 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     }
 
     setIsLoading(true);
-    try {
-      await signup(email, password, name);
-      onSignupSuccess?.(email);
-      showToast("success", toasts.success.title, toasts.success.message);
-      router.replace(ROUTES.DASHBOARD);
+   try {
+        await signup({ email, password, name });
+        onSignupSuccess?.(email);
+        showToast("success", toasts.success.title, toasts.success.message);
     } catch (error: unknown) {
       let errorMessage = toasts.genericError.message;
       let errorTitle = toasts.genericError.title;

@@ -12,7 +12,6 @@
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "type-check": "tsc --noEmit",
     "typescript": "tsc --noEmit",
-
     "prepare": "husky install",
     "test": "jest --watchAll"
   },

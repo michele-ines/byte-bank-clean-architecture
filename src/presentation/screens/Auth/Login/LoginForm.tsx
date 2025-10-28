@@ -24,7 +24,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
 
   const { login } = useAuth();
 
-  // ✅ Adicionando tipo de retorno explícito
   const handleLogin = async (): Promise<void> => {
     if (!email || !password) {
       showToast(
@@ -38,9 +37,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login({ email, password });
       onLoginSuccess?.(email);
-      router.replace(ROUTES.DASHBOARD);
     } catch (error: unknown) {
       console.error(error);
       const message =
@@ -53,7 +51,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     }
   };
 
-  // ✅ Adicionando tipo de retorno explícito
   const handleCreateAccount = (): void => {
     router.push(ROUTES.SIGNUP);
   };

@@ -1,132 +1,114 @@
-import { auth, db } from "@infrastructure/config/firebaseConfig";
-import type { AuthContextData, UserData } from "@shared/interfaces/auth.interfaces";
-import { router } from "expo-router";
-import type { User, UserCredential } from "firebase/auth";
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
-import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
-import type { ReactNode } from "react";
+// src/presentation/state/AuthContext.tsx
+import { router } from 'expo-router';
 import React, {
+  ReactNode,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
-} from "react";
+} from 'react';
 
-const AUTH_ROUTES = {
-  login: "/",
-  dashboard: "/dashboard",
-} as const;
+import { AuthUseCases } from '@/application/use-cases/AuthUseCases';
+import { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
+import { AuthenticatedUser, UserData } from '@domain/entities/User';
+import { AuthRepository } from '@domain/repositories/AuthRepository';
+import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
 
-const AUTH_MESSAGES = {
-  logoutError: "Erro ao fazer logout",
-} as const;
+interface AuthContextData {
+  user: AuthenticatedUser | null; 
+  userData: UserData | null;     
+  isAuthenticated: boolean;
+  loading: boolean;
+  signup: (credentials: SignupCredentials) => Promise<void>;
+  login: (credentials: AuthCredentials) => Promise<void>;   
+  resetPassword: (email: string) => Promise<void>;
+  signOut: () => Promise<void>;
+}
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
+
+const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository();
+const authUseCases = new AuthUseCases(firebaseAuthRepository);
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
-  useEffect((): (() => void) => {
-    let unsubscribeUser: () => void = (): void => {
-      // função inicial vazia para evitar erro antes da definição real
-    };
+  useEffect(() => {
+    let unsubscribeAuth: (() => void) | null = null;
+    let unsubscribeUserData: (() => void) | null = null;
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser: User | null): void => {
-      setUser(currentUser);
-      unsubscribeUser();
+    unsubscribeAuth = authUseCases.observeAuth.execute((authUser) => {
+      setUser(authUser);
 
-      if (currentUser) {
-        const docRef = doc(db, "users", currentUser.uid);
-        unsubscribeUser = onSnapshot(docRef, (docSnap) => {
-          if (docSnap.exists()) {
-            setUserData(docSnap.data() as UserData);
-          } else {
-            setUserData(null);
-          }
-        });
-      } else {
-        setUserData(null);
+      if (unsubscribeUserData) {
+        unsubscribeUserData();
+        unsubscribeUserData = null;
+        setUserData(null); 
       }
 
-      setLoading(false);
+      if (authUser) {
+         unsubscribeUserData = authUseCases.observeUserData.execute(authUser.uid, (data) => {
+             setUserData(data);
+             setLoading(false);
+         });
+      } else {
+         setUserData(null);
+         setLoading(false); 
+      }
     });
 
-    return (): void => {
-      unsubscribeAuth();
-      unsubscribeUser();
+    return () => {
+      if (unsubscribeAuth) unsubscribeAuth();
+      if (unsubscribeUserData) unsubscribeUserData();
     };
   }, []);
 
-  // 🔹 Cria usuário e retorna o UserCredential
-  const signup = useCallback(
-    async (email: string, password: string, name: string): Promise<UserCredential> => {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const newUser = userCredential.user;
+  const handleSignup = useCallback(async (credentials: SignupCredentials) => {
+      await authUseCases.signup.execute(credentials);
+      router.replace('/dashboard'); 
+  }, []);
 
-      await setDoc(doc(db, "users", newUser.uid), {
-        uuid: newUser.uid,
-        name,
-        email,
-        createdAt: serverTimestamp(),
-      });
+  const handleLogin = useCallback(async (credentials: AuthCredentials) => {
+      await authUseCases.login.execute(credentials);
+      router.replace('/dashboard');
+  }, []);
 
-      return userCredential;
-    },
-    []
-  );
+  const handleResetPassword = useCallback(async (email: string) => {
+      await authUseCases.resetPassword.execute(email);
+  }, []);
 
-  // 🔹 Login do usuário
-  const login = useCallback(
-    (email: string, password: string): Promise<UserCredential> =>
-      signInWithEmailAndPassword(auth, email, password),
-    []
-  );
-
-  // 🔹 Reset de senha
-  const resetPassword = useCallback(
-    (email: string): Promise<void> => sendPasswordResetEmail(auth, email),
-    []
-  );
-
-  // 🔹 Logout do usuário
-  const handleSignOut = async (): Promise<void> => {
+   const handleSignOut = useCallback(async () => {
     try {
-      await signOut(auth);
-      router.replace(AUTH_ROUTES.login);
+      await authUseCases.logout.execute();
+      router.replace('/');
     } catch (error) {
-      console.error(`${AUTH_MESSAGES.logoutError}:`, error);
+      console.error("Erro ao fazer logout no AuthContext:", error);
     }
-  };
+  }, []);
 
-  // 🔹 Contexto com função síncrona que chama o async internamente
-  const contextValue = useMemo<AuthContextData>(
+
+  const contextValue = useMemo(
     () => ({
       user,
       userData,
       isAuthenticated: !!user,
       loading,
-      signup,
-      login,
-      resetPassword,
-      // ✅ Corrigido: evita o erro no-misused-promises
-      signOut: (): void => {
-        void handleSignOut();
-      },
+      signup: handleSignup,
+      login: handleLogin,
+      resetPassword: handleResetPassword,
+      signOut: handleSignOut,
     }),
-    [user, userData, loading, signup, login, resetPassword]
+    [user, userData, loading, handleSignup, handleLogin, handleResetPassword, handleSignOut]
   );
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 };
 
 export function useAuth(): AuthContextData {
