@@ -1,16 +1,15 @@
+import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
+import type { AuthenticatedUser, UserData } from '@domain/entities/User';
+import type { AuthRepository } from '@domain/repositories/AuthRepository';
+import type { User as FirebaseUser } from 'firebase/auth';
 import {
-    User as FirebaseUser,
-    createUserWithEmailAndPassword,
-    onAuthStateChanged,
-    sendPasswordResetEmail,
-    signInWithEmailAndPassword,
-    signOut,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth';
 import { doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
-
-import { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
-import { AuthenticatedUser, UserData } from '@domain/entities/User';
-import { AuthRepository } from '@domain/repositories/AuthRepository';
 import { auth, db } from '../config/firebaseConfig';
 
 const mapFirebaseUserToAuthenticatedUser = (firebaseUser: FirebaseUser | null): AuthenticatedUser | null => {
@@ -35,19 +34,41 @@ export class FirebaseAuthRepository implements AuthRepository {
   }
 
   onUserDataChanged(uid: string, callback: (userData: UserData | null) => void): () => void {
-      const docRef = doc(db, "users", uid);
-      const unsubscribe = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          callback(docSnap.data() as UserData);
-        } else {
-          callback(null);
-        }
-      });
-      return unsubscribe;
+    const docRef = doc(db, "users", uid);
+
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (!docSnap.exists()) {
+        callback(null);
+        return;
+      }
+
+      const raw = docSnap.data();
+
+      if (typeof raw !== "object" || raw === null) {
+        callback(null);
+        return;
+      }
+
+      const obj = raw;
+
+      const data: UserData = {
+        uuid: typeof obj.uuid === "string" ? obj.uuid : "",
+        name: typeof obj.name === "string" ? obj.name : "",
+        email: typeof obj.email === "string" ? obj.email : "",
+        photoURL: typeof obj.photoURL === "string" ? obj.photoURL : null,
+        createdAt: obj.createdAt ?? undefined,
+      };
+
+      callback(data);
+    });
+
+    return unsubscribe;
   }
 
   async login(credentials: AuthCredentials): Promise<AuthenticatedUser> {
-    const userCredential = await signInWithEmailAndPassword(auth, credentials.email, credentials.password!);
+    const pw = credentials.password;
+    if (!pw) throw new Error('Password is required for login');
+    const userCredential = await signInWithEmailAndPassword(auth, credentials.email, pw);
     const authenticatedUser = mapFirebaseUserToAuthenticatedUser(userCredential.user);
     if (!authenticatedUser) {
         throw new Error('Falha ao mapear usuário após login.');
@@ -56,7 +77,7 @@ export class FirebaseAuthRepository implements AuthRepository {
   }
 
   async signup(credentials: SignupCredentials): Promise<AuthenticatedUser> {
-    const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password!);
+    const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
     const newUser = userCredential.user;
 
     const newUserProfile: UserData = {

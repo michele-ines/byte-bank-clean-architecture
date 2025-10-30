@@ -1,19 +1,19 @@
 // src/presentation/state/AuthContext.tsx
 import { router } from 'expo-router';
+import type { ReactNode } from 'react';
 import React, {
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
 } from 'react';
 
 import { AuthUseCases } from '@/application/use-cases/AuthUseCases';
-import { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
-import { AuthenticatedUser, UserData } from '@domain/entities/User';
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
+import type { AuthenticatedUser, UserData } from '@domain/entities/User';
+import type { AuthRepository } from '@domain/repositories/AuthRepository';
 import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
 
 interface AuthContextData {

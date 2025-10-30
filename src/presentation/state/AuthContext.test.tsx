@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/await-thenable */
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
 import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    sendPasswordResetEmail,
+    signInWithEmailAndPassword,
+    signOut,
 } from "firebase/auth";
 import { onSnapshot, setDoc } from "firebase/firestore";
 import type { JSX } from "react";

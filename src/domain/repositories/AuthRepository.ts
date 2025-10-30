@@ -1,6 +1,6 @@
 // src/domain/repositories/AuthRepository.ts
-import { AuthCredentials, SignupCredentials } from '../entities/AuthCredentials';
-import { AuthenticatedUser, UserData } from '../entities/User';
+import type { AuthCredentials, SignupCredentials } from '../entities/AuthCredentials';
+import type { AuthenticatedUser, UserData } from '../entities/User';
 
 export interface AuthRepository {
   getCurrentUser(): AuthenticatedUser | null;

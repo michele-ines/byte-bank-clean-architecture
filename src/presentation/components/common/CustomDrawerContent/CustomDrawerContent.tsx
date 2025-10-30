@@ -1,8 +1,8 @@
 import { useAuth } from "@presentation/state/AuthContext";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import {
-  DrawerContentScrollView,
-  DrawerItemList,
+    DrawerContentScrollView,
+    DrawerItemList,
 } from "@react-navigation/drawer";
 import type { JSX } from "react";
 import React from "react";
@@ -18,7 +18,7 @@ export function CustomDrawerContent(
   const { user, userData, signOut } = useAuth();
 
   const handleLogout = (): void => {
-    signOut();
+    void signOut();
   };
 
   const displayName =

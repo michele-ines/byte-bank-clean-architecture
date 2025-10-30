@@ -1,7 +1,7 @@
 // src/application/usecases/AuthUseCases.ts
-import { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
-import { AuthenticatedUser, UserData } from '@domain/entities/User';
-import { AuthRepository } from '@domain/repositories/AuthRepository';
+import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
+import type { AuthenticatedUser, UserData } from '@domain/entities/User';
+import type { AuthRepository } from '@domain/repositories/AuthRepository';
 
 export class LoginUseCase {
   constructor(private authRepository: AuthRepository) {}
