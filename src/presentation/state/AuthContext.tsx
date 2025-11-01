@@ -79,10 +79,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       router.replace('/dashboard'); 
   }, []);
 
-  const handleSignupWrapper = useCallback(async (...args: any[]) => {
-    if (args.length === 1) return await handleSignup(args[0] as SignupCredentials);
-  const [email, password, name] = args as [string, string, string?];
-  await handleSignup({ email, password, name: name ?? '' });
+  const handleSignupWrapper = useCallback(async (
+    ...args: [SignupCredentials] | [string, string, string?]
+  ) => {
+    if (args.length === 1) return await handleSignup(args[0]);
+    const [email, password, name] = args;
+    await handleSignup({ email, password, name: name ?? '' });
   }, [handleSignup]);
 
   const handleLogin = useCallback(async (credentials: AuthCredentials) => {
@@ -90,9 +92,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       router.replace('/dashboard');
   }, []);
 
-  const handleLoginWrapper = useCallback(async (...args: any[]) => {
-    if (args.length === 1) return await handleLogin(args[0] as AuthCredentials);
-    const [email, password] = args as [string, string];
+  const handleLoginWrapper = useCallback(async (
+    ...args: [AuthCredentials] | [string, string]
+  ) => {
+    if (args.length === 1) return await handleLogin(args[0]);
+    const [email, password] = args;
     await handleLogin({ email, password });
   }, [handleLogin]);
 
@@ -121,7 +125,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       resetPassword: handleResetPassword,
       signOut: handleSignOut,
     }),
-    [user, userData, loading, handleSignup, handleLogin, handleResetPassword, handleSignOut]
+    [user, userData, loading, handleSignupWrapper, handleLoginWrapper, handleResetPassword, handleSignOut]
   );
 
   return (

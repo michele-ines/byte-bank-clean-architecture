@@ -3,6 +3,7 @@ import type { AttachmentFile } from "@domain/entities/Transaction";
 import { Feather } from "@expo/vector-icons";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { colors, spacing, texts, typography } from "@presentation/theme";
+import type { ITransaction as LegacyITransaction } from "@shared/interfaces/auth.interfaces";
 import { truncateString } from "@shared/utils/string";
 import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";
@@ -48,9 +49,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   // um cast controlado para manter compatibilidade até migrarmos todas as
   // dependências para o novo shape.
   const filtered = filterFn
-    ? (transactions as unknown as any[]).filter(
-        filterFn as unknown as (transaction: any) => boolean
-      )
+    ? ((transactions as unknown as LegacyITransaction[]).filter(filterFn) as unknown as typeof transactions)
     : transactions;
 
   // -------------------- Funções auxiliares --------------------
@@ -180,10 +179,10 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     try {
       // Para cada transação selecionada, chama deleteTransaction passando os anexos atuais (se houver)
       await Promise.all(
-        Array.from(selectedItems).map(async (id) => {
+          Array.from(selectedItems).map(async (id) => {
           const tx = transactions.find((t) => t.id === id);
-          const attachments = (tx as any)?.attachments ?? [];
-          await deleteTransaction(id, attachments as string[]);
+          const attachments = tx?.attachments ?? [];
+          await deleteTransaction(id, attachments);
         })
       );
       showToast(
@@ -256,7 +255,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     <View style={styles.container}>
       <FlatList
         data={filtered}
-        keyExtractor={(item) => item.id!}
+  keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <ListHeader
             title={title}
@@ -282,8 +281,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
                   groupSeparator: ".",
                   precision: 2,
                 }}
-                value={editedValues[item.id!] ?? ""}
-                onChangeText={(_, raw) => handleValueChange(item.id!, raw)}
+                value={editedValues[item.id] ?? ""}
+                onChangeText={(_, raw) => handleValueChange(item.id, raw)}
               />
             ) : (
               <Text>R$ {item.valor.toFixed(2).replace(".", ",")}</Text>
@@ -297,14 +296,14 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
                   }}
                 >
                   <Text style={styles.attachmentLink}>
-                    {truncateString(decodeURIComponent(url.split("/").pop() || url), 20)}
+                    {truncateString(decodeURIComponent(url.split("/").pop() ?? url), 20)}
                   </Text>
                 </Pressable>
 
                 {isEditing && (
                   <Pressable
                     onPress={() => {
-                      handleDeleteAttachment(item.id!, url);
+                      handleDeleteAttachment(item.id, url);
                     }}
                   >
                     <Feather
@@ -324,7 +323,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
                 ) : (
                   <Pressable
                     onPress={() => {
-                      void handleAttachFile(item.id!);
+                      void handleAttachFile(item.id);
                     }}
                     disabled={!!uploadingId}
                   >
@@ -336,8 +335,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
 
             {isDeleting && (
               <Checkbox
-                value={selectedItems.has(item.id!)}
-                onValueChange={(v) => handleItemSelection(item.id!, v)}
+                value={selectedItems.has(item.id)}
+                onValueChange={(v) => handleItemSelection(item.id, v)}
               />
             )}
           </View>

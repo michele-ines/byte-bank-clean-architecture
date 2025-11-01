@@ -1,5 +1,5 @@
+import type { ReactNode } from 'react';
 import React, {
-  ReactNode,
   createContext,
   useCallback,
   useContext,
@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 
 import { TransactionUseCases } from '@/application/use-cases/TransactionUseCases';
-import { AttachmentFile, ITransaction, NewTransactionData } from '@domain/entities/Transaction';
+import type { AttachmentFile, ITransaction, NewTransactionData } from '@domain/entities/Transaction';
 import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
 import { useAuth } from '@presentation/state/AuthContext';
 import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
@@ -104,16 +104,16 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
   // Wrapper compatível com a API legada usada por alguns consumidores/tests
   const addTransactionWrapper = useCallback(
-    async (...args: any[]): Promise<any> => {
+    async (...args: [NewTransactionData, AttachmentFile[]] | [INewTransactionInput]): Promise<void | string> => {
       // assinatura nova: (transactionData, attachments)
       if (args.length === 2) {
-        return await handleAddTransaction(args[0] as NewTransactionData, args[1] as AttachmentFile[]);
+        return await handleAddTransaction(args[0], args[1]);
       }
 
       // assinatura legada: (INewTransactionInput)
-      const legacy = args[0] as INewTransactionInput;
+      const legacy = args[0];
       // Mapear para NewTransactionData do domínio
-      const mapToDomainType = (t: typeof legacy.tipo | undefined): 'entrada' | 'saida' => {
+      const mapToDomainType = (t: INewTransactionInput['tipo'] | undefined): 'entrada' | 'saida' => {
         if (t === 'deposito') return 'entrada';
         return 'saida';
       };
@@ -121,11 +121,11 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       const domainTx: NewTransactionData = {
         descricao: legacy.description,
         valor: legacy.valor,
-        tipo: mapToDomainType(legacy.tipo as any),
+        tipo: mapToDomainType(legacy.tipo),
         categoria: '',
         // usar Timestamp.now() para compatibilidade com o domínio
-        data: Timestamp.now() as unknown as any,
-      } as unknown as NewTransactionData;
+        data: Timestamp.now(),
+      };
 
       // Chama a implementação existente sem anexos
       await handleAddTransaction(domainTx, []);
@@ -145,7 +145,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       // Pega a lista de anexos atuais da transação
       const currentTx = transactions.find(t => t.id === id);
-      const currentAttachments = currentTx?.attachments || [];
+  const currentAttachments = currentTx?.attachments ?? [];
 
       // Adiciona o 'userId' do usuário aos dados de update,
       // pois o repositório precisa dele para uploads
@@ -167,12 +167,14 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
   );
 
     // Compatibilidade: aceitar chamada legada updateTransaction(id, updatedTransaction)
-    const updateTransactionWrapper = useCallback(async (...args: any[]) => {
+    const updateTransactionWrapper = useCallback(async (
+      ...args: [string, Partial<ITransaction>] | [string, Partial<ITransaction>, AttachmentFile[], string[]]
+    ) => {
       if (args.length === 2) {
-        const [id, updatedTransaction] = args as [string, Partial<ITransaction>];
+        const [id, updatedTransaction] = args;
         return await handleUpdateTransaction(id, updatedTransaction, [], []);
       }
-      const [id, updatedTransaction, newAttachments, attachmentsToRemove] = args as [string, Partial<ITransaction>, AttachmentFile[], string[]];
+      const [id, updatedTransaction, newAttachments, attachmentsToRemove] = args;
       return await handleUpdateTransaction(id, updatedTransaction, newAttachments, attachmentsToRemove);
     }, [handleUpdateTransaction]);
 
@@ -219,8 +221,8 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     () => ({
       transactions,
       loading,
-      addTransaction: addTransactionWrapper as unknown as any,
-  updateTransaction: updateTransactionWrapper as any,
+    addTransaction: addTransactionWrapper as unknown as TransactionsContextData['addTransaction'],
+    updateTransaction: updateTransactionWrapper as unknown as TransactionsContextData['updateTransaction'],
       deleteTransaction: handleDeleteTransaction,
       // legados
       balance: transactions.reduce((acc, t) => (t.tipo === 'entrada' ? acc + (t.valor ?? 0) : acc - (t.valor ?? 0)), 0),
@@ -232,11 +234,13 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       deleteTransactions: deleteTransactionsLegacy,
     }),
     [
-      transactions,
-      loading,
-      addTransactionWrapper,
-      handleUpdateTransaction,
-      handleDeleteTransaction,
+  transactions,
+  loading,
+  addTransactionWrapper,
+  updateTransactionWrapper,
+  loadingMore,
+  hasMore,
+  handleDeleteTransaction,
       loadMoreTransactionsLegacy,
       uploadAttachmentAndUpdateTransactionLegacy,
       deleteAttachmentLegacy,

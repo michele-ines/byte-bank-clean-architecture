@@ -8,8 +8,18 @@ export const DIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const value = useMemo<DI>(() => {
     // use-cases refatorados — fornecemos stubs compatíveis para evitar que o provider quebre
     return {
-      createTransaction: {} as any,
-      listUserTransactions: {} as any,
+      createTransaction: {
+        exec: (_tx: unknown) => {
+          // noop stub
+          return Promise.resolve();
+        },
+      },
+      listUserTransactions: {
+        exec: (_userId: string) => {
+          // noop stub: returns unsubscribe
+          return () => undefined;
+        },
+      },
     };
   }, []);
 

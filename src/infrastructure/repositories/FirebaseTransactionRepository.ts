@@ -1,3 +1,4 @@
+import type { PartialWithFieldValue } from 'firebase/firestore';
 import {
     addDoc,
     collection,
@@ -5,7 +6,6 @@ import {
     doc,
     onSnapshot,
     orderBy,
-    PartialWithFieldValue,
     query,
     serverTimestamp,
     updateDoc,
@@ -18,8 +18,8 @@ import {
     uploadBytes,
 } from 'firebase/storage';
 
-import { AttachmentFile, ITransaction, NewTransactionData } from '@domain/entities/Transaction';
-import { TransactionRepository } from '@domain/repositories/TransactionRepository';
+import type { AttachmentFile, ITransaction, NewTransactionData } from '@domain/entities/Transaction';
+import type { TransactionRepository } from '@domain/repositories/TransactionRepository';
 import { db, storage } from '../config/firebaseConfig';
 export class FirebaseTransactionRepository implements TransactionRepository {
 
@@ -66,13 +66,20 @@ export class FirebaseTransactionRepository implements TransactionRepository {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const userTransactions: ITransaction[] = [];
       snapshot.forEach((doc) => {
-        const raw = doc.data() as Record<string, any>;
+        const raw = doc.data() as Record<string, unknown>;
+        // Helper para ler campos possivelmente presentes no documento
+        const readStringField = (obj: Record<string, unknown>, key: string): string | undefined => {
+          const v = obj[key];
+          return typeof v === 'string' ? v : undefined;
+        };
+
         // Normaliza o campo de usuário: se o documento tiver 'userId' mapeia para 'uuid'
         const normalized = {
           ...raw,
-          uuid: raw.uuid ?? raw.userId ?? raw.user_id,
-        };
-        userTransactions.push({ id: doc.id, ...normalized } as ITransaction);
+          uuid: readStringField(raw, 'uuid') ?? readStringField(raw, 'userId') ?? readStringField(raw, 'user_id'),
+        } as Record<string, unknown>;
+
+  userTransactions.push({ id: doc.id, ...(normalized as Partial<ITransaction>) } as ITransaction);
       });
       callback(userTransactions); // Envia os dados para o callback
     });
@@ -118,17 +125,24 @@ export class FirebaseTransactionRepository implements TransactionRepository {
 
     // 2. Faz upload dos novos anexos
     let newAttachmentUrls: string[] = [];
-    if (newAttachments && newAttachments.length > 0) {
+  if (newAttachments && newAttachments.length > 0) {
       // Precisamos do 'userId', mas não recebemos. 
       // Idealmente, o 'updates' conteria o 'uuid' ou o 'userId' seria passado.
       // Por agora, vamos assumir que 'updates.uuid' existe ou é pego de forma estática.
       // Vamos simplificar: o 'updates' deve conter o 'uuid' do usuário.
     // O repositório precisa do userId para criar paths nos uploads
-    const uploaderId = (updates as any).userId ?? (updates as any).uuid;
+    const getUserIdFromUpdates = (u: Partial<ITransaction>): string | undefined => {
+      const candidate = (u as unknown as { userId?: string; uuid?: string }).userId ?? (u as unknown as { userId?: string; uuid?: string }).uuid;
+      return typeof candidate === 'string' ? candidate : undefined;
+    };
+
+    const uploaderId = getUserIdFromUpdates(updates);
     if (!uploaderId) {
       console.warn("userId do usuário não encontrado ao tentar fazer upload de novos anexos na atualização.");
     }
-    newAttachmentUrls = await this.uploadAttachments(uploaderId!, newAttachments);
+    if (uploaderId) {
+      newAttachmentUrls = await this.uploadAttachments(uploaderId, newAttachments);
+    }
     }
 
     // 3. Calcula a lista final de anexos

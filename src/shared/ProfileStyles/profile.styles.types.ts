@@ -1,11 +1,17 @@
-// Use placeholders for use-case types (old use-cases were refactored)
-type CreateTransaction = any;
-type ListUserTransactions = any;
 import type { UserInfo } from "firebase/auth";
 import type { ReactNode } from "react";
 import type { StyleProp, TextStyle, ViewStyle } from "react-native";
 import type { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
 import type { ITransaction } from "../interfaces/auth.interfaces";
+
+// Minimal types for refactored use-cases (avoid `any`)
+export interface CreateTransaction {
+  exec: (tx: Transaction) => Promise<void>;
+}
+
+export interface ListUserTransactions {
+  exec: (userId: string) => () => void;
+}
 
 export interface ProfileStyles {
   container: ViewStyle;

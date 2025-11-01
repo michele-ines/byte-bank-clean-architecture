@@ -1,4 +1,4 @@
-import { AttachmentFile, ITransaction, NewTransactionData } from '../entities/Transaction';
+import type { AttachmentFile, ITransaction, NewTransactionData } from '../entities/Transaction';
 
 export interface TransactionRepository {
 

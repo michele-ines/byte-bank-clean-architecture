@@ -1,6 +1,6 @@
 // src/application/usecases/TransactionUseCases.ts
-import { AttachmentFile, ITransaction, NewTransactionData } from '@domain/entities/Transaction';
-import { TransactionRepository } from '@domain/repositories/TransactionRepository';
+import type { AttachmentFile, ITransaction, NewTransactionData } from '@domain/entities/Transaction';
+import type { TransactionRepository } from '@domain/repositories/TransactionRepository';
 
 // --- Caso de Uso para Observar Transações ---
 export class ObserveTransactionsUseCase {
