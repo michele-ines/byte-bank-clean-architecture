@@ -1,5 +1,6 @@
-import type { CreateTransaction } from "@/application/use-cases/CreateTransaction";
-import type { ListUserTransactions } from "@/application/use-cases/ListUserTransactions";
+// Use placeholders for use-case types (old use-cases were refactored)
+type CreateTransaction = any;
+type ListUserTransactions = any;
 import type { UserInfo } from "firebase/auth";
 import type { ReactNode } from "react";
 import type { StyleProp, TextStyle, ViewStyle } from "react-native";

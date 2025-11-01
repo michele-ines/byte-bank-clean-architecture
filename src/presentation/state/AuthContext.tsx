@@ -2,12 +2,12 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import React, {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react';
 
 import { AuthUseCases } from '@/application/use-cases/AuthUseCases';
@@ -21,8 +21,14 @@ interface AuthContextData {
   userData: UserData | null;     
   isAuthenticated: boolean;
   loading: boolean;
-  signup: (credentials: SignupCredentials) => Promise<void>;
-  login: (credentials: AuthCredentials) => Promise<void>;   
+  signup: {
+    (credentials: SignupCredentials): Promise<void>;
+    (email: string, password: string, name?: string): Promise<void>;
+  };
+  login: {
+    (credentials: AuthCredentials): Promise<void>;
+    (email: string, password: string): Promise<void>;
+  };
   resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -73,10 +79,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       router.replace('/dashboard'); 
   }, []);
 
+  const handleSignupWrapper = useCallback(async (...args: any[]) => {
+    if (args.length === 1) return await handleSignup(args[0] as SignupCredentials);
+  const [email, password, name] = args as [string, string, string?];
+  await handleSignup({ email, password, name: name ?? '' });
+  }, [handleSignup]);
+
   const handleLogin = useCallback(async (credentials: AuthCredentials) => {
       await authUseCases.login.execute(credentials);
       router.replace('/dashboard');
   }, []);
+
+  const handleLoginWrapper = useCallback(async (...args: any[]) => {
+    if (args.length === 1) return await handleLogin(args[0] as AuthCredentials);
+    const [email, password] = args as [string, string];
+    await handleLogin({ email, password });
+  }, [handleLogin]);
 
   const handleResetPassword = useCallback(async (email: string) => {
       await authUseCases.resetPassword.execute(email);
@@ -98,8 +116,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       userData,
       isAuthenticated: !!user,
       loading,
-      signup: handleSignup,
-      login: handleLogin,
+      signup: handleSignupWrapper,
+      login: handleLoginWrapper,
       resetPassword: handleResetPassword,
       signOut: handleSignOut,
     }),

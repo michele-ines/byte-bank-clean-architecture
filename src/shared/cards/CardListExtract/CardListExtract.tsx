@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import type { AttachmentFile } from "@domain/entities/Transaction";
 import { Feather } from "@expo/vector-icons";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { colors, spacing, texts, typography } from "@presentation/theme";
@@ -19,7 +20,6 @@ import { MaskedTextInput } from "react-native-mask-text";
 import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
-import type { IAnexo } from "../../interfaces/auth.interfaces";
 import type {
   CardListExtractProps,
   EditedValuesMap,
@@ -33,13 +33,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   const {
     transactions,
     loading,
-    loadingMore,
-    hasMore,
-    loadMoreTransactions,
     updateTransaction,
-    uploadAttachmentAndUpdateTransaction,
-    deleteAttachment,
-    deleteTransactions,
+    deleteTransaction,
   } = useTransactions();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -48,7 +43,15 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
-  const filtered = filterFn ? transactions.filter(filterFn) : transactions;
+  // O tipo de `transactions` vem do domínio (ITransaction do domain) e pode
+  // divergir da forma antiga esperada por `filterFn` (typing legacy). Fazemos
+  // um cast controlado para manter compatibilidade até migrarmos todas as
+  // dependências para o novo shape.
+  const filtered = filterFn
+    ? (transactions as unknown as any[]).filter(
+        filterFn as unknown as (transaction: any) => boolean
+      )
+    : transactions;
 
   // -------------------- Funções auxiliares --------------------
 
@@ -95,11 +98,13 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
       const result = await DocumentPicker.getDocumentAsync({});
       if (!result.canceled && result.assets?.length) {
         const file = result.assets[0];
-        await uploadAttachmentAndUpdateTransaction(
-          transactionId,
-          file.uri,
-          file.name
-        );
+        // Converte URI para Blob e anexa o nome para que o repositório consiga usar
+        const response = await fetch(file.uri);
+        const blob = await response.blob();
+        // o repositório espera um AttachmentFile (File). Em runtime, um blob com a propriedade 'name' é aceitável.
+        const attachment = Object.assign(blob, { name: file.name }) as unknown as AttachmentFile;
+
+        await updateTransaction(transactionId, {}, [attachment], []);
         showToast(
           "success",
           texts.cardList.toasts.attachSuccess.title,
@@ -120,7 +125,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
 
   const handleDeleteAttachment = (
     transactionId: string,
-    file: IAnexo
+    fileUrl: string
   ): void => {
     const dialog = texts.cardList.dialogs.deleteAttachment;
     Alert.alert(dialog.title, dialog.message, [
@@ -132,7 +137,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
           // ✅ Corrigido: executa async com void
           void (async () => {
             try {
-              await deleteAttachment(transactionId, file);
+              // Usa o novo contrato: updateTransaction com attachmentsToRemove
+              await updateTransaction(transactionId, {}, [], [fileUrl]);
               showToast(
                 "success",
                 texts.cardList.toasts.deleteAttachmentSuccess.title,
@@ -172,7 +178,14 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
 
     try {
-      await deleteTransactions(Array.from(selectedItems));
+      // Para cada transação selecionada, chama deleteTransaction passando os anexos atuais (se houver)
+      await Promise.all(
+        Array.from(selectedItems).map(async (id) => {
+          const tx = transactions.find((t) => t.id === id);
+          const attachments = (tx as any)?.attachments ?? [];
+          await deleteTransaction(id, attachments as string[]);
+        })
+      );
       showToast(
         "success",
         texts.cardList.toasts.deleteTransactionsSuccess.title,
@@ -215,7 +228,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     try {
       await Promise.all(
         transacoesAlteradas.map(([id, raw]) =>
-          updateTransaction(id, { valor: parseFloat(raw) / 100 })
+          // novo contrato: updateTransaction(id, updatedTransaction, newAttachments, attachmentsToRemove)
+          updateTransaction(id, { valor: parseFloat(raw) / 100 }, [], [])
         )
       );
       showToast(
@@ -275,22 +289,22 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
               <Text>R$ {item.valor.toFixed(2).replace(".", ",")}</Text>
             )}
 
-            {item.anexos?.map((file, i) => (
+            {item.attachments?.map((url: string, i: number) => (
               <Fragment key={i}>
                 <Pressable
                   onPress={() => {
-                    void handleOpenReceipt(file.url);
+                    void handleOpenReceipt(url);
                   }}
                 >
                   <Text style={styles.attachmentLink}>
-                    {truncateString(file.name, 20)}
+                    {truncateString(decodeURIComponent(url.split("/").pop() || url), 20)}
                   </Text>
                 </Pressable>
 
                 {isEditing && (
                   <Pressable
                     onPress={() => {
-                      handleDeleteAttachment(item.id!, file);
+                      handleDeleteAttachment(item.id!, url);
                     }}
                   >
                     <Feather
@@ -338,12 +352,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
             </Text>
           ) : null
         }
-        ListFooterComponent={<ListFooter isLoadingMore={loadingMore} />}
-        onEndReached={() => {
-          if (hasMore && !loadingMore) {
-            void loadMoreTransactions(); 
-          }
-        }}
+        ListFooterComponent={<ListFooter isLoadingMore={false} />}
         onEndReachedThreshold={0.1}
         keyboardShouldPersistTaps="handled"
       />
