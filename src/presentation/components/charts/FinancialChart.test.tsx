@@ -49,7 +49,7 @@ describe("FinancialChart", () => {
         data: texts.financialChartData,
         yAxisLabel: texts.currencyPrefix,
       }),
-      expect.anything()
+      undefined
     );
   });
 
@@ -64,7 +64,7 @@ describe("FinancialChart", () => {
       expect.objectContaining<Partial<ChartProps>>({
         width: windowWidth - spacing.xl,
       }),
-      expect.anything()
+      undefined
     );
   });
 
@@ -78,7 +78,7 @@ describe("FinancialChart", () => {
       expect.objectContaining<Partial<ChartProps>>({
         height: layout.chartHeight,
       }),
-      expect.anything()
+      undefined
     );
   });
 });

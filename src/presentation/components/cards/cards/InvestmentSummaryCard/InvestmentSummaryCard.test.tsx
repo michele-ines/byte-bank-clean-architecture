@@ -7,11 +7,13 @@ import { texts } from "@presentation/theme";
 import { render } from "@testing-library/react-native";
 import type { JSX } from "react";
 import React from "react";
-import { Text, View } from "react-native";
 import { InvestmentSummaryCard } from "./InvestmentSummaryCard";
 import { investmentSummaryMock } from "./Mock/InvestmentSummaryCard.mock";
 
 jest.mock("@assets/images/dash-card-new-transacao/card-pixels-3.svg", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
   const SvgMock = (props: SvgMockProps): JSX.Element =>
     React.createElement(View, {
       accessible: props.accessible,
@@ -24,6 +26,9 @@ jest.mock("@assets/images/dash-card-new-transacao/card-pixels-3.svg", () => {
 });
 
 jest.mock("react-native-gesture-handler", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
   const ScrollViewMock = ({ children, ...props }: ScrollViewMockProps): JSX.Element =>
     React.createElement(View, props, children);
 
@@ -31,7 +36,10 @@ jest.mock("react-native-gesture-handler", () => {
   return { __esModule: true, ScrollView: ScrollViewMock };
 });
 
-jest.mock("../../DonutChart/DonutChart", () => {
+jest.mock("@presentation/components/charts/DonutChart", () => {
+  const React = require("react");
+  const { View, Text } = require("react-native");
+
   const DonutChartMock = ({ accessibilityLabel, data }: DonutChartMockProps): JSX.Element =>
     React.createElement(
       View,

@@ -37,18 +37,24 @@ jest.mock("@expo/vector-icons", () => {
 });
 
 // ✅ garante strings estáveis para os botões/labels
-jest.mock("@presentation/theme", () => ({
-  texts: {
-    modal: {
-      buttons: {
-        cancel: "Cancelar",
-        save: "Salvar",
-        accessibilityCancel: "Cancelar",
-        accessibilitySave: "Salvar",
+jest.mock("@presentation/theme", () => {
+  // use the real theme module but override only texts to keep styles intact
+  const actual = jest.requireActual("@presentation/theme");
+  return {
+    ...actual,
+    texts: {
+      ...actual.texts,
+      modal: {
+        buttons: {
+          cancel: "Cancelar",
+          save: "Salvar",
+          accessibilityCancel: "Cancelar",
+          accessibilitySave: "Salvar",
+        },
       },
     },
-  },
-}));
+  };
+});
 
 describe("EditFieldModal", () => {
   beforeEach(() => {

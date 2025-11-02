@@ -1,30 +1,33 @@
 import { render, screen } from "@testing-library/react-native";
 import React from "react";
-import { Text, View } from "react-native";
 import DashboardScreen from "./DashboardScreen";
 
-jest.mock("@/src/components/common/ScreenWrapper/ScreenWrapper", () => ({
-  ScreenWrapper: ({ children }: React.PropsWithChildren<Record<string, unknown>>) => (
-    <View>
-      {children}
-      <Text testID="mock-screen-wrapper">ScreenWrapper</Text>
-    </View>
-  ),
-}));
-(Object.assign(
-  jest.requireMock("@/src/components/common/ScreenWrapper/ScreenWrapper"),
-  { displayName: "MockScreenWrapper" }
-));
+jest.mock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper", () => {
+  const React = require("react");
+  const { View, Text } = require("react-native");
+  const ScreenWrapper = ({ children }: React.PropsWithChildren<Record<string, unknown>>) =>
+    React.createElement(View, null, children, React.createElement(Text, { testID: "mock-screen-wrapper" }, "ScreenWrapper"));
 
-jest.mock("@/src/components/forms/NewTransactionForm/NewTransactionForm", () => ({
-  NewTransactionForm: () => (
-    <Text testID="mock-new-transaction-form">NewTransactionForm</Text>
-  ),
-}));
-(Object.assign(
-  jest.requireMock("@/src/components/forms/NewTransactionForm/NewTransactionForm"),
+  return { ScreenWrapper };
+});
+
+Object.assign(
+  jest.requireMock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper"),
+  { displayName: "MockScreenWrapper" }
+);
+
+jest.mock("@presentation/components/forms/NewTransactionForm/NewTransactionForm", () => {
+  const React = require("react");
+  const { Text } = require("react-native");
+  const NewTransactionForm = () => React.createElement(Text, { testID: "mock-new-transaction-form" }, "NewTransactionForm");
+
+  return { NewTransactionForm };
+});
+
+Object.assign(
+  jest.requireMock("@presentation/components/forms/NewTransactionForm/NewTransactionForm"),
   { displayName: "MockNewTransactionForm" }
-));
+);
 
 describe("DashboardScreen", () => {
   it("renderiza o ScreenWrapper", () => {

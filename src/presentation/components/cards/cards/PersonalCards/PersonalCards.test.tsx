@@ -4,7 +4,6 @@ import { texts } from "@presentation/theme";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import type { JSX } from "react";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
 import PersonalCards from "./PersonalCards";
 
 /** 🔹 Declarações globais fortemente tipadas */
@@ -17,24 +16,33 @@ declare global {
 }
 
 /* ---------------------- 🔹 SVG mocks ---------------------- */
-jest.mock("@/assets/images/dash-card-my-cards/cartao-fisico.svg", () => {
-  const CartaoFisicoImg = (props: SvgMockProps): JSX.Element => (
-    <View {...props} testID="CartaoFisicoImg" />
-  );
-  CartaoFisicoImg.displayName = "CartaoFisicoImgMock";
-  return CartaoFisicoImg;
+jest.mock("@assets/images/dash-card-my-cards/cartao-fisico.svg", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
+  const CartaoFisicoImg = (props: SvgMockProps): JSX.Element =>
+    React.createElement(View, { ...props, testID: "CartaoFisicoImg" });
+
+  (CartaoFisicoImg as React.FC).displayName = "CartaoFisicoImgMock";
+  return { __esModule: true, default: CartaoFisicoImg };
 });
 
-jest.mock("@/assets/images/dash-card-my-cards/cartao-digital.svg", () => {
-  const CartaoDigitalImg = (props: SvgMockProps): JSX.Element => (
-    <View {...props} testID="CartaoDigitalImg" />
-  );
-  CartaoDigitalImg.displayName = "CartaoDigitalImgMock";
-  return CartaoDigitalImg;
+jest.mock("@assets/images/dash-card-my-cards/cartao-digital.svg", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
+  const CartaoDigitalImg = (props: SvgMockProps): JSX.Element =>
+    React.createElement(View, { ...props, testID: "CartaoDigitalImg" });
+
+  (CartaoDigitalImg as React.FC).displayName = "CartaoDigitalImgMock";
+  return { __esModule: true, default: CartaoDigitalImg };
 });
 
 /* ---------------------- 🔹 ConfirmModal mock ---------------------- */
-jest.mock("@/src/components/common/ConfirmModal/ConfirmModal", () => {
+jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", () => {
+  const React = require("react");
+  const { View, Text, Pressable } = require("react-native");
+
   const ConfirmModal = ({
     visible,
     title,
@@ -43,36 +51,43 @@ jest.mock("@/src/components/common/ConfirmModal/ConfirmModal", () => {
     onCancel,
   }: ConfirmModalProps): JSX.Element | null => {
     if (!visible) return null;
-    return (
-      <View testID="ConfirmModal">
-        <Text>{title}</Text>
-        <Text>{message}</Text>
-        <Pressable accessibilityLabel="confirm" onPress={onConfirm}>
-          <Text>confirm</Text>
-        </Pressable>
-        <Pressable accessibilityLabel="cancel" onPress={onCancel}>
-          <Text>cancel</Text>
-        </Pressable>
-      </View>
+    return React.createElement(
+      View,
+      { testID: "ConfirmModal" },
+      React.createElement(Text, null, title),
+      React.createElement(Text, null, message),
+      React.createElement(
+        Pressable,
+        { accessibilityLabel: "confirm", onPress: onConfirm },
+        React.createElement(Text, null, "confirm")
+      ),
+      React.createElement(
+        Pressable,
+        { accessibilityLabel: "cancel", onPress: onCancel },
+        React.createElement(Text, null, "cancel")
+      )
     );
   };
-  ConfirmModal.displayName = "ConfirmModalMock";
-  return ConfirmModal;
+  (ConfirmModal as React.FC).displayName = "ConfirmModalMock";
+  return { __esModule: true, default: ConfirmModal };
 });
 
 /* ---------------------- 🔹 DefaultButton mock ---------------------- */
-jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => {
+jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
+  const React = require("react");
+  const { Pressable, Text } = require("react-native");
+
   const DefaultButton = ({
     title,
     onPress,
     accessibilityLabel,
-  }: DefaultButtonProps): JSX.Element => (
-    <Pressable accessibilityLabel={accessibilityLabel} onPress={onPress}>
-      <Text>{title}</Text>
-    </Pressable>
-  );
-  DefaultButton.displayName = "DefaultButtonMock";
-  return { DefaultButton };
+  }: DefaultButtonProps): JSX.Element =>
+    React.createElement(Pressable, { accessibilityLabel, onPress },
+      React.createElement(Text, null, title)
+    );
+
+  (DefaultButton as React.FC).displayName = "DefaultButtonMock";
+  return { __esModule: true, DefaultButton };
 });
 
 /* ---------------------- 🔹 Mocks fortemente tipados ---------------------- */
@@ -92,7 +107,7 @@ const notificationAsync: jest.MockedFunction<() => Promise<void>> = jest.fn(() =
 );
 
 /* ---------------------- 🔹 Mock seguro de módulos ---------------------- */
-jest.mock("@/src/OtherServices/cards", () => ({
+jest.mock("@presentation/screens/OtherServices/cards", () => ({
   apiToggleCardState: (type: string, state: string): Promise<ToggleResponse> =>
     globalThis.__mockToggle__(type, state),
 }));
