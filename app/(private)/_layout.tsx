@@ -11,7 +11,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { CustomDrawerContent } from "@presentation/components/common/CustomDrawerContent/CustomDrawerContent";
 import { Header } from "@presentation/layout/Header/Header";
 import { useAuth } from "@presentation/state/AuthContext";
-import { colors, radius, spacing, typography } from "@presentation/theme";
+import { colors, layout, radius, spacing, typography } from "@presentation/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
@@ -169,9 +169,9 @@ export default function AppLayout(): JSX.Element {
 
 const styles = StyleSheet.create<AppLayoutStyles>({
   loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    flex: layout.one,
+    justifyContent: typography.alignFlexStart,
+    alignItems: typography.alignCenter,
     backgroundColor: colors.byteBgDefault,
   },
   drawerStyle: {
