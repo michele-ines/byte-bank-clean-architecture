@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react-native";
-import type { FC } from "react";
+import type { JSX } from "react";
+import type React from "react";
 import { ScreenWrapper } from "./ScreenWrapper";
 
 jest.mock("@presentation/state/AuthContext", () => ({
@@ -26,19 +27,18 @@ interface BalanceProps {
   user?: { displayName?: string; name?: string };
 }
 
-// ✅ Tipo auxiliar seguro para mocks de componentes
-type MockedFC<P = Record<string, unknown>> = FC<P> & { displayName?: string };
-
 // Mock do componente de Balance (default export)
 jest.mock("../../../../../shared/cards/balance/BalanceComponent", () => {
-  const React = require("react");
-  const { View, Text } = require("react-native");
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const mockText = reactNative.Text;
 
-  const BalanceMock = ({ user }: BalanceProps) =>
-    React.createElement(
-      View,
+  const BalanceMock = ({ user }: BalanceProps): JSX.Element =>
+    mockReact.createElement(
+      mockView,
       { testID: "balance" },
-      React.createElement(Text, null, `Balance para ${user?.displayName ?? user?.name ?? ""}`)
+      mockReact.createElement(mockText, null, `Balance para ${user?.displayName ?? user?.name ?? ""}`)
     );
 
   BalanceMock.displayName = "BalanceComponentMock";
@@ -52,14 +52,16 @@ interface CardListExtractProps {
 
 // Mock do CardListExtract (named export)
 jest.mock("../../../../../shared/cards/CardListExtract/CardListExtract", () => {
-  const React = require("react");
-  const { View, Text } = require("react-native");
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const mockText = reactNative.Text;
 
-  const CardListExtract = ({ title }: CardListExtractProps) =>
-    React.createElement(
-      View,
+  const CardListExtract = ({ title }: CardListExtractProps): JSX.Element =>
+    mockReact.createElement(
+      mockView,
       { testID: "extract" },
-      React.createElement(Text, null, `Extrato: ${title}`)
+      mockReact.createElement(mockText, null, `Extrato: ${title}`)
     );
 
   CardListExtract.displayName = "CardListExtractMock";

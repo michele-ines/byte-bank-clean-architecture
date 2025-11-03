@@ -39,11 +39,14 @@ jest.mock("@expo/vector-icons", () => {
 // ✅ garante strings estáveis para os botões/labels
 jest.mock("@presentation/theme", () => {
   // use the real theme module but override only texts to keep styles intact
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const actual = jest.requireActual("@presentation/theme");
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
     ...actual,
     texts: {
-      ...actual.texts,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      ...(actual.texts as Record<string, unknown>),
       modal: {
         buttons: {
           cancel: "Cancelar",

@@ -5,7 +5,6 @@ import { showToast } from "@shared/utils/transactions.utils";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
 import type { JSX } from "react";
-import React from "react";
 import { SignupForm } from "./SignupForm";
 
 // ✅ Evita função vazia
@@ -45,74 +44,85 @@ jest.mock("@shared/constants/routes", () => ({
 }));
 
 // ✅ Mock de DefaultButton
-jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => ({
-  DefaultButton: ({
-    title,
-    onPress,
-    disabled,
-    loading,
-    accessibilityLabel,
-  }: {
-    title: string;
-    onPress: () => void;
-    disabled?: boolean;
-    loading?: boolean;
-    accessibilityLabel?: string;
-  }): JSX.Element => {
-    const React = require("react");
-    const { TouchableOpacity, Text } = require("react-native");
-    return React.createElement(
-      TouchableOpacity,
-      { onPress, disabled: (disabled ?? false) || (loading ?? false), accessibilityLabel },
-      React.createElement(Text, null, loading ? "Loading..." : title)
-    );
-  },
-}));
+jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
+  const mockTouchableOpacity = reactNative.TouchableOpacity;
+  const mockText = reactNative.Text;
+  return {
+    DefaultButton: ({
+      title,
+      onPress,
+      disabled,
+      loading,
+      accessibilityLabel,
+    }: {
+      title: string;
+      onPress: () => void;
+      disabled?: boolean;
+      loading?: boolean;
+      accessibilityLabel?: string;
+    }): JSX.Element => {
+      return mockReact.createElement(
+        mockTouchableOpacity,
+        { onPress, disabled: (disabled ?? false) || (loading ?? false), accessibilityLabel },
+        mockReact.createElement(mockText, null, loading ? "Loading..." : title)
+      );
+    },
+  };
+});
 Object.assign(
   jest.requireMock("@presentation/components/common/common/DefaultButton/DefaultButton"),
   { displayName: "MockDefaultButton" }
 );
 
 // ✅ Mock de Checkbox
-jest.mock("@shared/components/Checkbox/Checkbox", () => ({
-  Checkbox: ({
-    value,
-    onValueChange,
-    accessibilityLabel,
-  }: {
-    value: boolean;
-    onValueChange: (newVal: boolean) => void;
-    accessibilityLabel?: string;
-  }): JSX.Element => {
-    const React = require("react");
-    const { TouchableOpacity, Text } = require("react-native");
-    return React.createElement(
-      TouchableOpacity,
-      { onPress: () => onValueChange(!value), accessibilityLabel, accessibilityRole: "checkbox" },
-      React.createElement(Text, null, value ? "☑" : "☐")
-    );
-  },
-}));
+jest.mock("@shared/components/Checkbox/Checkbox", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
+  const mockTouchableOpacity = reactNative.TouchableOpacity;
+  const mockText = reactNative.Text;
+  return {
+    Checkbox: ({
+      value,
+      onValueChange,
+      accessibilityLabel,
+    }: {
+      value: boolean;
+      onValueChange: (newVal: boolean) => void;
+      accessibilityLabel?: string;
+    }): JSX.Element => {
+      return mockReact.createElement(
+        mockTouchableOpacity,
+        { onPress: () => onValueChange(!value), accessibilityLabel, accessibilityRole: "checkbox" },
+        mockReact.createElement(mockText, null, value ? "☑" : "☐")
+      );
+    },
+  };
+});
 Object.assign(jest.requireMock("@shared/components/Checkbox/Checkbox"), {
   displayName: "MockCheckbox",
 });
 
 // ✅ Mock de SVG
-jest.mock("@assets/images/cadastro/ilustracao-cadastro.svg", () => ({
-  __esModule: true,
-  default: ({
-    accessible,
-    accessibilityLabel,
-    ...props
-  }: {
-    accessible?: boolean;
-    accessibilityLabel?: string;
-  }): JSX.Element => {
-    const React = require("react");
-    const { View } = require("react-native");
-    return React.createElement(View, { accessible, accessibilityLabel, ...props });
-  },
-}));
+jest.mock("@assets/images/cadastro/ilustracao-cadastro.svg", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
+  const mockView = reactNative.View;
+  return {
+    __esModule: true,
+    default: ({
+      accessible,
+      accessibilityLabel,
+      ...props
+    }: {
+      accessible?: boolean;
+      accessibilityLabel?: string;
+    }): JSX.Element => {
+      return mockReact.createElement(mockView, { accessible, accessibilityLabel, ...props });
+    },
+  };
+});
 Object.assign(
   jest.requireMock("@assets/images/cadastro/ilustracao-cadastro.svg"),
   { displayName: "MockSignupIllustration" }

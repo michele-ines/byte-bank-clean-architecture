@@ -1,12 +1,21 @@
 import { render, screen } from "@testing-library/react-native";
-import React from "react";
+import React, { type JSX, type PropsWithChildren } from "react";
 import DashboardScreen from "./DashboardScreen";
 
 jest.mock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper", () => {
-  const React = require("react");
-  const { View, Text } = require("react-native");
-  const ScreenWrapper = ({ children }: React.PropsWithChildren<Record<string, unknown>>) =>
-    React.createElement(View, null, children, React.createElement(Text, { testID: "mock-screen-wrapper" }, "ScreenWrapper"));
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const mockText = reactNative.Text;
+  const ScreenWrapper = ({
+    children,
+  }: PropsWithChildren<Record<string, unknown>>): JSX.Element =>
+    mockReact.createElement(
+      mockView,
+      null,
+      children,
+      mockReact.createElement(mockText, { testID: "mock-screen-wrapper" }, "ScreenWrapper")
+    );
 
   return { ScreenWrapper };
 });
@@ -17,9 +26,11 @@ Object.assign(
 );
 
 jest.mock("@presentation/components/forms/NewTransactionForm/NewTransactionForm", () => {
-  const React = require("react");
-  const { Text } = require("react-native");
-  const NewTransactionForm = () => React.createElement(Text, { testID: "mock-new-transaction-form" }, "NewTransactionForm");
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockText = reactNative.Text;
+  const NewTransactionForm = (): JSX.Element =>
+    mockReact.createElement(mockText, { testID: "mock-new-transaction-form" }, "NewTransactionForm");
 
   return { NewTransactionForm };
 });

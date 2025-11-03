@@ -46,7 +46,8 @@ jest.mock("expo-router", () => ({
   },
 }));
 
-jest.mock("../config/firebaseConfig", () => ({
+// the real firebase config file is under src/infrastructure/config
+jest.mock("../../infrastructure/config/firebaseConfig", () => ({
   auth: {},
   db: {},
 }));

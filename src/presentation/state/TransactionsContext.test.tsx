@@ -23,9 +23,9 @@ afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
-// ▶️ MOCK do useAuth
 const mockUser = { uid: "test-user-id" };
-jest.mock("@/src/contexts/AuthContext", () => ({
+// ▶️ MOCK do useAuth
+jest.mock("./AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
@@ -34,6 +34,7 @@ jest.mock("firebase/firestore", () => ({
   addDoc: jest.fn(),
   collection: jest.fn(() => "mock-collection-ref"),
   doc: jest.fn(() => "mock-doc-ref"),
+  deleteDoc: jest.fn(),
   getDoc: jest.fn(),
   getDocs: jest.fn(),
   limit: jest.fn(() => "mock-limit"),
@@ -48,6 +49,10 @@ jest.mock("firebase/firestore", () => ({
   arrayRemove: jest.fn(() => "mock-array-remove"),
 }));
 
+// provide Timestamp mock (used by TransactionsContext.addTransaction wrapper)
+const fsMock = require("firebase/firestore") as { Timestamp: { now: () => { seconds: number } } };
+fsMock.Timestamp = { now: () => ({ seconds: Math.floor(Date.now() / 1000) }) };
+
 // ▶️ MOCK do Firebase Storage
 jest.mock("firebase/storage", () => ({
   deleteObject: jest.fn(),
@@ -57,7 +62,8 @@ jest.mock("firebase/storage", () => ({
 }));
 
 // ▶️ MOCK do Firebase Config
-jest.mock("../config/firebaseConfig", () => ({
+// the real config lives under src/infrastructure/config/firebaseConfig.ts
+jest.mock("../../infrastructure/config/firebaseConfig", () => ({
   db: {},
   storage: {},
 }));
@@ -217,9 +223,17 @@ describe("TransactionsContext", (): void => {
     (onSnapshot as jest.Mock).mockImplementation(
       (
         _query: unknown,
-        callback: (snapshot: { docs: unknown[]; empty: boolean }) => void
+        callback: (snapshot: { forEach: (fn: (d: unknown) => void) => void; empty: boolean }) => void
       ): (() => void) => {
-        callback({ docs: [], empty: true });
+        // simulate an empty snapshot with a forEach method
+        const snapshot = {
+          docs: [],
+          empty: true,
+          forEach: (fn: (d: unknown) => void) => {
+            // no docs -> nothing to iterate
+          },
+        };
+        callback(snapshot);
         return jest.fn(); // função de unsubscribe mockada
       }
     );
@@ -233,12 +247,13 @@ describe("TransactionsContext", (): void => {
       fireEvent.press(getByTestId("addTransaction"));
 
       await waitFor(() => {
+        // new repository contract expects domain fields (descricao, tipo mapped to entrada)
         expect(addDoc).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            tipo: "deposito",
+            descricao: "Test",
             valor: 100,
-            description: "Test",
+            tipo: "entrada",
             userId: "test-user-id",
           })
         );
@@ -253,7 +268,7 @@ describe("TransactionsContext", (): void => {
 
       await waitFor(() => {
         expect(getByTestId("error").children[0]).toBe(
-          "Usuário não autenticado."
+          "Usuário não autenticado"
         );
       });
     });
@@ -286,7 +301,8 @@ describe("TransactionsContext", (): void => {
       fireEvent.press(getByTestId("deleteTransactions"));
 
       await waitFor(() => {
-        expect(mockBatch.commit).toHaveBeenCalled();
+        const firestoreModule = require("firebase/firestore") as { deleteDoc: jest.Mock };
+        expect(firestoreModule.deleteDoc).toHaveBeenCalled();
       });
     });
   });

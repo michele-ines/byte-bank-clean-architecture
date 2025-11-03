@@ -1,34 +1,45 @@
 import { render, screen } from "@testing-library/react-native";
 import type { JSX } from "react";
 import React from "react";
-import { Text } from "react-native";
 import MyAccountPage from "./MinhaContaScreen";
 
 // ✅ Adicionado tipo de retorno explícito : JSX.Element
-jest.mock("@/assets/images/dash-card-my-account/card-pixels-3.svg", () => {
-  const CardPixel3 = (): JSX.Element => <Text testID="card-pixel-3">CardPixel3</Text>;
+jest.mock("@assets/images/dash-card-my-account/card-pixels-3.svg", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ Text: unknown }>("react-native");
+  const mockText = reactNative.Text;
+  const CardPixel3 = (): JSX.Element =>
+    mockReact.createElement(mockText, { testID: "card-pixel-3" }, "CardPixel3");
   CardPixel3.displayName = "CardPixel3";
   return CardPixel3;
 });
 
-jest.mock("@/assets/images/dash-card-my-account/card-pixels-4.svg", () => {
-  const CardPixel4 = (): JSX.Element => <Text testID="card-pixel-4">CardPixel4</Text>;
+jest.mock("@assets/images/dash-card-my-account/card-pixels-4.svg", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ Text: unknown }>("react-native");
+  const mockText = reactNative.Text;
+  const CardPixel4 = (): JSX.Element =>
+    mockReact.createElement(mockText, { testID: "card-pixel-4" }, "CardPixel4");
   CardPixel4.displayName = "CardPixel4";
   return CardPixel4;
 });
 
-jest.mock("@/assets/images/dash-card-my-account/ilustracao-card-accout.svg", () => {
-  const Illustration = (): JSX.Element => (
-    <Text testID="illustration">MyAccountIllustration</Text>
-  );
+jest.mock("@assets/images/dash-card-my-account/ilustracao-card-accout.svg", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ Text: unknown }>("react-native");
+  const mockText = reactNative.Text;
+  const Illustration = (): JSX.Element =>
+    mockReact.createElement(mockText, { testID: "illustration" }, "MyAccountIllustration");
   Illustration.displayName = "MyAccountIllustration";
   return Illustration;
 });
 
-jest.mock("@/src/components/cards/CardMinhaConta/CardMinhaConta", () => {
-  const CardMinhaConta = (): JSX.Element => (
-    <Text testID="card-minha-conta">CardMinhaConta</Text>
-  );
+jest.mock("@presentation/components/cards/CardMinhaConta/CardMinhaConta", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ Text: unknown }>("react-native");
+  const mockText = reactNative.Text;
+  const CardMinhaConta = (): JSX.Element =>
+    mockReact.createElement(mockText, { testID: "card-minha-conta" }, "CardMinhaConta");
   CardMinhaConta.displayName = "CardMinhaConta";
   return { CardMinhaConta };
 });

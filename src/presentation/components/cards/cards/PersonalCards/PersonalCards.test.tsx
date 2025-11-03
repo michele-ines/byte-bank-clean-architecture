@@ -17,22 +17,22 @@ declare global {
 
 /* ---------------------- 🔹 SVG mocks ---------------------- */
 jest.mock("@assets/images/dash-card-my-cards/cartao-fisico.svg", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
+  const mockView = reactNative.View;
   const CartaoFisicoImg = (props: SvgMockProps): JSX.Element =>
-    React.createElement(View, { ...props, testID: "CartaoFisicoImg" });
+    mockReact.createElement(mockView, { ...props, testID: "CartaoFisicoImg" });
 
   (CartaoFisicoImg as React.FC).displayName = "CartaoFisicoImgMock";
   return { __esModule: true, default: CartaoFisicoImg };
 });
 
 jest.mock("@assets/images/dash-card-my-cards/cartao-digital.svg", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
+  const mockView = reactNative.View;
   const CartaoDigitalImg = (props: SvgMockProps): JSX.Element =>
-    React.createElement(View, { ...props, testID: "CartaoDigitalImg" });
+    mockReact.createElement(mockView, { ...props, testID: "CartaoDigitalImg" });
 
   (CartaoDigitalImg as React.FC).displayName = "CartaoDigitalImgMock";
   return { __esModule: true, default: CartaoDigitalImg };
@@ -40,9 +40,11 @@ jest.mock("@assets/images/dash-card-my-cards/cartao-digital.svg", () => {
 
 /* ---------------------- 🔹 ConfirmModal mock ---------------------- */
 jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", () => {
-  const React = require("react");
-  const { View, Text, Pressable } = require("react-native");
-
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const mockText = reactNative.Text;
+  const mockPressable = reactNative.Pressable;
   const ConfirmModal = ({
     visible,
     title,
@@ -51,20 +53,20 @@ jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", ()
     onCancel,
   }: ConfirmModalProps): JSX.Element | null => {
     if (!visible) return null;
-    return React.createElement(
-      View,
+    return mockReact.createElement(
+      mockView,
       { testID: "ConfirmModal" },
-      React.createElement(Text, null, title),
-      React.createElement(Text, null, message),
-      React.createElement(
-        Pressable,
+      mockReact.createElement(mockText, null, title),
+      mockReact.createElement(mockText, null, message),
+      mockReact.createElement(
+        mockPressable,
         { accessibilityLabel: "confirm", onPress: onConfirm },
-        React.createElement(Text, null, "confirm")
+        mockReact.createElement(mockText, null, "confirm")
       ),
-      React.createElement(
-        Pressable,
+      mockReact.createElement(
+        mockPressable,
         { accessibilityLabel: "cancel", onPress: onCancel },
-        React.createElement(Text, null, "cancel")
+        mockReact.createElement(mockText, null, "cancel")
       )
     );
   };
@@ -74,16 +76,19 @@ jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", ()
 
 /* ---------------------- 🔹 DefaultButton mock ---------------------- */
 jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
-  const React = require("react");
-  const { Pressable, Text } = require("react-native");
-
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
+  const mockPressable = reactNative.Pressable;
+  const mockText = reactNative.Text;
   const DefaultButton = ({
     title,
     onPress,
     accessibilityLabel,
   }: DefaultButtonProps): JSX.Element =>
-    React.createElement(Pressable, { accessibilityLabel, onPress },
-      React.createElement(Text, null, title)
+    mockReact.createElement(
+      mockPressable,
+      { accessibilityLabel, onPress },
+      mockReact.createElement(mockText, null, title)
     );
 
   (DefaultButton as React.FC).displayName = "DefaultButtonMock";

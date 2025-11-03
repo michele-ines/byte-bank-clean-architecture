@@ -1,4 +1,4 @@
-// src/presentation/state/AuthContext.tsx
+/* eslint-disable @typescript-eslint/await-thenable */
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import React, {

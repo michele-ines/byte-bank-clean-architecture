@@ -114,4 +114,12 @@ module.exports = defineConfig([
       ],
     },
   },
+
+  // ✅ Permite require() em arquivos de teste (necessário para jest.mock())
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ]);
