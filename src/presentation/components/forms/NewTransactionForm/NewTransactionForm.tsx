@@ -2,7 +2,7 @@ import CardPixelsTop from "@assets/images/dash-card-new-transacao/card-pixels-3.
 import CardPixelBotton from "@assets/images/dash-card-new-transacao/card-pixels-4.svg";
 import TransactionIllustration from "@assets/images/dash-card-new-transacao/Ilustracao-2.svg";
 
-import type { AttachmentFile, NewTransactionData } from "@domain/entities/Transaction";
+import type { AttachmentFile, NewTransactionData } from "@domain/entities/TransactionData";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { layout, texts } from "@presentation/theme";
@@ -72,7 +72,6 @@ export const NewTransactionForm: React.FC = (): JSX.Element => {
         data: Timestamp.now(),
       };
 
-      // Chamamos o novo contrato do contexto: addTransaction(transactionData, attachments[])
       await addTransaction(newTransaction, [] as AttachmentFile[]);
 
       showToast("success", t.toasts.success.title, t.toasts.success.message);

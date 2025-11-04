@@ -1,75 +1,81 @@
-// src/application/usecases/AuthUseCases.ts
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
+import { BaseUseCase } from './BaseUseCase';
 
-export class LoginUseCase {
-  constructor(private authRepository: AuthRepository) {}
+
+export class LoginUseCase extends BaseUseCase {
+  constructor(private authRepository: AuthRepository) {
+    super(); 
+  }
 
   async execute(credentials: AuthCredentials): Promise<AuthenticatedUser> {
-    try {
+    return this._tryExecute(async () => {
        return await this.authRepository.login(credentials);
-    } catch (error) {
-        console.error("Erro no LoginUseCase:", error);
-        throw error;
-    }
+    });
   }
 }
 
-export class SignupUseCase {
-  constructor(private authRepository: AuthRepository) {}
+export class SignupUseCase extends BaseUseCase {
+  constructor(private authRepository: AuthRepository) {
+    super();
+  }
 
   async execute(credentials: SignupCredentials): Promise<AuthenticatedUser> {
-    try {
+    return this._tryExecute(async () => {
       return await this.authRepository.signup(credentials);
-    } catch (error) {
-        console.error("Erro no SignupUseCase:", error);
-        throw error;
-    }
+    });
   }
 }
 
-export class LogoutUseCase {
-    constructor(private authRepository: AuthRepository) {}
+export class LogoutUseCase extends BaseUseCase {
+    constructor(private authRepository: AuthRepository) {
+        super();
+    }
 
     async execute(): Promise<void> {
-        try {
+        return this._tryExecute(async () => {
             await this.authRepository.logout();
-        } catch(error) {
-            console.error("Erro no LogoutUseCase:", error);
-            throw error;
-        }
+        });
     }
 }
 
- export class ResetPasswordUseCase {
-    constructor(private authRepository: AuthRepository) {}
+ export class ResetPasswordUseCase extends BaseUseCase {
+    constructor(private authRepository: AuthRepository) {
+        super();
+    }
 
     async execute(email: string): Promise<void> {
-        try {
+        return this._tryExecute(async () => {
             await this.authRepository.resetPassword(email);
-        } catch(error) {
-            console.error("Erro no ResetPasswordUseCase:", error);
-            throw error;
-        }
+        });
     }
 }
+
 
 export class ObserveAuthStateUseCase {
     constructor(private authRepository: AuthRepository) {}
 
-    execute(callback: (user: AuthenticatedUser | null) => void): () => void {
-       return this.authRepository.onAuthStateChanged(callback);
+    execute(presentationCallback: (user: AuthenticatedUser | null) => void): () => void {
+       
+       const repositoryCallback = (userFromRepo: AuthenticatedUser | null): void => {
+            presentationCallback(userFromRepo);
+       };
+       
+       return this.authRepository.onAuthStateChanged(repositoryCallback);
     }
 }
 
 export class ObserveUserDataUseCase {
     constructor(private authRepository: AuthRepository) {}
 
-    execute(uid: string, callback: (userData: UserData | null) => void): () => void {
-       return this.authRepository.onUserDataChanged(uid, callback);
+    execute(uid: string, presentationCallback: (userData: UserData | null) => void): () => void {
+       return this.authRepository.onUserDataChanged(uid, (userDataFromRepo) => {
+            presentationCallback(userDataFromRepo);
+       });
     }
 }
+
 
 export class AuthUseCases {
   login: LoginUseCase;

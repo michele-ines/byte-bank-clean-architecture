@@ -1,7 +1,6 @@
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
-import type { User as FirebaseUser } from 'firebase/auth';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -9,17 +8,13 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import { doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebaseConfig';
-
-const mapFirebaseUserToAuthenticatedUser = (firebaseUser: FirebaseUser | null): AuthenticatedUser | null => {
-  if (!firebaseUser) return null;
-  return {
-    uid: firebaseUser.uid,
-    email: firebaseUser.email,
-    displayName: firebaseUser.displayName,
-  };
-};
+import {
+  mapDocumentToUserData,
+  mapFirebaseUserToAuthenticatedUser,
+  mapSignupToNewUserProfile
+} from '../mappers/user.mapper';
 
 export class FirebaseAuthRepository implements AuthRepository {
   getCurrentUser(): AuthenticatedUser | null {
@@ -41,24 +36,8 @@ export class FirebaseAuthRepository implements AuthRepository {
         callback(null);
         return;
       }
-
       const raw = docSnap.data();
-
-      if (typeof raw !== "object" || raw === null) {
-        callback(null);
-        return;
-      }
-
-      const obj = raw;
-
-      const data: UserData = {
-        uuid: typeof obj.uuid === "string" ? obj.uuid : "",
-        name: typeof obj.name === "string" ? obj.name : "",
-        email: typeof obj.email === "string" ? obj.email : "",
-        photoURL: typeof obj.photoURL === "string" ? obj.photoURL : null,
-        createdAt: obj.createdAt ?? undefined,
-      };
-
+      const data = mapDocumentToUserData(raw);
       callback(data);
     });
 
@@ -80,12 +59,7 @@ export class FirebaseAuthRepository implements AuthRepository {
     const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
     const newUser = userCredential.user;
 
-    const newUserProfile: UserData = {
-        uuid: newUser.uid,
-        name: credentials.name,
-        email: credentials.email,
-        createdAt: serverTimestamp(),
-    };
+    const newUserProfile = mapSignupToNewUserProfile(credentials, newUser.uid);
     await this.createUserProfile(newUserProfile);
 
     const authenticatedUser = mapFirebaseUserToAuthenticatedUser(newUser);
@@ -96,7 +70,7 @@ export class FirebaseAuthRepository implements AuthRepository {
   }
 
   async createUserProfile(userData: UserData): Promise<void> {
-     await setDoc(doc(db, "users", userData.uuid), userData);
+     await setDoc(doc(db, "users", userData.uuid), userData, { merge: true });
   }
 
   async logout(): Promise<void> {

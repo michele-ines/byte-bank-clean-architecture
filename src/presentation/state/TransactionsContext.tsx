@@ -8,22 +8,21 @@ import React, {
   useState,
 } from 'react';
 
-import { TransactionUseCases } from '@/application/use-cases/TransactionUseCases';
-import type { AttachmentFile, ITransaction, NewTransactionData } from '@domain/entities/Transaction';
+import { TransactionUseCasesFactory } from '@/domain/use-cases/TransactionUseCasesFactory';
+import type { ITransaction } from '@domain/entities/Transaction';
+import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
 import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
 import { useAuth } from '@presentation/state/AuthContext';
 import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
 import { Timestamp } from 'firebase/firestore';
 
 const transactionRepository = new FirebaseTransactionRepository();
-const transactionUseCases = new TransactionUseCases(transactionRepository);
+const transactionUseCases = new TransactionUseCasesFactory(transactionRepository);
 
-// --- Interface do Contexto ---
 interface TransactionsContextData {
   transactions: ITransaction[];
   loading: boolean;
 
-  // Suporta sobrecarga: chamada nova (domínio) e chamada legada (UI/tests)
   addTransaction: {
     (transactionData: NewTransactionData, attachments: AttachmentFile[]): Promise<string>;
     (transaction: INewTransactionInput): Promise<void>;
@@ -39,7 +38,6 @@ interface TransactionsContextData {
     attachments?: string[]
   ) => Promise<void>;
 
-  // Campos e métodos legados para compatibilidade com código / testes antigos
   balance: number | null;
   loadingMore: boolean;
   hasMore: boolean;
@@ -55,13 +53,11 @@ interface TransactionsContextData {
 
 const TransactionsContext = createContext<TransactionsContextData>({} as TransactionsContextData);
 
-// --- Provider ---
 export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth(); // Pega o usuário logado
+  const { user } = useAuth(); 
 
-  // Efeito para observar transações
   useEffect(() => {
     if (!user) {
       setTransactions([]);
@@ -70,20 +66,16 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
 
     setLoading(true);
-    // Chama o Caso de Uso para observar
     const unsubscribe = transactionUseCases.observe.execute(
       user.uid,
-      (userTransactions) => {
+      (userTransactions): void => {
         setTransactions(userTransactions);
         setLoading(false);
       }
     );
 
-    // Retorna a função de unsubscribe para limpar o listener
     return () => unsubscribe();
-  }, [user]); // Depende do 'user'
-
-  // --- Funções de Ação (agora delegam para os Casos de Uso) ---
+  }, [user]); 
 
   const handleAddTransaction = useCallback(
     async (
@@ -92,27 +84,22 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     ) => {
       if (!user) throw new Error('Usuário não autenticado');
 
-      // Chama o Caso de Uso 'add'
       return await transactionUseCases.add.execute(
         user.uid,
         transactionData,
         attachments
       );
     },
-    [user] // Depende do 'user' para injetar o 'user.uid'
+    [user] 
   );
 
-  // Wrapper compatível com a API legada usada por alguns consumidores/tests
   const addTransactionWrapper = useCallback(
     async (...args: [NewTransactionData, AttachmentFile[]] | [INewTransactionInput]): Promise<void | string> => {
-      // assinatura nova: (transactionData, attachments)
       if (args.length === 2) {
         return await handleAddTransaction(args[0], args[1]);
       }
 
-      // assinatura legada: (INewTransactionInput)
       const legacy = args[0];
-      // Mapear para NewTransactionData do domínio
       const mapToDomainType = (t: INewTransactionInput['tipo'] | undefined): 'entrada' | 'saida' => {
         if (t === 'deposito') return 'entrada';
         return 'saida';
@@ -123,11 +110,9 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
         valor: legacy.valor,
         tipo: mapToDomainType(legacy.tipo),
         categoria: '',
-        // usar Timestamp.now() para compatibilidade com o domínio
         data: Timestamp.now(),
       };
 
-      // Chama a implementação existente sem anexos
       await handleAddTransaction(domainTx, []);
       return;
     },
@@ -143,18 +128,14 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     ) => {
       if (!user) throw new Error('Usuário não autenticado');
 
-      // Pega a lista de anexos atuais da transação
       const currentTx = transactions.find(t => t.id === id);
-  const currentAttachments = currentTx?.attachments ?? [];
+      const currentAttachments = currentTx?.attachments ?? [];
 
-      // Adiciona o 'userId' do usuário aos dados de update,
-      // pois o repositório precisa dele para uploads
       const updatesWithUserId = {
           ...updatedTransaction,
-          userId: user.uid,
+          uuid: user.uid,
       };
 
-      // Chama o Caso de Uso 'update'
       await transactionUseCases.update.execute(
         id,
         updatesWithUserId,
@@ -163,10 +144,9 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
         attachmentsToRemove
       );
     },
-    [user, transactions] // Depende do 'user' e da lista de 'transactions'
+    [user, transactions]
   );
 
-    // Compatibilidade: aceitar chamada legada updateTransaction(id, updatedTransaction)
     const updateTransactionWrapper = useCallback(async (
       ...args: [string, Partial<ITransaction>] | [string, Partial<ITransaction>, AttachmentFile[], string[]]
     ) => {
@@ -182,22 +162,18 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     async (id: string, attachments?: string[]) => {
       if (!user) throw new Error('Usuário não autenticado');
 
-      // Pega os anexos da transação se não forem passados
       const urlsToDelete = attachments ?? transactions.find(t => t.id === id)?.attachments ?? [];
 
-      // Chama o Caso de Uso 'delete'
       await transactionUseCases.delete.execute(id, urlsToDelete);
     },
-    [user, transactions] // Depende do 'user' e da lista de 'transactions'
+    [user, transactions]
   );
 
-  // --- Métodos legados para compatibilidade ---
   const deleteTransactionsLegacy = useCallback(async (ids: string[]) => {
     await Promise.all(ids.map(id => handleDeleteTransaction(id)));
   }, [handleDeleteTransaction]);
 
   const uploadAttachmentAndUpdateTransactionLegacy = useCallback(async (transactionId: string, fileUri: string, fileName: string) => {
-    // Converte URI para blob e chama update
     const response = await fetch(fileUri);
     const blob = await response.blob();
     const attachment = Object.assign(blob, { name: fileName }) as unknown as AttachmentFile;
@@ -209,22 +185,19 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
   }, [handleUpdateTransaction]);
 
   const loadMoreTransactionsLegacy = useCallback(async () => {
-    // funcionalidade de paginação removida — placeholder noop
     return Promise.resolve();
   }, []);
 
   const loadingMore = false;
   const hasMore = false;
 
-  // --- Valor do Contexto ---
   const contextValue = useMemo(
     () => ({
       transactions,
       loading,
-    addTransaction: addTransactionWrapper as unknown as TransactionsContextData['addTransaction'],
-    updateTransaction: updateTransactionWrapper as unknown as TransactionsContextData['updateTransaction'],
+      addTransaction: addTransactionWrapper as unknown as TransactionsContextData['addTransaction'],
+      updateTransaction: updateTransactionWrapper as unknown as TransactionsContextData['updateTransaction'],
       deleteTransaction: handleDeleteTransaction,
-      // legados
       balance: transactions.reduce((acc, t) => (t.tipo === 'entrada' ? acc + (t.valor ?? 0) : acc - (t.valor ?? 0)), 0),
       loadingMore,
       hasMore,
@@ -234,13 +207,13 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       deleteTransactions: deleteTransactionsLegacy,
     }),
     [
-  transactions,
-  loading,
-  addTransactionWrapper,
-  updateTransactionWrapper,
-  loadingMore,
-  hasMore,
-  handleDeleteTransaction,
+      transactions,
+      loading,
+      addTransactionWrapper,
+      updateTransactionWrapper,
+      loadingMore,
+      hasMore,
+      handleDeleteTransaction,
       loadMoreTransactionsLegacy,
       uploadAttachmentAndUpdateTransactionLegacy,
       deleteAttachmentLegacy,
@@ -255,7 +228,6 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
   );
 };
 
-// --- Hook ---
 export function useTransactions(): TransactionsContextData {
   const context = useContext(TransactionsContext);
   if (!context) {

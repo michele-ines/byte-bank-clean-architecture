@@ -1,42 +1,45 @@
-// src/application/usecases/TransactionUseCases.ts
-import type { AttachmentFile, ITransaction, NewTransactionData } from '@domain/entities/Transaction';
+import type { ITransaction } from '@domain/entities/Transaction';
 import type { TransactionRepository } from '@domain/repositories/TransactionRepository';
+import type { AttachmentFile, NewTransactionData } from '../entities/TransactionData';
+import { BaseUseCase } from './BaseUseCase';
 
-// --- Caso de Uso para Observar Transações ---
 export class ObserveTransactionsUseCase {
   constructor(private transactionRepository: TransactionRepository) {}
 
-  execute(userId: string, callback: (transactions: ITransaction[]) => void): () => void {
-    return this.transactionRepository.observeTransactions(userId, callback);
+  execute(userId: string, presentationCallback: (transactions: ITransaction[]) => void): () => void {
+    
+    const repositoryCallback = (transactionsFromRepo: ITransaction[]): void => {
+        presentationCallback(transactionsFromRepo);
+    };
+
+    return this.transactionRepository.observeTransactions(userId, repositoryCallback);
   }
 }
 
-// --- Caso de Uso para Adicionar Transação ---
-export class AddTransactionUseCase {
-  constructor(private transactionRepository: TransactionRepository) {}
+export class AddTransactionUseCase extends BaseUseCase {
+  constructor(private transactionRepository: TransactionRepository) {
+    super();
+  }
 
   async execute(
     userId: string,
     transactionData: NewTransactionData,
     attachments: AttachmentFile[]
   ): Promise<string> {
-    // Aqui poderia ter lógica de negócio, ex: verificar limite, etc.
-    try {
+    return this._tryExecute(async () => {
       return await this.transactionRepository.addTransaction(
         userId,
         transactionData,
         attachments
       );
-    } catch (error) {
-      console.error("Erro no AddTransactionUseCase:", error);
-      throw error;
-    }
+    });
   }
 }
 
-// --- Caso de Uso para Atualizar Transação ---
-export class UpdateTransactionUseCase {
-  constructor(private transactionRepository: TransactionRepository) {}
+export class UpdateTransactionUseCase extends BaseUseCase {
+  constructor(private transactionRepository: TransactionRepository) {
+    super();
+  }
 
   async execute(
     transactionId: string,
@@ -45,7 +48,7 @@ export class UpdateTransactionUseCase {
     newAttachments: AttachmentFile[],
     attachmentsToRemove: string[]
   ): Promise<void> {
-    try {
+    return this._tryExecute(async () => {
       await this.transactionRepository.updateTransaction(
         transactionId,
         updates,
@@ -53,29 +56,23 @@ export class UpdateTransactionUseCase {
         newAttachments,
         attachmentsToRemove
       );
-    } catch (error) {
-      console.error("Erro no UpdateTransactionUseCase:", error);
-      throw error;
-    }
+    });
   }
 }
 
-// --- Caso de Uso para Deletar Transação ---
-export class DeleteTransactionUseCase {
-  constructor(private transactionRepository: TransactionRepository) {}
+export class DeleteTransactionUseCase extends BaseUseCase {
+  constructor(private transactionRepository: TransactionRepository) {
+    super();
+  }
 
   async execute(transactionId: string, attachmentUrls: string[]): Promise<void> {
-    try {
+    return this._tryExecute(async () => {
       await this.transactionRepository.deleteTransaction(transactionId, attachmentUrls);
-    } catch (error) {
-      console.error("Erro no DeleteTransactionUseCase:", error);
-      throw error;
-    }
+    });
   }
 }
 
-// --- Agregador de Casos de Uso (opcional, mas útil) ---
-export class TransactionUseCases {
+export class TransactionUseCasesFactory {
   observe: ObserveTransactionsUseCase;
   add: AddTransactionUseCase;
   update: UpdateTransactionUseCase;

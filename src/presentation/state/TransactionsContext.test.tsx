@@ -13,10 +13,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useAuth } from "./AuthContext";
 import { TransactionsProvider, useTransactions } from "./TransactionsContext";
 
-// ▶️ Silencia console.error
 beforeAll((): void => {
   jest.spyOn(console, "error").mockImplementation((): void => {
-    // Silencia erros esperados nos testes
+    // Silencia erros
   });
 });
 afterAll((): void => {
@@ -24,12 +23,11 @@ afterAll((): void => {
 });
 
 const mockUser = { uid: "test-user-id" };
-// ▶️ MOCK do useAuth
+
 jest.mock("./AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
-// ▶️ MOCK do Firebase Firestore
 jest.mock("firebase/firestore", () => ({
   addDoc: jest.fn(),
   collection: jest.fn(() => "mock-collection-ref"),
@@ -49,11 +47,9 @@ jest.mock("firebase/firestore", () => ({
   arrayRemove: jest.fn(() => "mock-array-remove"),
 }));
 
-// provide Timestamp mock (used by TransactionsContext.addTransaction wrapper)
 const fsMock = require("firebase/firestore") as { Timestamp: { now: () => { seconds: number } } };
 fsMock.Timestamp = { now: () => ({ seconds: Math.floor(Date.now() / 1000) }) };
 
-// ▶️ MOCK do Firebase Storage
 jest.mock("firebase/storage", () => ({
   deleteObject: jest.fn(),
   getDownloadURL: jest.fn(),
@@ -61,14 +57,11 @@ jest.mock("firebase/storage", () => ({
   uploadBytesResumable: jest.fn(),
 }));
 
-// ▶️ MOCK do Firebase Config
-// the real config lives under src/infrastructure/config/firebaseConfig.ts
 jest.mock("../../infrastructure/config/firebaseConfig", () => ({
   db: {},
   storage: {},
 }));
 
-// ▶️ Helper para criar um componente de teste
 const TestComponent: React.FC = (): JSX.Element => {
   const {
     transactions,
@@ -86,7 +79,6 @@ const TestComponent: React.FC = (): JSX.Element => {
 
   const [error, setError] = React.useState<string | null>(null);
 
-  // ✅ Cada função agora é síncrona e chama async internamente (para evitar no-misused-promises)
   const handleAddTransaction = (): void => {
     void (async (): Promise<void> => {
       try {
@@ -167,7 +159,6 @@ const TestComponent: React.FC = (): JSX.Element => {
       <Text testID="transactionsCount">{transactions.length}</Text>
       {error && <Text testID="error">{error}</Text>}
 
-      {/* Todos os handlers agora são void (sem async direto) */}
       <TouchableOpacity testID="addTransaction" onPress={handleAddTransaction}>
         <Text>Add Transaction</Text>
       </TouchableOpacity>
@@ -207,7 +198,6 @@ const TestComponent: React.FC = (): JSX.Element => {
   );
 };
 
-// ✅ Tipagem explícita
 const renderWithProvider = (
   component: React.ReactElement
 ): ReturnType<typeof render> => {
@@ -219,22 +209,20 @@ describe("TransactionsContext", (): void => {
     (useAuth as jest.Mock).mockReturnValue({ user: mockUser });
     jest.clearAllMocks();
 
-    // ✅ Mock padrão do onSnapshot sem uso de any
     (onSnapshot as jest.Mock).mockImplementation(
       (
         _query: unknown,
         callback: (snapshot: { forEach: (fn: (d: unknown) => void) => void; empty: boolean }) => void
       ): (() => void) => {
-        // simulate an empty snapshot with a forEach method
         const snapshot = {
           docs: [],
           empty: true,
           forEach: (fn: (d: unknown) => void) => {
-            // no docs -> nothing to iterate
+            // No-op
           },
         };
         callback(snapshot);
-        return jest.fn(); // função de unsubscribe mockada
+        return jest.fn();
       }
     );
   });
@@ -247,14 +235,13 @@ describe("TransactionsContext", (): void => {
       fireEvent.press(getByTestId("addTransaction"));
 
       await waitFor(() => {
-        // new repository contract expects domain fields (descricao, tipo mapped to entrada)
         expect(addDoc).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
             descricao: "Test",
             valor: 100,
             tipo: "entrada",
-            userId: "test-user-id",
+            uuid: "test-user-id",
           })
         );
       });

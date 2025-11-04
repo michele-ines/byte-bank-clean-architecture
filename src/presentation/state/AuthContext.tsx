@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/await-thenable */
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import React, {
@@ -10,31 +9,14 @@ import React, {
   useState,
 } from 'react';
 
-import { AuthUseCases } from '@/application/use-cases/AuthUseCases';
+import { AuthUseCases } from '@/domain/use-cases/AuthUseCaseFactory';
+import type { AuthContextData } from '@/shared/interfaces/auth.interfaces';
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
 import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
 
-interface AuthContextData {
-  user: AuthenticatedUser | null; 
-  userData: UserData | null;     
-  isAuthenticated: boolean;
-  loading: boolean;
-  signup: {
-    (credentials: SignupCredentials): Promise<void>;
-    (email: string, password: string, name?: string): Promise<void>;
-  };
-  login: {
-    (credentials: AuthCredentials): Promise<void>;
-    (email: string, password: string): Promise<void>;
-  };
-  resetPassword: (email: string) => Promise<void>;
-  signOut: () => Promise<void>;
-}
-
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
-
 
 const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository();
 const authUseCases = new AuthUseCases(firebaseAuthRepository);
@@ -48,7 +30,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let unsubscribeAuth: (() => void) | null = null;
     let unsubscribeUserData: (() => void) | null = null;
 
-    unsubscribeAuth = authUseCases.observeAuth.execute((authUser) => {
+    unsubscribeAuth = authUseCases.observeAuth.execute((authUser): void => {
       setUser(authUser);
 
       if (unsubscribeUserData) {
@@ -58,7 +40,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       if (authUser) {
-         unsubscribeUserData = authUseCases.observeUserData.execute(authUser.uid, (data) => {
+         unsubscribeUserData = authUseCases.observeUserData.execute(authUser.uid, (data): void => {
              setUserData(data);
              setLoading(false);
          });
@@ -104,7 +86,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await authUseCases.resetPassword.execute(email);
   }, []);
 
-   const handleSignOut = useCallback(async () => {
+    const handleSignOut = useCallback(async () => {
     try {
       await authUseCases.logout.execute();
       router.replace('/');

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import type { AttachmentFile } from "@domain/entities/Transaction";
+import type { AttachmentFile } from "@/domain/entities/TransactionData";
 import { Feather } from "@expo/vector-icons";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { colors, spacing, texts, typography } from "@presentation/theme";

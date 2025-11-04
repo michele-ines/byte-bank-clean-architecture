@@ -1,11 +1,11 @@
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
 import {
-    createUserWithEmailAndPassword,
-    onAuthStateChanged,
-    sendPasswordResetEmail,
-    signInWithEmailAndPassword,
-    signOut,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { onSnapshot, setDoc } from "firebase/firestore";
 import type { JSX } from "react";
@@ -13,7 +13,6 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { AuthProvider, useAuth } from "./AuthContext";
 
-// ✅ Silencia erros esperados nos testes
 beforeAll((): void => {
   jest.spyOn(console, "error").mockImplementation((): void => {
     // Intencionalmente vazio
@@ -24,7 +23,6 @@ afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
-// ✅ Mocks
 jest.mock("firebase/auth", () => ({
   createUserWithEmailAndPassword: jest.fn(),
   signInWithEmailAndPassword: jest.fn(),
@@ -46,13 +44,11 @@ jest.mock("expo-router", () => ({
   },
 }));
 
-// the real firebase config file is under src/infrastructure/config
 jest.mock("../../infrastructure/config/firebaseConfig", () => ({
   auth: {},
   db: {},
 }));
 
-// ✅ Componente de teste
 const TestComponent: React.FC = (): JSX.Element => {
   const {
     user,
@@ -134,14 +130,12 @@ const TestComponent: React.FC = (): JSX.Element => {
   );
 };
 
-// ✅ Tipagem explícita
 const renderWithProvider = (
   component: React.ReactElement
 ): ReturnType<typeof render> => {
   return render(<AuthProvider>{component}</AuthProvider>);
 };
 
-// ✅ Testes
 describe("AuthContext", (): void => {
   beforeEach((): void => {
     jest.clearAllMocks();
@@ -176,20 +170,21 @@ describe("AuthContext", (): void => {
       const { getByTestId } = renderWithProvider(<TestComponent />);
       fireEvent.press(getByTestId("signup"));
 
-      // ✅ Troca de `await` por `return`
       return waitFor((): void => {
         expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
           expect.anything(),
           "test@example.com",
           "password123"
         );
+        
         expect(setDoc).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
             uuid: "test-user-id",
             name: "Test User",
             email: "test@example.com",
-          })
+          }),
+          { merge: true }
         );
       });
     });

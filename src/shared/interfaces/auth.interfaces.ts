@@ -1,5 +1,6 @@
+import type { AuthCredentials, SignupCredentials } from "@/domain/entities/AuthCredentials";
+import type { AuthenticatedUser } from "@/domain/entities/User";
 import type { CardState } from "@/presentation/screens/OtherServices/cards";
-import type { User, UserCredential } from "firebase/auth";
 import type { DocumentData } from "firebase/firestore";
 import type { AccessibilityRole, StyleProp, TextStyle, ViewStyle } from "react-native";
 import type { SvgProps } from "react-native-svg";
@@ -33,14 +34,20 @@ export interface DefaultButtonProps {
 }
 
 export interface AuthContextData {
-  user: User | null;
-  userData: UserData | null;
+  user: AuthenticatedUser | null; 
+  userData: UserData | null;      
   isAuthenticated: boolean;
   loading: boolean;
-  signup: (email: string, password: string, name: string) => Promise<UserCredential>;
-  login: (email: string, password: string) => Promise<UserCredential>;
+  signup: {
+    (credentials: SignupCredentials): Promise<void>;
+    (email: string, password: string, name?: string): Promise<void>;
+  };
+  login: {
+    (credentials: AuthCredentials): Promise<void>;
+    (email: string, password: string): Promise<void>;
+  };
   resetPassword: (email: string) => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 }
 
 export interface ScreenWrapperProps {
@@ -159,7 +166,7 @@ export interface CardPanelProps {
     state: CardState;
     onConfigure: () => void;
     onToggle: () => void;
-    image: React.ComponentType<SvgProps>; // ✅ usa SvgProps (RN)
+    image: React.ComponentType<SvgProps>; 
     functionText: string;
     loading?: boolean;
   }
