@@ -104,7 +104,6 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       const domainTx: NewTransactionData = {
         descricao: legacy.description,
-        userId:user?.uid ?? '',
         valor: legacy.valor,
         tipo: mapToDomainType(legacy.tipo),
         categoria: '',

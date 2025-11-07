@@ -234,14 +234,14 @@ describe("TransactionsContext", (): void => {
       const { getByTestId } = renderWithProvider(<TestComponent />);
       fireEvent.press(getByTestId("addTransaction"));
 
-      await waitFor(() => {
+await waitFor(() => {
         expect(addDoc).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            descricao: "Test",
+            descricao: 'Test',
+            tipo: 'entrada',
+            userId: 'test-user-id', // <-- Linha corrigida
             valor: 100,
-            tipo: "entrada",
-            uuid: "test-user-id",
           })
         );
       });
