@@ -9,19 +9,30 @@ import React, {
   useState,
 } from 'react';
 
-import { AuthUseCases } from '@/domain/use-cases/AuthUseCaseFactory';
 import type { AuthContextData } from '@/shared/interfaces/auth.interfaces';
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
+import { AuthUseCasesFactory } from '@domain/use-cases/AuthUseCaseFactory';
+import { auth, db } from '@infrastructure/config/firebaseConfig';
 import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository();
-const authUseCases = new AuthUseCases(firebaseAuthRepository);
+// REMOVIDO: A inicialização foi movida para DENTRO do Provider
+// const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db);
+// const authUseCases = new AuthUseCasesFactory(firebaseAuthRepository);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  
+  // CORREÇÃO: Inicializa os serviços com useMemo.
+  // Isso garante que 'auth' e 'db' estejam definidos (pois os módulos já carregaram)
+  // antes de serem passados para o construtor.
+  const authUseCases = useMemo(() => {
+    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db);
+    return new AuthUseCasesFactory(firebaseAuthRepository);
+  }, []); // O array vazio [] garante que isso só rode uma vez.
+
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,12 +65,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (unsubscribeAuth) unsubscribeAuth();
       if (unsubscribeUserData) unsubscribeUserData();
     };
-  }, []);
+  }, [authUseCases]); // Adiciona authUseCases à dependência do useEffect
 
   const handleSignup = useCallback(async (credentials: SignupCredentials) => {
       await authUseCases.signup.execute(credentials);
       router.replace('/dashboard'); 
-  }, []);
+  }, [authUseCases]);
 
   const handleSignupWrapper = useCallback(async (
     ...args: [SignupCredentials] | [string, string, string?]
@@ -72,7 +83,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const handleLogin = useCallback(async (credentials: AuthCredentials) => {
       await authUseCases.login.execute(credentials);
       router.replace('/dashboard');
-  }, []);
+  }, [authUseCases]);
 
   const handleLoginWrapper = useCallback(async (
     ...args: [AuthCredentials] | [string, string]
@@ -84,7 +95,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const handleResetPassword = useCallback(async (email: string) => {
       await authUseCases.resetPassword.execute(email);
-  }, []);
+  }, [authUseCases]);
 
     const handleSignOut = useCallback(async () => {
     try {
@@ -93,7 +104,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (error) {
       console.error("Erro ao fazer logout no AuthContext:", error);
     }
-  }, []);
+  }, [authUseCases]);
 
 
   const contextValue = useMemo(

@@ -24,6 +24,7 @@ afterAll((): void => {
 });
 
 jest.mock("firebase/auth", () => ({
+  getAuth: jest.fn(() => ({})),
   createUserWithEmailAndPassword: jest.fn(),
   signInWithEmailAndPassword: jest.fn(),
   sendPasswordResetEmail: jest.fn(),
@@ -32,6 +33,7 @@ jest.mock("firebase/auth", () => ({
 }));
 
 jest.mock("firebase/firestore", () => ({
+  getFirestore: jest.fn(() => ({})),
   doc: jest.fn(() => "mock-doc-ref"),
   setDoc: jest.fn(),
   onSnapshot: jest.fn(),
@@ -44,7 +46,7 @@ jest.mock("expo-router", () => ({
   },
 }));
 
-jest.mock("../../infrastructure/config/firebaseConfig", () => ({
+jest.mock("@infrastructure/config/firebaseConfig", () => ({
   auth: {},
   db: {},
 }));
@@ -176,7 +178,6 @@ describe("AuthContext", (): void => {
           "test@example.com",
           "password123"
         );
-        
         expect(setDoc).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({

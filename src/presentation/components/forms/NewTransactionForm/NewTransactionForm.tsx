@@ -57,9 +57,7 @@ export const NewTransactionForm: React.FC = (): JSX.Element => {
         numericAmount
       );
 
-      // Converte o tipo da UI para o tipo esperado pelo domínio
       const mapToDomainType = (t: TransactionType | undefined): "entrada" | "saida" => {
-        // Aqui mapeamos 'deposito' como entrada; demais opções são tratadas como saída
         if (t === "deposito") return "entrada";
         return "saida";
       };

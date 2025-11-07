@@ -1,6 +1,7 @@
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
+import type { Auth } from 'firebase/auth'; // Importa o TIPO
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -8,8 +9,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
+import type { Firestore } from 'firebase/firestore';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { auth, db } from '../config/firebaseConfig';
 import {
   mapDocumentToUserData,
   mapFirebaseUserToAuthenticatedUser,
@@ -17,19 +18,25 @@ import {
 } from '../mappers/user.mapper';
 
 export class FirebaseAuthRepository implements AuthRepository {
+
+  constructor(
+    private readonly auth: Auth, 
+    private readonly firestore: Firestore
+  ) {}
+
   getCurrentUser(): AuthenticatedUser | null {
-    return mapFirebaseUserToAuthenticatedUser(auth.currentUser);
+    return mapFirebaseUserToAuthenticatedUser(this.auth.currentUser);
   }
 
   onAuthStateChanged(callback: (user: AuthenticatedUser | null) => void): () => void {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(this.auth, (firebaseUser) => {
       callback(mapFirebaseUserToAuthenticatedUser(firebaseUser));
     });
     return unsubscribe; 
   }
 
   onUserDataChanged(uid: string, callback: (userData: UserData | null) => void): () => void {
-    const docRef = doc(db, "users", uid);
+    const docRef = doc(this.firestore, "users", uid);
 
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (!docSnap.exists()) {
@@ -47,7 +54,7 @@ export class FirebaseAuthRepository implements AuthRepository {
   async login(credentials: AuthCredentials): Promise<AuthenticatedUser> {
     const pw = credentials.password;
     if (!pw) throw new Error('Password is required for login');
-    const userCredential = await signInWithEmailAndPassword(auth, credentials.email, pw);
+    const userCredential = await signInWithEmailAndPassword(this.auth, credentials.email, pw);
     const authenticatedUser = mapFirebaseUserToAuthenticatedUser(userCredential.user);
     if (!authenticatedUser) {
         throw new Error('Falha ao mapear usuário após login.');
@@ -56,7 +63,7 @@ export class FirebaseAuthRepository implements AuthRepository {
   }
 
   async signup(credentials: SignupCredentials): Promise<AuthenticatedUser> {
-    const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
+    const userCredential = await createUserWithEmailAndPassword(this.auth, credentials.email, credentials.password);
     const newUser = userCredential.user;
 
     const newUserProfile = mapSignupToNewUserProfile(credentials, newUser.uid);
@@ -70,14 +77,14 @@ export class FirebaseAuthRepository implements AuthRepository {
   }
 
   async createUserProfile(userData: UserData): Promise<void> {
-     await setDoc(doc(db, "users", userData.uuid), userData, { merge: true });
+     await setDoc(doc(this.firestore, "users", userData.uuid), userData, { merge: true });
   }
 
   async logout(): Promise<void> {
-    await signOut(auth);
+    await signOut(this.auth);
   }
 
   async resetPassword(email: string): Promise<void> {
-    await sendPasswordResetEmail(auth, email);
+    await sendPasswordResetEmail(this.auth, email);
   }
 }

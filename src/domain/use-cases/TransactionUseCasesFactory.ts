@@ -1,6 +1,6 @@
 import type { ITransaction } from '@domain/entities/Transaction';
+import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
 import type { TransactionRepository } from '@domain/repositories/TransactionRepository';
-import type { AttachmentFile, NewTransactionData } from '../entities/TransactionData';
 import { BaseUseCase } from './BaseUseCase';
 
 export class ObserveTransactionsUseCase {
@@ -43,6 +43,7 @@ export class UpdateTransactionUseCase extends BaseUseCase {
 
   async execute(
     transactionId: string,
+    userId: string,
     updates: Partial<ITransaction>,
     currentAttachments: string[],
     newAttachments: AttachmentFile[],
@@ -51,6 +52,7 @@ export class UpdateTransactionUseCase extends BaseUseCase {
     return this._tryExecute(async () => {
       await this.transactionRepository.updateTransaction(
         transactionId,
+        userId,
         updates,
         currentAttachments,
         newAttachments,

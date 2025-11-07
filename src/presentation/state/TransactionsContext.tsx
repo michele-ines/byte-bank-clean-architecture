@@ -11,33 +11,30 @@ import React, {
 import { TransactionUseCasesFactory } from '@/domain/use-cases/TransactionUseCasesFactory';
 import type { ITransaction } from '@domain/entities/Transaction';
 import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
+import { db, storage } from '@infrastructure/config/firebaseConfig';
 import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
 import { useAuth } from '@presentation/state/AuthContext';
 import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
 import { Timestamp } from 'firebase/firestore';
 
-const transactionRepository = new FirebaseTransactionRepository();
+const transactionRepository = new FirebaseTransactionRepository(db, storage);
 const transactionUseCases = new TransactionUseCasesFactory(transactionRepository);
 
 interface TransactionsContextData {
   transactions: ITransaction[];
   loading: boolean;
-
   addTransaction: {
     (transactionData: NewTransactionData, attachments: AttachmentFile[]): Promise<string>;
     (transaction: INewTransactionInput): Promise<void>;
   };
-
   updateTransaction: {
     (id: string, updatedTransaction: Partial<ITransaction>, newAttachments: AttachmentFile[], attachmentsToRemove: string[]): Promise<void>;
     (id: string, updatedTransaction: Partial<ITransaction>): Promise<void>;
   };
-
   deleteTransaction: (
     id: string,
     attachments?: string[]
   ) => Promise<void>;
-
   balance: number | null;
   loadingMore: boolean;
   hasMore: boolean;
@@ -107,6 +104,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       const domainTx: NewTransactionData = {
         descricao: legacy.description,
+        userId:user?.uid ?? '',
         valor: legacy.valor,
         tipo: mapToDomainType(legacy.tipo),
         categoria: '',
@@ -131,14 +129,10 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       const currentTx = transactions.find(t => t.id === id);
       const currentAttachments = currentTx?.attachments ?? [];
 
-      const updatesWithUserId = {
-          ...updatedTransaction,
-          uuid: user.uid,
-      };
-
       await transactionUseCases.update.execute(
         id,
-        updatesWithUserId,
+        user.uid,
+        updatedTransaction,
         currentAttachments,
         newAttachments,
         attachmentsToRemove

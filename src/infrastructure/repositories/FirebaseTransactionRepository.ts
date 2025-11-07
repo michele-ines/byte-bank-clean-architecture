@@ -1,3 +1,4 @@
+import type { Firestore } from 'firebase/firestore';
 import {
   addDoc,
   collection,
@@ -7,8 +8,9 @@ import {
   orderBy,
   query,
   updateDoc,
-  where
+  where,
 } from 'firebase/firestore';
+import type { FirebaseStorage } from 'firebase/storage';
 import {
   deleteObject,
   getDownloadURL,
@@ -16,10 +18,9 @@ import {
   uploadBytes,
 } from 'firebase/storage';
 
-import type { AttachmentFile, NewTransactionData } from '@/domain/entities/TransactionData';
 import type { ITransaction } from '@domain/entities/Transaction';
+import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
 import type { TransactionRepository } from '@domain/repositories/TransactionRepository';
-import { db, storage } from '../config/firebaseConfig';
 import {
   mapDocumentToTransaction,
   mapNewTransactionToDocument,
@@ -28,42 +29,53 @@ import {
 
 export class FirebaseTransactionRepository implements TransactionRepository {
 
+  constructor(
+    private readonly db: Firestore,
+    private readonly storage: FirebaseStorage
+  ) {}
+
   private async uploadAttachments(
     userId: string, 
     attachments: AttachmentFile[]
   ): Promise<string[]> {
-    const urls: string[] = [];
-    for (const file of attachments) {
+    const uploadPromises = attachments.map(async (file) => {
       const storageRef = ref(
-        storage,
+        this.storage,
         `attachments/${userId}/${Date.now()}_${file.name}`
       );
       await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-      urls.push(url);
-    }
-    return urls;
+      return getDownloadURL(storageRef);
+    });
+    
+    return Promise.all(uploadPromises);
   }
 
   private async deleteAttachments(attachmentUrls: string[]): Promise<void> {
     const deletePromises = attachmentUrls.map((url) => {
-      const storageRef = ref(storage, url);
+      const storageRef = ref(this.storage, url);
       return deleteObject(storageRef);
     });
-    await Promise.all(deletePromises);
+    
+    const results = await Promise.allSettled(deletePromises);
+
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        console.error(`Falha ao deletar anexo: ${attachmentUrls[index]}`, result.reason);
+      }
+    });
   }
 
   observeTransactions(
     userId: string,
     callback: (transactions: ITransaction[]) => void
   ): () => void {
-    const q = query(
-      collection(db, 'transactions'),
+    const transactionsQuery = query(
+      collection(this.db, 'transactions'),
       where('userId', '==', userId),
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe = onSnapshot(transactionsQuery, (snapshot) => {
       const userTransactions: ITransaction[] = [];
       snapshot.forEach((doc) => {
         userTransactions.push(mapDocumentToTransaction(doc.id, doc.data()));
@@ -90,31 +102,29 @@ export class FirebaseTransactionRepository implements TransactionRepository {
         attachmentUrls
     );
 
-    const docRef = await addDoc(collection(db, 'transactions'), newTransaction);
+    const docRef = await addDoc(collection(this.db, 'transactions'), newTransaction);
     return docRef.id;
   }
 
   async updateTransaction(
     transactionId: string,
+    userId: string,
     updates: Partial<ITransaction>,
     currentAttachments: string[],
     newAttachments: AttachmentFile[],
     attachmentsToRemove: string[]
   ): Promise<void> {
+    
     if (attachmentsToRemove && attachmentsToRemove.length > 0) {
       await this.deleteAttachments(attachmentsToRemove);
     }
 
     let newAttachmentUrls: string[] = [];
     if (newAttachments && newAttachments.length > 0) {
-      const getUserIdFromUpdates = (u: Partial<ITransaction>): string | undefined => {
-        const candidate = (u as unknown as { userId?: string; uuid?: string }).userId ?? (u as unknown as { userId?: string; uuid?: string }).uuid;
-        return typeof candidate === 'string' ? candidate : undefined;
-      };
-
-      const uploaderId = getUserIdFromUpdates(updates);
-      if (uploaderId) {
-        newAttachmentUrls = await this.uploadAttachments(uploaderId, newAttachments);
+      if (userId) {
+        newAttachmentUrls = await this.uploadAttachments(userId, newAttachments);
+      } else {
+        console.warn("userId do usuário não foi fornecido ao tentar fazer upload de novos anexos.");
       }
     }
 
@@ -123,7 +133,7 @@ export class FirebaseTransactionRepository implements TransactionRepository {
       ...newAttachmentUrls
     ];
 
-    const docRef = doc(db, 'transactions', transactionId);
+    const docRef = doc(this.db, 'transactions', transactionId);
     
     const dataToUpdate = mapUpdateTransactionToDocument(
         updates, 
@@ -140,6 +150,6 @@ export class FirebaseTransactionRepository implements TransactionRepository {
     if (attachmentUrls && attachmentUrls.length > 0) {
       await this.deleteAttachments(attachmentUrls);
     }
-    await deleteDoc(doc(db, 'transactions', transactionId));
+    await deleteDoc(doc(this.db, 'transactions', transactionId));
   }
 }

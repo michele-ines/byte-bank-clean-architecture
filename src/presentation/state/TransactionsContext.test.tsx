@@ -304,6 +304,7 @@ describe("TransactionsContext", (): void => {
       fireEvent.press(getByTestId("deleteAttachment"));
 
       await waitFor(() => {
+        
         expect(deleteObject).toHaveBeenCalled();
         expect(updateDoc).toHaveBeenCalled();
       });

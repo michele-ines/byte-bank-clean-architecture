@@ -77,7 +77,7 @@ export class ObserveUserDataUseCase {
 }
 
 
-export class AuthUseCases {
+export class AuthUseCasesFactory {
   login: LoginUseCase;
   signup: SignupUseCase;
   logout: LogoutUseCase;
