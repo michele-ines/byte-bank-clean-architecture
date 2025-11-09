@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
-import type { StyleProp, TextStyle} from "react-native";
+import React, { useEffect } from "react";
+import type { StyleProp, TextStyle } from "react-native";
 import { ScrollView, Text, View } from "react-native";
 import type { SvgProps } from "react-native-svg";
 
@@ -10,15 +10,19 @@ import IconDispositivos from "@assets/images/page/icon-dispositivos.svg";
 import IconPontos from "@assets/images/page/icon-pontos.svg";
 import IconPresente from "@assets/images/page/icon-presente.svg";
 import IconSaque from "@assets/images/page/icon-saque.svg";
-
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { Footer } from "@presentation/layout/Footer/Footer";
 import { Header } from "@presentation/layout/Header/Header";
 import { colors, sizes, texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
+import { markEnd, markStart } from "@shared/utils/performance";
 import { styles } from "./MainScreen.styles";
 
+markStart("MainScreen.direct");
 const MainScreen: React.FC = () => {
+  useEffect(() => {
+    markEnd("MainScreen.direct");
+  }, []);
   return (
     <View style={styles.container}>
       <Header />
@@ -40,7 +44,7 @@ const MainScreen: React.FC = () => {
               <BannerIlustracao
                 width={"100%"}
                 height={sizes.illustrationSignupHeight}
-                accessibilityLabel="Ilustração de pessoa com gráfico financeiro"
+                accessibilityLabel="Ilustrao de pessoa com grfico financeiro"
               />
 
               <View style={styles.buttonsRow}>
@@ -138,6 +142,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       accessibilityLabel={title}
     />
     <Text style={styles.cardTitle}>{title}</Text>
-    <Text style={[styles.cardDescription, descriptionStyle]}>{description}</Text>
+    <Text style={[styles.cardDescription, descriptionStyle]}>
+      {description}
+    </Text>
   </View>
 );
