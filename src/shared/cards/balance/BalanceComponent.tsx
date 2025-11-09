@@ -11,7 +11,6 @@ import { getCurrentDate } from "@shared/utils/date";
 import { getFirstName } from "@shared/utils/string";
 import { styles } from "./BalanceComponent.styles";
 
-// 🔹 Estes são imports apenas de tipos
 import type { BalanceComponentProps } from "@/shared/ProfileStyles/profile.styles.types";
 import type { JSX } from "react";
 

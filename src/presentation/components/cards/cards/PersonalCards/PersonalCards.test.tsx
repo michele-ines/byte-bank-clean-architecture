@@ -6,7 +6,6 @@ import type { JSX } from "react";
 import React from "react";
 import PersonalCards from "./PersonalCards";
 
-/** 🔹 Declarações globais fortemente tipadas */
 declare global {
   var __mockToggle__: jest.MockedFunction<
     (type: string, currentState: string) => Promise<{ state: string }>
@@ -15,7 +14,6 @@ declare global {
   var __notificationAsync__: jest.MockedFunction<() => Promise<void>>;
 }
 
-/* ---------------------- 🔹 SVG mocks ---------------------- */
 jest.mock("@assets/images/dash-card-my-cards/cartao-fisico.svg", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
@@ -38,7 +36,6 @@ jest.mock("@assets/images/dash-card-my-cards/cartao-digital.svg", () => {
   return { __esModule: true, default: CartaoDigitalImg };
 });
 
-/* ---------------------- 🔹 ConfirmModal mock ---------------------- */
 jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
@@ -74,7 +71,6 @@ jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", ()
   return { __esModule: true, default: ConfirmModal };
 });
 
-/* ---------------------- 🔹 DefaultButton mock ---------------------- */
 jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
@@ -95,7 +91,6 @@ jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", 
   return { __esModule: true, DefaultButton };
 });
 
-/* ---------------------- 🔹 Mocks fortemente tipados ---------------------- */
 interface ToggleResponse {
   state: string;
 }
@@ -111,7 +106,6 @@ const notificationAsync: jest.MockedFunction<() => Promise<void>> = jest.fn(() =
   Promise.resolve()
 );
 
-/* ---------------------- 🔹 Mock seguro de módulos ---------------------- */
 jest.mock("@presentation/screens/OtherServices/cards", () => ({
   apiToggleCardState: (type: string, state: string): Promise<ToggleResponse> =>
     globalThis.__mockToggle__(type, state),
@@ -132,13 +126,10 @@ beforeEach((): void => {
   jest.clearAllMocks();
 });
 
-/* ---------------------- 🔹 Função utilitária de erro segura ---------------------- */
-// ✅ retorna string segura ou objeto tipado — sem retornar Error diretamente
 function createApiError(message: string): { message: string } {
   return { message };
 }
 
-/* ---------------------- 🔹 Testes ---------------------- */
 describe("PersonalCards", () => {
   it("renderiza os dois painéis (Físico e Digital)", () => {
     const { getByText, getAllByText } = render(<PersonalCards />);
@@ -193,7 +184,6 @@ describe("PersonalCards", () => {
   });
 
   it("trata erro de API com segurança", async () => {
-    // ✅ Agora o mock rejeita um objeto simples e seguro
     mockToggle.mockRejectedValueOnce(createApiError("API error"));
 
     const { getByLabelText, getByTestId } = render(<PersonalCards />);

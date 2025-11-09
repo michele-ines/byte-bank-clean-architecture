@@ -19,19 +19,12 @@ import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAut
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-// REMOVIDO: A inicialização foi movida para DENTRO do Provider
-// const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db);
-// const authUseCases = new AuthUseCasesFactory(firebaseAuthRepository);
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   
-  // CORREÇÃO: Inicializa os serviços com useMemo.
-  // Isso garante que 'auth' e 'db' estejam definidos (pois os módulos já carregaram)
-  // antes de serem passados para o construtor.
   const authUseCases = useMemo(() => {
     const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db);
     return new AuthUseCasesFactory(firebaseAuthRepository);
-  }, []); // O array vazio [] garante que isso só rode uma vez.
+  }, []); 
 
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -65,7 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (unsubscribeAuth) unsubscribeAuth();
       if (unsubscribeUserData) unsubscribeUserData();
     };
-  }, [authUseCases]); // Adiciona authUseCases à dependência do useEffect
+  }, [authUseCases]);
 
   const handleSignup = useCallback(async (credentials: SignupCredentials) => {
       await authUseCases.signup.execute(credentials);

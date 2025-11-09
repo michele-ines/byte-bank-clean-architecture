@@ -15,7 +15,6 @@ import { AuthProvider, useAuth } from "./AuthContext";
 
 beforeAll((): void => {
   jest.spyOn(console, "error").mockImplementation((): void => {
-    // Intencionalmente vazio
   });
 });
 

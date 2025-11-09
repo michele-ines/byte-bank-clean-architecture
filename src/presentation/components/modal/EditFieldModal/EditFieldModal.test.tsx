@@ -8,7 +8,6 @@ const mockUpdateEmail = jest.fn();
 const mockUpdatePassword = jest.fn();
 const mockOnClose = jest.fn();
 
-// ✅ use o MESMO alias que o componente usa
 jest.mock("@presentation/hooks/useEditField", () => ({
   useEditField: () => ({
     value: "valor-inicial",
@@ -29,16 +28,13 @@ jest.mock("@presentation/hooks/useEditField", () => ({
   }),
 }));
 
-// ✅ corrige ts(2571) sem usar "as unknown"
 jest.mock("@expo/vector-icons", () => {
   const MaterialIcons: FC = () => null;
   MaterialIcons.displayName = "MaterialIconsMock";
   return { MaterialIcons };
 });
 
-// ✅ garante strings estáveis para os botões/labels
 jest.mock("@presentation/theme", () => {
-  // use the real theme module but override only texts to keep styles intact
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const actual = jest.requireActual("@presentation/theme");
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return

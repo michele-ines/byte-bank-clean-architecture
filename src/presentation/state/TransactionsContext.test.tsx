@@ -15,7 +15,6 @@ import { TransactionsProvider, useTransactions } from "./TransactionsContext";
 
 beforeAll((): void => {
   jest.spyOn(console, "error").mockImplementation((): void => {
-    // Silencia erros
   });
 });
 afterAll((): void => {
@@ -218,7 +217,6 @@ describe("TransactionsContext", (): void => {
           docs: [],
           empty: true,
           forEach: (fn: (d: unknown) => void) => {
-            // No-op
           },
         };
         callback(snapshot);

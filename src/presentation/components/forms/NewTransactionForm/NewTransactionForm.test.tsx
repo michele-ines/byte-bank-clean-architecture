@@ -13,7 +13,6 @@ import {
 import type { JSX } from "react";
 import { NewTransactionForm } from "./NewTransactionForm";
 
-// Mock firebase/firestore so Jest doesn't try to parse ESM files from node_modules
 jest.mock("firebase/firestore", () => ({
   Timestamp: {
     now: () => ({ seconds: Math.floor(Date.now() / 1000) }),

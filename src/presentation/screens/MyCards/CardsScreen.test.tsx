@@ -30,7 +30,6 @@ jest.mock("@presentation/components/cards/cards/PersonalCards/PersonalCards", ()
   const mockText = reactNative.Text;
   const PersonalCards = (): JSX.Element =>
     mockReact.createElement(mockText, { testID: "mock-personal-cards" }, "PersonalCards");
-  // Export as default to match `import PersonalCards from '.../PersonalCards'`
   return { __esModule: true, default: PersonalCards };
 });
 Object.assign(jest.requireMock("@presentation/components/cards/cards/PersonalCards/PersonalCards"), {

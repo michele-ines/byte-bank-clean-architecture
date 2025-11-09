@@ -116,7 +116,6 @@ declarations.d.ts
 - Exemplo de arquivo de rota fino:
 
 ```ts
-// app/(private)/minha-conta.tsx
 export { default } from '../../src/presentation/screens/MinhaConta/MinhaContaScreen';
 ```
 

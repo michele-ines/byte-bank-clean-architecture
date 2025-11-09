@@ -113,7 +113,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             title={texts.loginForm.buttons.submit}
             loading={isLoading}
             disabled={isFormInvalid}
-            // ✅ Corrigido: evita erro no-misused-promises
             onPress={() => {
               void handleLogin();
             }}

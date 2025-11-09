@@ -19,7 +19,6 @@ module.exports = function (api) {
           }
         }
       ],
-      // SEMPRE por último
       'react-native-reanimated/plugin'
     ]
   };

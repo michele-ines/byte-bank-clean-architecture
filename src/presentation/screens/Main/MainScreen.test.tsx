@@ -44,7 +44,6 @@ jest.mock("expo-router", () => ({
 //   });
 // });
 
-// Adiciona um teste mínimo para evitar "Your test suite must contain at least one test."
 describe("MainScreen (smoke)", () => {
   it("tem uma suíte de teste válida", () => {
     expect(true).toBeTruthy();

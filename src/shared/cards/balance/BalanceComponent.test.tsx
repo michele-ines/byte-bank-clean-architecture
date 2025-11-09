@@ -3,7 +3,6 @@ import type { UserInfo } from "firebase/auth";
 import React from "react";
 import Balance from "./BalanceComponent";
 
-// ✅ Mock utils
 jest.mock("@/shared/utils/currency-formatte", () => ({
   formatBRL: jest.fn((value: number) => `R$ ${value.toFixed(2).replace(".", ",")}`),
 }));
@@ -17,7 +16,6 @@ jest.mock("@expo/vector-icons", () => ({ Entypo: "Entypo" }));
 jest.mock("@assets/images/dash-card-saldo/card-pixels-1.svg", () => "card-pixels-1.svg");
 jest.mock("@assets/images/dash-card-saldo/card-pixels-2.svg", () => "card-pixels-2.svg");
 
-// ✅ Helper para criar mock de usuário
 const makeMockUser = (overrides?: Partial<UserInfo>): UserInfo =>
   ({
     displayName: "John Silva Santos",
@@ -37,7 +35,6 @@ describe("BalanceComponent", () => {
 
   beforeEach(() => jest.clearAllMocks());
 
-  // ✅ Helper moderno sem ReactTestInstance
   const getLabel = (label: string): ReturnType<typeof screen.getByLabelText> =>
     screen.getByLabelText(label);
 

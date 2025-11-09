@@ -29,7 +29,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
 
   const { signup } = useAuth();
 
-  // ✅ Adicionado tipo de retorno explícito: void
   const validateEmail = (text: string): void => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regex.test(text) && text.length > 0) {
@@ -40,7 +39,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     setEmail(text);
   };
 
-  // ✅ Adicionado tipo de retorno explícito: Promise<void>
   const handleSubmit = async (): Promise<void> => {
     const { toasts } = texts.signupForm;
     if (!name || !email || !password || !confirmPassword) {
@@ -73,7 +71,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
       let errorMessage = toasts.genericError.message;
       let errorTitle = toasts.genericError.title;
 
-      // ✅ Tipagem de erro aprimorada
       if (
         error instanceof Error &&
         (error as { code?: string }).code === "auth/email-already-in-use"
@@ -182,7 +179,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             title={texts.signupForm.buttons.submit}
             loading={isLoading}
             disabled={isFormInvalid}
-            // ✅ Corrigido para evitar no-misused-promises
             onPress={() => void handleSubmit()}
             buttonStyle={[styles.button, styles.submitButton]}
             textStyle={styles.buttonText}
