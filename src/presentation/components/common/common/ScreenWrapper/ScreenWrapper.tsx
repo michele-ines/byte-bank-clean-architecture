@@ -1,8 +1,8 @@
+import type { ITransaction, ScreenWrapperProps } from "@/domain/interfaces/auth.interfaces";
 import { useAuth } from "@presentation/state/AuthContext";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import Balance from "@shared/cards/balance/BalanceComponent";
 import { CardListExtract } from "@shared/cards/CardListExtract/CardListExtract";
-import type { ITransaction, ScreenWrapperProps } from "@shared/interfaces/auth.interfaces";
 import type { UserInfo } from "firebase/auth";
 import type { JSX } from "react";
 import React from "react";

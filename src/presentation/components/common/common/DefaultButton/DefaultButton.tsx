@@ -1,6 +1,6 @@
 
+import type { DefaultButtonProps } from "@/domain/interfaces/auth.interfaces";
 import { colors, layout } from "@presentation/theme";
-import type { DefaultButtonProps } from "@shared/interfaces/auth.interfaces";
 import React from "react";
 import {
   ActivityIndicator,

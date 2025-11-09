@@ -1,4 +1,4 @@
-import type { CardMinhaContaStyles } from "@/shared/interfaces/auth.interfaces";
+import type { CardMinhaContaStyles } from "@/domain/interfaces/auth.interfaces";
 import { border, colors, layout, radius, sizes, spacing, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
 import { sharedStyles } from "src/styles/shared.styles";

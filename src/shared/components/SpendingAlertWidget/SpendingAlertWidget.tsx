@@ -2,7 +2,7 @@ import { texts } from "@presentation/theme";
 import type { JSX } from "react";
 import React from "react";
 import { Text, View } from "react-native";
-import type { SpendingAlertProps } from "../../interfaces/auth.interfaces";
+import type { SpendingAlertProps } from "../../../domain/interfaces/auth.interfaces";
 import { styles } from "./SpendingAlertWidget.styles";
 
 export default function SpendingAlertWidget({

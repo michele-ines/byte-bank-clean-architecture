@@ -2,7 +2,7 @@ import type { UserInfo } from "firebase/auth";
 import type { ReactNode } from "react";
 import type { StyleProp, TextStyle, ViewStyle } from "react-native";
 import type { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
-import type { ITransaction } from "../interfaces/auth.interfaces";
+import type { ITransaction } from "../../domain/interfaces/auth.interfaces";
 
 // Minimal types for refactored use-cases (avoid `any`)
 export interface CreateTransaction {

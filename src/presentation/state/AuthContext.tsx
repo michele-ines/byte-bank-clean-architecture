@@ -9,33 +9,31 @@ import React, {
   useState,
 } from 'react';
 
-import type { AuthContextData } from '@/shared/interfaces/auth.interfaces';
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
+import type { AuthContextData } from '@domain/interfaces/auth.interfaces';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
 import { AuthUseCasesFactory } from '@domain/use-cases/AuthUseCaseFactory';
 import { auth, db } from '@infrastructure/config/firebaseConfig';
 import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
+import { loggerService, useLogger } from './LoggerContext';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-// REMOVIDO: A inicialização foi movida para DENTRO do Provider
-// const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db);
-// const authUseCases = new AuthUseCasesFactory(firebaseAuthRepository);
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  
-  // CORREÇÃO: Inicializa os serviços com useMemo.
-  // Isso garante que 'auth' e 'db' estejam definidos (pois os módulos já carregaram)
-  // antes de serem passados para o construtor.
   const authUseCases = useMemo(() => {
-    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db);
+    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(
+      auth,
+      db,
+      loggerService
+    );
     return new AuthUseCasesFactory(firebaseAuthRepository);
-  }, []); // O array vazio [] garante que isso só rode uma vez.
+  }, []);
 
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const logger = useLogger();
 
   useEffect(() => {
     let unsubscribeAuth: (() => void) | null = null;
@@ -47,17 +45,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (unsubscribeUserData) {
         unsubscribeUserData();
         unsubscribeUserData = null;
-        setUserData(null); 
+        setUserData(null);
       }
 
       if (authUser) {
-         unsubscribeUserData = authUseCases.observeUserData.execute(authUser.uid, (data): void => {
-             setUserData(data);
-             setLoading(false);
-         });
+        unsubscribeUserData = authUseCases.observeUserData.execute(
+          authUser.uid,
+          (data): void => {
+            setUserData(data);
+            setLoading(false);
+          }
+        );
       } else {
-         setUserData(null);
-         setLoading(false); 
+        setUserData(null);
+        setLoading(false);
       }
     });
 
@@ -65,47 +66,57 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (unsubscribeAuth) unsubscribeAuth();
       if (unsubscribeUserData) unsubscribeUserData();
     };
-  }, [authUseCases]); // Adiciona authUseCases à dependência do useEffect
-
-  const handleSignup = useCallback(async (credentials: SignupCredentials) => {
-      await authUseCases.signup.execute(credentials);
-      router.replace('/dashboard'); 
   }, [authUseCases]);
 
-  const handleSignupWrapper = useCallback(async (
-    ...args: [SignupCredentials] | [string, string, string?]
-  ) => {
-    if (args.length === 1) return await handleSignup(args[0]);
-    const [email, password, name] = args;
-    await handleSignup({ email, password, name: name ?? '' });
-  }, [handleSignup]);
+  const handleSignup = useCallback(
+    async (credentials: SignupCredentials) => {
+      await authUseCases.signup.execute(credentials);
+      router.replace('/dashboard');
+    },
+    [authUseCases]
+  );
 
-  const handleLogin = useCallback(async (credentials: AuthCredentials) => {
+  const handleSignupWrapper = useCallback(
+    async (...args: [SignupCredentials] | [string, string, string?]) => {
+      if (args.length === 1) return await handleSignup(args[0]);
+      const [email, password, name] = args;
+      await handleSignup({ email, password, name: name ?? '' });
+    },
+    [handleSignup]
+  );
+
+  const handleLogin = useCallback(
+    async (credentials: AuthCredentials) => {
       await authUseCases.login.execute(credentials);
       router.replace('/dashboard');
-  }, [authUseCases]);
+    },
+    [authUseCases]
+  );
 
-  const handleLoginWrapper = useCallback(async (
-    ...args: [AuthCredentials] | [string, string]
-  ) => {
-    if (args.length === 1) return await handleLogin(args[0]);
-    const [email, password] = args;
-    await handleLogin({ email, password });
-  }, [handleLogin]);
+  const handleLoginWrapper = useCallback(
+    async (...args: [AuthCredentials] | [string, string]) => {
+      if (args.length === 1) return await handleLogin(args[0]);
+      const [email, password] = args;
+      await handleLogin({ email, password });
+    },
+    [handleLogin]
+  );
 
-  const handleResetPassword = useCallback(async (email: string) => {
+  const handleResetPassword = useCallback(
+    async (email: string) => {
       await authUseCases.resetPassword.execute(email);
-  }, [authUseCases]);
+    },
+    [authUseCases]
+  );
 
-    const handleSignOut = useCallback(async () => {
+  const handleSignOut = useCallback(async () => {
     try {
       await authUseCases.logout.execute();
       router.replace('/');
     } catch (error) {
-      console.error("Erro ao fazer logout no AuthContext:", error);
+      logger.error('Erro ao fazer logout no AuthContext', error as Error);
     }
-  }, [authUseCases]);
-
+  }, [authUseCases, logger]);
 
   const contextValue = useMemo(
     () => ({
@@ -118,7 +129,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       resetPassword: handleResetPassword,
       signOut: handleSignOut,
     }),
-    [user, userData, loading, handleSignupWrapper, handleLoginWrapper, handleResetPassword, handleSignOut]
+    [
+      user,
+      userData,
+      loading,
+      handleSignupWrapper,
+      handleLoginWrapper,
+      handleResetPassword,
+      handleSignOut,
+    ]
   );
 
   return (
@@ -129,7 +148,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   return context;
 }

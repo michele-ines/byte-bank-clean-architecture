@@ -8,13 +8,13 @@ import React, {
   useState,
 } from 'react';
 
+import type { IAnexo, INewTransactionInput } from '@/domain/interfaces/auth.interfaces';
 import { TransactionUseCasesFactory } from '@/domain/use-cases/TransactionUseCasesFactory';
 import type { ITransaction } from '@domain/entities/Transaction';
 import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
 import { db, storage } from '@infrastructure/config/firebaseConfig';
 import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
 import { useAuth } from '@presentation/state/AuthContext';
-import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
 import { Timestamp } from 'firebase/firestore';
 
 const transactionRepository = new FirebaseTransactionRepository(db, storage);

@@ -20,6 +20,7 @@ import {
 
 import type { ITransaction } from '@domain/entities/Transaction';
 import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
+import type { ILoggerService } from '@domain/interfaces/log.Interfaces';
 import type { TransactionRepository } from '@domain/repositories/TransactionRepository';
 import {
   mapDocumentToTransaction,
@@ -31,7 +32,8 @@ export class FirebaseTransactionRepository implements TransactionRepository {
 
   constructor(
     private readonly db: Firestore,
-    private readonly storage: FirebaseStorage
+    private readonly storage: FirebaseStorage,
+    private readonly logger: ILoggerService
   ) {}
 
   private async uploadAttachments(
@@ -60,7 +62,14 @@ export class FirebaseTransactionRepository implements TransactionRepository {
 
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
-        console.error(`Falha ao deletar anexo: ${attachmentUrls[index]}`, result.reason);
+       this.logger.error(
+          'Falha ao deletar anexo no storage',
+          result.reason as Error,
+          {
+            url: attachmentUrls[index],
+            component: 'FirebaseTransactionRepository.deleteAttachments',
+          }
+        );
       }
     });
   }
@@ -75,38 +84,52 @@ export class FirebaseTransactionRepository implements TransactionRepository {
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(transactionsQuery, (snapshot) => {
+   const unsubscribe = onSnapshot(transactionsQuery, (snapshot) => {
       const userTransactions: ITransaction[] = [];
       snapshot.forEach((doc) => {
         userTransactions.push(mapDocumentToTransaction(doc.id, doc.data()));
       });
       callback(userTransactions);
+    }, (error) => {
+        this.logger.error('Erro no observeTransactions', error, { userId });
     });
 
     return unsubscribe;
   }
 
-  async addTransaction(
+ async addTransaction(
     userId: string,
     transactionData: NewTransactionData,
     attachments: AttachmentFile[]
   ): Promise<string> {
-    let attachmentUrls: string[] = [];
-    if (attachments && attachments.length > 0) {
-      attachmentUrls = await this.uploadAttachments(userId, attachments);
-    }
+    try {
+      let attachmentUrls: string[] = [];
+      if (attachments && attachments.length > 0) {
+        attachmentUrls = await this.uploadAttachments(userId, attachments);
+      }
 
-    const newTransaction = mapNewTransactionToDocument(
-        userId, 
-        transactionData, 
+      const newTransaction = mapNewTransactionToDocument(
+        userId,
+        transactionData,
         attachmentUrls
-    );
+      );
 
-    const docRef = await addDoc(collection(this.db, 'transactions'), newTransaction);
-    return docRef.id;
+      const docRef = await addDoc(
+        collection(this.db, 'transactions'),
+        newTransaction
+      );
+      return docRef.id;
+    } catch (error) {
+      this.logger.error(
+        'Erro em FirebaseTransactionRepository.addTransaction',
+        error as Error,
+        { userId }
+      );
+      throw error; 
+    }
   }
 
-  async updateTransaction(
+ async updateTransaction(
     transactionId: string,
     userId: string,
     updates: Partial<ITransaction>,
@@ -114,42 +137,68 @@ export class FirebaseTransactionRepository implements TransactionRepository {
     newAttachments: AttachmentFile[],
     attachmentsToRemove: string[]
   ): Promise<void> {
-    
-    if (attachmentsToRemove && attachmentsToRemove.length > 0) {
-      await this.deleteAttachments(attachmentsToRemove);
-    }
-
-    let newAttachmentUrls: string[] = [];
-    if (newAttachments && newAttachments.length > 0) {
-      if (userId) {
-        newAttachmentUrls = await this.uploadAttachments(userId, newAttachments);
-      } else {
-        console.warn("userId do usuário não foi fornecido ao tentar fazer upload de novos anexos.");
+    try {
+      if (attachmentsToRemove && attachmentsToRemove.length > 0) {
+        await this.deleteAttachments(attachmentsToRemove);
       }
-    }
 
-    const finalAttachments = [
-      ...currentAttachments.filter(url => !attachmentsToRemove?.includes(url)),
-      ...newAttachmentUrls
-    ];
+      let newAttachmentUrls: string[] = [];
+      if (newAttachments && newAttachments.length > 0) {
+        if (userId) {
+          newAttachmentUrls = await this.uploadAttachments(
+            userId,
+            newAttachments
+          );
+        } else {
+          this.logger.warn(
+            'UserId não foi fornecido ao tentar fazer upload de novos anexos',
+            {
+              transactionId,
+              component: 'FirebaseTransactionRepository.updateTransaction',
+            }
+          );
+        }
+      }
 
-    const docRef = doc(this.db, 'transactions', transactionId);
-    
-    const dataToUpdate = mapUpdateTransactionToDocument(
-        updates, 
+      const finalAttachments = [
+        ...currentAttachments.filter((url) => !attachmentsToRemove?.includes(url)),
+        ...newAttachmentUrls,
+      ];
+
+      const docRef = doc(this.db, 'transactions', transactionId);
+
+      const dataToUpdate = mapUpdateTransactionToDocument(
+        updates,
         finalAttachments
-    );
+      );
 
-    await updateDoc(docRef, dataToUpdate);
+      await updateDoc(docRef, dataToUpdate);
+    } catch (error) {
+      this.logger.error(
+        'Erro em FirebaseTransactionRepository.updateTransaction',
+        error as Error,
+        { transactionId, userId }
+      );
+      throw error; 
+    }
   }
 
   async deleteTransaction(
     transactionId: string,
     attachmentUrls: string[]
   ): Promise<void> {
-    if (attachmentUrls && attachmentUrls.length > 0) {
-      await this.deleteAttachments(attachmentUrls);
+    try {
+      if (attachmentUrls && attachmentUrls.length > 0) {
+        await this.deleteAttachments(attachmentUrls);
+      }
+      await deleteDoc(doc(this.db, 'transactions', transactionId));
+    } catch (error) {
+      this.logger.error(
+        'Erro em FirebaseTransactionRepository.deleteTransaction',
+        error as Error,
+        { transactionId }
+      );
+      throw error; 
     }
-    await deleteDoc(doc(this.db, 'transactions', transactionId));
   }
 }

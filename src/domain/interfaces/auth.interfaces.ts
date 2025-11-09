@@ -5,7 +5,7 @@ import type { DocumentData } from "firebase/firestore";
 import type { AccessibilityRole, StyleProp, TextStyle, ViewStyle } from "react-native";
 import type { SvgProps } from "react-native-svg";
 import type { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
-import type { BalanceValue, TransactionType } from "../ProfileStyles/profile.styles.types";
+import type { BalanceValue, TransactionType } from "../../shared/ProfileStyles/profile.styles.types";
 
 export interface UserData {
   uuid: string; 

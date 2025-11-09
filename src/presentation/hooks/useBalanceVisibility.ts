@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import type { UseBalanceVisibilityProps, UseBalanceVisibilityReturn } from '@shared/interfaces/auth.interfaces';
+import type { UseBalanceVisibilityProps, UseBalanceVisibilityReturn } from '@/domain/interfaces/auth.interfaces';
 import { formatBRL } from '@shared/utils/currency-formatte';
 import { useMemo, useState } from 'react';
 import { texts } from '../theme';

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import type { AttachmentFile } from "@/domain/entities/TransactionData";
+import type { ITransaction as LegacyITransaction } from "@/domain/interfaces/auth.interfaces";
 import { Feather } from "@expo/vector-icons";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { colors, spacing, texts, typography } from "@presentation/theme";
-import type { ITransaction as LegacyITransaction } from "@shared/interfaces/auth.interfaces";
 import { truncateString } from "@shared/utils/string";
 import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";

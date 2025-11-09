@@ -1,14 +1,17 @@
-import type { ReactNode } from 'react';
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { AuthProvider } from './AuthContext';
+import { LoggerProvider } from './LoggerContext';
 import { TransactionsProvider } from './TransactionsContext';
 
-export const GlobalContextProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+export const GlobalContextProvider = ({ children }: { children: ReactNode }): React.JSX.Element => {
   return (
-    <AuthProvider>
-      <TransactionsProvider>
-        {children}
-      </TransactionsProvider>
-    </AuthProvider>
+ 
+    <LoggerProvider>
+      <AuthProvider>
+        <TransactionsProvider>
+          {children}
+        </TransactionsProvider>
+      </AuthProvider>
+    </LoggerProvider>
   );
 };

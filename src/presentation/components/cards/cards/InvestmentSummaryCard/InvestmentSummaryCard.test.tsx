@@ -2,7 +2,7 @@ import type {
   DonutChartMockProps,
   ScrollViewMockProps,
   SvgMockProps,
-} from "@/shared/interfaces/auth.interfaces";
+} from "@/domain/interfaces/auth.interfaces";
 import { texts } from "@presentation/theme";
 import { render } from "@testing-library/react-native";
 import type { JSX } from "react";
