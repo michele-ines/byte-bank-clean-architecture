@@ -17,6 +17,7 @@ beforeAll((): void => {
   jest.spyOn(console, 'error').mockImplementation(jest.fn());
 });
 
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });

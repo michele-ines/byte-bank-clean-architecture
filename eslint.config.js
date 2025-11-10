@@ -1,19 +1,16 @@
-// eslint.config.js
 const { defineConfig } = require("eslint/config");
 const expo = require("eslint-config-expo/flat");
 const tseslint = require("typescript-eslint");
 const boundaries = require("eslint-plugin-boundaries");
 
 module.exports = defineConfig([
-  // Base do Expo
   ...expo,
 
-  // ✅ Ignora tudo que não deve ser lido pelo ESLint
   {
     ignores: [
       "dist/**",
       "node_modules/**",
-      "coverage/**", // 👈 ESSENCIAL: ignora relatórios do Jest
+      "coverage/**", 
       "babel.config.js",
       "metro.config.js",
       "jest.config.js",
@@ -21,7 +18,6 @@ module.exports = defineConfig([
     ],
   },
 
-  // ✅ Regras leves para arquivos JS (sem type-check)
   {
     files: ["**/*.js", "**/*.jsx"],
     languageOptions: {
@@ -34,7 +30,6 @@ module.exports = defineConfig([
     },
   },
 
-  // ✅ Configuração completa para TypeScript com type-check
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
 
@@ -71,19 +66,16 @@ module.exports = defineConfig([
     },
 
     rules: {
-      // 🚫 Sem any
       "@typescript-eslint/no-explicit-any": [
         "error",
         { fixToUnknown: true, ignoreRestArgs: false },
       ],
 
-      // 🚫 Sem unsafe
       "@typescript-eslint/no-unsafe-assignment": "error",
       "@typescript-eslint/no-unsafe-return": "error",
       "@typescript-eslint/no-unsafe-call": "error",
       "@typescript-eslint/no-unsafe-member-access": "error",
 
-      // 🧠 Boas práticas
       "@typescript-eslint/consistent-type-imports": [
         "error",
         { prefer: "type-imports" },
@@ -98,7 +90,6 @@ module.exports = defineConfig([
       ],
       "@typescript-eslint/ban-ts-comment": ["error", { "ts-ignore": true }],
 
-      // Imports
       "import/no-unresolved": "error",
       "import/extensions": [
         "error",
@@ -115,7 +106,6 @@ module.exports = defineConfig([
     },
   },
 
-  // ✅ Permite require() em arquivos de teste (necessário para jest.mock())
   {
     files: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
     rules: {

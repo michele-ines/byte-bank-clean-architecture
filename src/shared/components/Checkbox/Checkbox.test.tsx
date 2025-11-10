@@ -4,7 +4,6 @@ import type { ReactTestInstance } from "react-test-renderer";
 import { Checkbox } from "./Checkbox";
 
 describe("Checkbox", () => {
-  // Função auxiliar com tipo explícito de retorno
   const getCheckbox = (label: string): ReactTestInstance => {
     return screen.getByLabelText(label) as unknown as ReactTestInstance;
   };

@@ -13,7 +13,6 @@ import {
 import type { JSX } from "react";
 import { NewTransactionForm } from "./NewTransactionForm";
 
-// Mock firebase/firestore so Jest doesn't try to parse ESM files from node_modules
 jest.mock("firebase/firestore", () => ({
   Timestamp: {
     now: () => ({ seconds: Math.floor(Date.now() / 1000) }),
@@ -123,10 +122,9 @@ jest.mock("@assets/images/dash-card-new-transacao/card-pixels-4.svg", () => "Car
 jest.mock("@assets/images/dash-card-new-transacao/Ilustracao-2.svg", () => "TransactionIllustration");
 
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation(() => {
-    /* ✅ evita erro de função vazia */
-  });
+  jest.spyOn(console, "error").mockImplementation(() => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react-native";
-import type { JSX } from "react";
 import type React from "react";
+import type { JSX } from "react";
 import { ScreenWrapper } from "./ScreenWrapper";
 
 jest.mock("@presentation/state/AuthContext", () => ({
@@ -27,7 +27,6 @@ interface BalanceProps {
   user?: { displayName?: string; name?: string };
 }
 
-// Mock do componente de Balance (default export)
 jest.mock("../../../../../shared/cards/balance/BalanceComponent", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
@@ -50,7 +49,6 @@ interface CardListExtractProps {
   title: string;
 }
 
-// Mock do CardListExtract (named export)
 jest.mock("../../../../../shared/cards/CardListExtract/CardListExtract", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");

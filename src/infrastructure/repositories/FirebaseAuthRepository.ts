@@ -1,3 +1,4 @@
+import type { TokenStorage } from '@domain/auth/TokenStorage';
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { ILoggerService } from '@domain/interfaces/log.Interfaces';
@@ -22,7 +23,8 @@ export class FirebaseAuthRepository implements AuthRepository {
   constructor(
     private readonly auth: Auth,
     private readonly firestore: Firestore,
-    private readonly logger: ILoggerService 
+    private readonly logger: ILoggerService,
+    private readonly tokenStorage: TokenStorage
   ) {}
 
   getCurrentUser(): AuthenticatedUser | null {
@@ -66,17 +68,20 @@ export class FirebaseAuthRepository implements AuthRepository {
   }
 
   async login(credentials: AuthCredentials): Promise<AuthenticatedUser> {
+    const pw = credentials.password;
     try {
-      const pw = credentials.password;
       if (!pw) {
           this.logger.warn('Tentativa de login sem senha', { email: credentials.email });
           throw new Error('Password is required for login');
       }
+      
       const userCredential = await signInWithEmailAndPassword(
         this.auth,
         credentials.email,
         pw
       );
+      const token = await userCredential.user.getIdToken();
+      await this.tokenStorage.saveToken(token);
       const authenticatedUser = mapFirebaseUserToAuthenticatedUser(
         userCredential.user
       );
@@ -104,8 +109,15 @@ export class FirebaseAuthRepository implements AuthRepository {
       const newUserProfile = mapSignupToNewUserProfile(credentials, newUser.uid);
       await this.createUserProfile(newUserProfile);
 
-      const authenticatedUser = mapFirebaseUserToAuthenticatedUser(newUser);
-      if (!authenticatedUser) {
+    try {
+      const token = await newUser.getIdToken();
+      await this.tokenStorage.saveToken(token);
+    } catch (error) {
+      console.error('Erro ao salvar token no signup:', error);
+    }
+
+    const authenticatedUser = mapFirebaseUserToAuthenticatedUser(newUser);
+     if (!authenticatedUser) {
         throw new Error('Falha ao mapear usuário após signup.');
       }
       return authenticatedUser;
@@ -132,11 +144,12 @@ export class FirebaseAuthRepository implements AuthRepository {
 
   async logout(): Promise<void> {
     try {
-      await signOut(this.auth);
+      await this.tokenStorage.removeToken();
     } catch (error) {
       this.logger.error('Erro em FirebaseAuthRepository.logout', error as Error);
-      throw error; 
+      console.error('Erro ao remover token no logout:', error);
     }
+    await signOut(this.auth);
   }
 
   async resetPassword(email: string): Promise<void> {

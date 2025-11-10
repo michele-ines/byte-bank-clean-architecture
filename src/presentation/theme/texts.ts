@@ -1,4 +1,3 @@
-// ✅ Correção aplicada: tipo de retorno explicitamente declarado como string
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',

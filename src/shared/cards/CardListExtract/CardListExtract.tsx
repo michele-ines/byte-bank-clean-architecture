@@ -43,16 +43,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   const [editedValues, setEditedValues] = useState<EditedValuesMap>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-
-  // O tipo de `transactions` vem do domínio (ITransaction do domain) e pode
-  // divergir da forma antiga esperada por `filterFn` (typing legacy). Fazemos
-  // um cast controlado para manter compatibilidade até migrarmos todas as
-  // dependências para o novo shape.
   const filtered = filterFn
     ? ((transactions as unknown as LegacyITransaction[]).filter(filterFn) as unknown as typeof transactions)
     : transactions;
-
-  // -------------------- Funções auxiliares --------------------
 
   const handleOpenReceipt = async (url: string): Promise<void> => {
     const supported = await Linking.canOpenURL(url);
@@ -97,10 +90,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
       const result = await DocumentPicker.getDocumentAsync({});
       if (!result.canceled && result.assets?.length) {
         const file = result.assets[0];
-        // Converte URI para Blob e anexa o nome para que o repositório consiga usar
         const response = await fetch(file.uri);
         const blob = await response.blob();
-        // o repositório espera um AttachmentFile (File). Em runtime, um blob com a propriedade 'name' é aceitável.
         const attachment = Object.assign(blob, { name: file.name }) as unknown as AttachmentFile;
 
         await updateTransaction(transactionId, {}, [attachment], []);
@@ -133,10 +124,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         text: dialog.confirmButton,
         style: "destructive",
         onPress: () => {
-          // ✅ Corrigido: executa async com void
           void (async () => {
             try {
-              // Usa o novo contrato: updateTransaction com attachmentsToRemove
               await updateTransaction(transactionId, {}, [], [fileUrl]);
               showToast(
                 "success",
@@ -177,7 +166,6 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
 
     try {
-      // Para cada transação selecionada, chama deleteTransaction passando os anexos atuais (se houver)
       await Promise.all(
           Array.from(selectedItems).map(async (id) => {
           const tx = transactions.find((t) => t.id === id);
@@ -227,7 +215,6 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     try {
       await Promise.all(
         transacoesAlteradas.map(([id, raw]) =>
-          // novo contrato: updateTransaction(id, updatedTransaction, newAttachments, attachmentsToRemove)
           updateTransaction(id, { valor: parseFloat(raw) / 100 }, [], [])
         )
       );
@@ -248,8 +235,6 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
       setEditedValues({});
     }
   };
-
-  // -------------------- Render --------------------
 
   return (
     <View style={styles.container}>

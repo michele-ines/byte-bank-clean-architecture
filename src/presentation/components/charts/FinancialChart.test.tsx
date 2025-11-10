@@ -1,4 +1,3 @@
-// FinancialChart.test.tsx
 import { layout, spacing, texts } from "@presentation/theme";
 import { render } from "@testing-library/react-native";
 import type { JSX } from "react";
@@ -7,7 +6,6 @@ import { Dimensions } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import FinancialChart from "./FinancialChart";
 
-// Props mínimas validadas nos testes (usar interface p/ regra eslint)
 interface ChartProps {
   data: typeof texts.financialChartData;
   yAxisLabel: string;
@@ -16,7 +14,6 @@ interface ChartProps {
   [key: string]: unknown;
 }
 
-// Mock tipado do LineChart
 jest.mock("react-native-chart-kit", () => {
   return {
     LineChart: jest.fn((_props: ChartProps): JSX.Element | null => null),

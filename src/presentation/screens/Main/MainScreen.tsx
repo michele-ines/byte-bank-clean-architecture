@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
-import type { StyleProp, TextStyle} from "react-native";
+import type { StyleProp, TextStyle } from "react-native";
 import { ScrollView, Text, View } from "react-native";
 import type { SvgProps } from "react-native-svg";
 
@@ -116,8 +116,6 @@ const MainScreen: React.FC = () => {
 };
 
 export default MainScreen;
-
-/* ============================ Feature Card ============================ */
 interface FeatureCardProps {
   Icon: React.FC<SvgProps>;
   title: string;

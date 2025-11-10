@@ -30,7 +30,6 @@ jest.mock("@/shared/utils/transactions.utils", () => ({
 }));
 
 jest.mock("@presentation/theme", () => {
-  // use the real theme module but override only texts.cardList so styles/layout stay intact
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const actual = jest.requireActual("@presentation/theme");
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -83,7 +82,6 @@ jest.mock("@presentation/theme", () => {
   };
 });
 
-// ✅ Correção do mock tipado
 jest.mock("@expo/vector-icons", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   return {
@@ -96,9 +94,6 @@ jest.mock("@expo/vector-icons", () => {
 describe("CardListExtract", () => {
   it("deve renderizar a transação com acessibilidade", () => {
     render(<CardListExtract title="Minhas Transações" filterFn={() => true} />);
-
-    // The item no longer sets a single accessibilityLabel in this component.
-    // Verify visible pieces instead: description and formatted amount.
     expect(screen.getByText("Compra")).toBeTruthy();
     expect(screen.getByText("R$ 120,50")).toBeTruthy();
   });

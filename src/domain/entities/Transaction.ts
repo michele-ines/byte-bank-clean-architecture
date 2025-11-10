@@ -1,8 +1,8 @@
 import type { Timestamp } from 'firebase/firestore';
 
 export interface ITransaction {
-  id: string; 
-  userId: string; 
+  id: string;
+  userId: string;
   descricao: string;
   valor: number;
   tipo: 'entrada' | 'saida';

@@ -3,24 +3,21 @@ import { texts } from "@presentation/theme";
 import { showToast } from "@shared/utils/transactions.utils";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
-import type { JSX, ReactNode } from "react";
 import type React from "react";
+import type { JSX, ReactNode } from "react";
 import type { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { LoginForm } from "./LoginForm";
 
-// ✅ Evita arrow function vazia — adiciona comentário interno
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation(() => {
-    /* silence console.error */
-  });
+  jest.spyOn(console, "error").mockImplementation((): void => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
 const mockLogin = jest.fn();
 
-// ✅ Corrige path e tipagem do mock
 jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
@@ -30,7 +27,6 @@ jest.mock("@shared/utils/transactions.utils", () => ({
   formatTransactionDescription: jest.fn(),
 }));
 
-// ✅ Tipagem explícita e nullish coalescing (`??`)
 jest.mock("expo-router", () => {
   const ReactLib = require("react") as {
     createElement: <P>(
@@ -80,7 +76,6 @@ Object.assign(jest.requireMock("react-native-gesture-handler"), {
   displayName: "MockScrollView",
 });
 
-// ✅ Tipagem segura e uso de ?? no disabled
 jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
   const ReactLib = require("react") as {
     createElement: <P>(
@@ -157,9 +152,6 @@ describe("LoginForm", () => {
     jest.clearAllMocks();
   });
 
-  // ==============================================================
-  // handleLogin function
-  // ==============================================================
   describe("handleLogin function", () => {
     it("deve fazer login com sucesso quando campos estão preenchidos", async (): Promise<void> => {
       mockLogin.mockResolvedValueOnce(undefined);
@@ -216,7 +208,6 @@ describe("LoginForm", () => {
     });
 
     it("deve mostrar toast de erro inesperado quando login falha com erro desconhecido", async (): Promise<void> => {
-      // ✅ Tipagem segura do erro genérico
       const unknownError: unknown = "Unknown error";
       mockLogin.mockRejectedValueOnce(unknownError);
 
@@ -248,9 +239,7 @@ describe("LoginForm", () => {
     });
   });
 
-  // ==============================================================
-  // handleCreateAccount
-  // ==============================================================
+
   describe("handleCreateAccount function", () => {
     it("deve navegar para página de cadastro quando botão criar conta é pressionado", (): void => {
       const { getByLabelText } = render(
@@ -283,9 +272,6 @@ describe("LoginForm", () => {
     });
   });
 
-  // ==============================================================
-  // Renderização e comportamento geral
-  // ==============================================================
   describe("Renderização e comportamento geral", () => {
     it("renderiza todos os elementos do formulário", (): void => {
       const { getByText, getByLabelText } = render(

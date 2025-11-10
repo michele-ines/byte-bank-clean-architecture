@@ -38,9 +38,7 @@ export const maskCurrency = (valor?: string): string => {
   });
 };
 
-/**
- * Formata um número para moeda BRL com símbolo.
- */
+
 export function formatCurrencyToBRL(value: number): string {
   return value.toLocaleString("pt-BR", {
     style: "currency",

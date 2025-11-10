@@ -7,19 +7,16 @@ import { router } from "expo-router";
 import type { JSX } from "react";
 import { SignupForm } from "./SignupForm";
 
-// ✅ Evita função vazia
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation(() => {
-    /* silence console.error */
-  });
+  jest.spyOn(console, "error").mockImplementation((): void => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
 const mockSignup = jest.fn();
 
-// ✅ Corrige mocks
 jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
@@ -43,7 +40,6 @@ jest.mock("@shared/constants/routes", () => ({
   },
 }));
 
-// ✅ Mock de DefaultButton
 jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
@@ -76,7 +72,6 @@ Object.assign(
   { displayName: "MockDefaultButton" }
 );
 
-// ✅ Mock de Checkbox
 jest.mock("@shared/components/Checkbox/Checkbox", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
@@ -104,7 +99,6 @@ Object.assign(jest.requireMock("@shared/components/Checkbox/Checkbox"), {
   displayName: "MockCheckbox",
 });
 
-// ✅ Mock de SVG
 jest.mock("@assets/images/cadastro/ilustracao-cadastro.svg", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
@@ -138,9 +132,6 @@ describe("SignupForm", () => {
     jest.clearAllMocks();
   });
 
-  // ==============================================================
-  // handleSubmit
-  // ==============================================================
   describe("handleSubmit function", () => {
     it("deve mostrar toast de erro quando senha é muito fraca", async (): Promise<void> => {
       const { getByLabelText } = render(
@@ -224,8 +215,6 @@ describe("SignupForm", () => {
         t.toasts.success.title,
         t.toasts.success.message
       );
-      // SignupForm calls onSignupSuccess and shows toast on success.
-      // Navigation is handled by the parent; do not assert router.replace here.
     });
 
     it("deve mostrar toast de erro quando email já está em uso", async (): Promise<void> => {
@@ -308,9 +297,6 @@ describe("SignupForm", () => {
     });
   });
 
-  // ==============================================================
-  // validateEmail
-  // ==============================================================
   describe("validateEmail function", () => {
     it("deve mostrar erro quando email é inválido", (): void => {
       const { getByLabelText, getByText } = render(
@@ -341,9 +327,6 @@ describe("SignupForm", () => {
     });
   });
 
-  // ==============================================================
-  // Renderização e comportamento geral
-  // ==============================================================
   describe("Renderização e comportamento geral", () => {
     it("renderiza todos os elementos do formulário", (): void => {
       const { getByText, getByLabelText } = render(

@@ -132,9 +132,6 @@ export default function PersonalCards(): JSX.Element {
     );
   };
 
-  /* ---------------------------------------------------------------------- */
-  /* 🧠 Memos para título e mensagem do modal                                */
-  /* ---------------------------------------------------------------------- */
   const modalTitle = useMemo((): string => {
     if (!modal.visible) return "";
     return modal.willBlock
@@ -189,7 +186,6 @@ export default function PersonalCards(): JSX.Element {
         isDestructive={modal.visible && modal.willBlock}
         loading={modal.visible ? loading[modal.kind] ?? false : false}
         onCancel={closeConfirm}
-        /* ✅ encapsula Promise-returning em void */
         onConfirm={() => {
           void confirmToggle();
         }}

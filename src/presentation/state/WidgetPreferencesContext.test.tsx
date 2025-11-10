@@ -4,7 +4,6 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { WidgetPreferencesProvider, useWidgetPreferences } from "./WidgetPreferencesContext";
 
-// ✅ Corrigido: mock sem função vazia (usa jest.fn())
 beforeAll((): void => {
   jest.spyOn(console, "error").mockImplementation(jest.fn());
 });
@@ -13,7 +12,6 @@ afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
-// ✅ Tipagem explícita no componente de teste
 const TestComponent: React.FC = (): JSX.Element => {
   const { preferences, updatePreferences } = useWidgetPreferences();
 
@@ -58,7 +56,6 @@ const TestComponent: React.FC = (): JSX.Element => {
   );
 };
 
-// ✅ Tipagem explícita para a função de renderização
 const renderWithProvider = (component: React.ReactElement): ReturnType<typeof render> => {
   return render(<WidgetPreferencesProvider>{component}</WidgetPreferencesProvider>);
 };

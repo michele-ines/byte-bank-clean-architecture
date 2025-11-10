@@ -3,7 +3,6 @@ import type { JSX } from "react";
 import React from "react";
 import MyAccountPage from "./MinhaContaScreen";
 
-// ✅ Adicionado tipo de retorno explícito : JSX.Element
 jest.mock("@assets/images/dash-card-my-account/card-pixels-3.svg", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ Text: unknown }>("react-native");

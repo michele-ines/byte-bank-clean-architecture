@@ -15,18 +15,16 @@ import type { AuthContextData } from '@domain/interfaces/auth.interfaces';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
 import { AuthUseCasesFactory } from '@domain/use-cases/AuthUseCaseFactory';
 import { auth, db } from '@infrastructure/config/firebaseConfig';
+import { secureTokenStorage } from '@infrastructure/persistence/SecureTokenStorage';
 import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
 import { loggerService, useLogger } from './LoggerContext';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  
   const authUseCases = useMemo(() => {
-    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(
-      auth,
-      db,
-      loggerService
-    );
+    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db,loggerService, secureTokenStorage);
     return new AuthUseCasesFactory(firebaseAuthRepository);
   }, []);
 
@@ -68,13 +66,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, [authUseCases]);
 
-  const handleSignup = useCallback(
-    async (credentials: SignupCredentials) => {
+  const handleSignup = useCallback(async (credentials: SignupCredentials) => {
       await authUseCases.signup.execute(credentials);
-      router.replace('/dashboard');
-    },
-    [authUseCases]
-  );
+      router.replace('/dashboard'); 
+  }, [authUseCases]);
+
 
   const handleSignupWrapper = useCallback(
     async (...args: [SignupCredentials] | [string, string, string?]) => {

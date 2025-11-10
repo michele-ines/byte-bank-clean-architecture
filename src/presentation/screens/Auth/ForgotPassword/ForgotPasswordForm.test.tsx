@@ -1,11 +1,9 @@
-// ✅ Todos os imports no topo
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import type { JSX } from "react";
 import type React from "react";
+import type { JSX } from "react";
 import type { Text, TouchableOpacity } from "react-native";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
-// 🔹 Mocks externos primeiro
 const mockShowToast = jest.fn();
 jest.mock("@shared/utils/transactions.utils", () => ({
   formatTransactionDescription: jest.fn(),
@@ -13,7 +11,6 @@ jest.mock("@shared/utils/transactions.utils", () => ({
 }));
 
 const mockResetPassword = jest.fn();
-// Ajusta o caminho do mock para o caminho real usado pelo componente
 jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: () => ({
     resetPassword: mockResetPassword,
@@ -35,7 +32,6 @@ jest.mock("@shared/constants/routes", () => ({
   },
 }));
 
-// ✅ Tipagem explícita e uso seguro do operador `??`
 jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
   const ReactLib = require("react") as {
     createElement: <P>(
@@ -171,7 +167,6 @@ describe("ForgotPasswordForm", () => {
   });
 
   describe("Validação de formulário", () => {
-    // ✅ Removido async desnecessário — não há `await` dentro
     it("não chama resetPassword quando e-mail está vazio", (): void => {
       render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
 

@@ -18,7 +18,7 @@ const mockAuthRepository: jest.Mocked<AuthRepository> = {
   resetPassword: jest.fn(),
   onAuthStateChanged: jest.fn(),
   onUserDataChanged: jest.fn(),
-  getCurrentUser: jest.fn(), 
+  getCurrentUser: jest.fn(),
   createUserProfile: jest.fn(),
 };
 
@@ -29,11 +29,11 @@ const mockAuthenticatedUser: AuthenticatedUser = {
 };
 
 const mockUserData: UserData = {
-    uuid: 'user-123',
-    name: 'Usuário Teste',
-    email: 'teste@teste.com',
-    photoURL: null,
-    createdAt: new Date(),
+  uuid: 'user-123',
+  name: 'Usuário Teste',
+  email: 'teste@teste.com',
+  photoURL: null,
+  createdAt: new Date(),
 };
 
 beforeEach(() => {
@@ -41,10 +41,18 @@ beforeEach(() => {
 });
 
 describe('LoginUseCase', () => {
+  const originalConsoleError = console.error;
+  beforeAll(() => {
+    console.error = jest.fn();
+  });
+  afterAll(() => {
+    console.error = originalConsoleError;
+  });
+
   it('should call repository.login and return the authenticated user', async () => {
     const useCase = new LoginUseCase(mockAuthRepository);
     const mockCredentials: AuthCredentials = { email: 'teste@teste.com', password: '123' };
-    
+
     mockAuthRepository.login.mockResolvedValue(mockAuthenticatedUser);
 
     const result = await useCase.execute(mockCredentials);
@@ -62,16 +70,20 @@ describe('LoginUseCase', () => {
     mockAuthRepository.login.mockRejectedValue(mockError);
 
     await expect(useCase.execute(mockCredentials)).rejects.toThrow(mockError);
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('Erro no LoginUseCase:'),
+      mockError,
+    );
   });
 });
 
 describe('SignupUseCase', () => {
   it('should call repository.signup and return the new user', async () => {
     const useCase = new SignupUseCase(mockAuthRepository);
-    const mockSignupData: SignupCredentials = { 
-        email: 'new@teste.com', 
-        password: '123', 
-        name: 'Novo User'
+    const mockSignupData: SignupCredentials = {
+      email: 'new@teste.com',
+      password: '123',
+      name: 'Novo User',
     };
 
     mockAuthRepository.signup.mockResolvedValue(mockAuthenticatedUser);
@@ -85,6 +97,14 @@ describe('SignupUseCase', () => {
 });
 
 describe('LogoutUseCase', () => {
+  const originalConsoleError = console.error;
+  beforeAll(() => {
+    console.error = jest.fn();
+  });
+  afterAll(() => {
+    console.error = originalConsoleError;
+  });
+
   it('should call repository.logout', async () => {
     const useCase = new LogoutUseCase(mockAuthRepository);
     mockAuthRepository.logout.mockResolvedValue(undefined);
@@ -100,6 +120,10 @@ describe('LogoutUseCase', () => {
     mockAuthRepository.logout.mockRejectedValue(mockError);
 
     await expect(useCase.execute()).rejects.toThrow(mockError);
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('Erro no LogoutUseCase:'),
+      mockError,
+    );
   });
 });
 
@@ -120,11 +144,11 @@ describe('ObserveAuthStateUseCase', () => {
   it('should wrap the repository callback and forward data to presentation', () => {
     const useCase = new ObserveAuthStateUseCase(mockAuthRepository);
     const mockPresentationCallback = jest.fn();
-    const mockUnsubscribe = jest.fn(); 
+    const mockUnsubscribe = jest.fn();
 
     mockAuthRepository.onAuthStateChanged.mockImplementation((repositoryCallback) => {
-        repositoryCallback(mockAuthenticatedUser);
-        return mockUnsubscribe;
+      repositoryCallback(mockAuthenticatedUser);
+      return mockUnsubscribe;
     });
 
     const unsubscribeFn = useCase.execute(mockPresentationCallback);
@@ -133,33 +157,33 @@ describe('ObserveAuthStateUseCase', () => {
     expect(mockPresentationCallback).toHaveBeenCalledTimes(1);
     expect(mockPresentationCallback).toHaveBeenCalledWith(mockAuthenticatedUser);
     expect(unsubscribeFn).toBe(mockUnsubscribe);
-    
+
     unsubscribeFn();
     expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
   });
 });
 
 describe('ObserveUserDataUseCase', () => {
-    it('should wrap onUserDataChanged and forward data', () => {
-        const useCase = new ObserveUserDataUseCase(mockAuthRepository);
-        const mockUid = 'user-123';
-        const mockPresentationCallback = jest.fn();
-        const mockUnsubscribe = jest.fn();
+  it('should wrap onUserDataChanged and forward data', () => {
+    const useCase = new ObserveUserDataUseCase(mockAuthRepository);
+    const mockUid = 'user-123';
+    const mockPresentationCallback = jest.fn();
+    const mockUnsubscribe = jest.fn();
 
-        mockAuthRepository.onUserDataChanged.mockImplementation((uid, repositoryCallback) => {
-            repositoryCallback(mockUserData);
-            return mockUnsubscribe;
-        });
-
-        const unsubscribeFn = useCase.execute(mockUid, mockPresentationCallback);
-
-        expect(mockAuthRepository.onUserDataChanged).toHaveBeenCalledTimes(1);
-        expect(mockAuthRepository.onUserDataChanged).toHaveBeenCalledWith(
-            mockUid, 
-            expect.any(Function)
-        );
-        expect(mockPresentationCallback).toHaveBeenCalledTimes(1);
-        expect(mockPresentationCallback).toHaveBeenCalledWith(mockUserData);
-        expect(unsubscribeFn).toBe(mockUnsubscribe);
+    mockAuthRepository.onUserDataChanged.mockImplementation((uid, repositoryCallback) => {
+      repositoryCallback(mockUserData);
+      return mockUnsubscribe;
     });
+
+    const unsubscribeFn = useCase.execute(mockUid, mockPresentationCallback);
+
+    expect(mockAuthRepository.onUserDataChanged).toHaveBeenCalledTimes(1);
+    expect(mockAuthRepository.onUserDataChanged).toHaveBeenCalledWith(
+      mockUid,
+      expect.any(Function),
+    );
+    expect(mockPresentationCallback).toHaveBeenCalledTimes(1);
+    expect(mockPresentationCallback).toHaveBeenCalledWith(mockUserData);
+    expect(unsubscribeFn).toBe(mockUnsubscribe);
+  });
 });
