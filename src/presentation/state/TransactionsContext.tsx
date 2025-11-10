@@ -13,11 +13,12 @@ import type { ITransaction } from '@domain/entities/Transaction';
 import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
 import { db, storage } from '@infrastructure/config/firebaseConfig';
 import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
+import { cryptoEncryptionService } from '@infrastructure/security/CryptoEncryptionService';
 import { useAuth } from '@presentation/state/AuthContext';
 import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
 import { Timestamp } from 'firebase/firestore';
 
-const transactionRepository = new FirebaseTransactionRepository(db, storage);
+const transactionRepository = new FirebaseTransactionRepository(db, storage, cryptoEncryptionService);
 const transactionUseCases = new TransactionUseCasesFactory(transactionRepository);
 
 interface TransactionsContextData {
