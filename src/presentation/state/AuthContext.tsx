@@ -1,16 +1,5 @@
-import { auth, db } from "@infrastructure/config/firebaseConfig";
-import type { AuthContextData, UserData } from "@shared/interfaces/auth.interfaces";
-import { router } from "expo-router";
-import type { User, UserCredential } from "firebase/auth";
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
-import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
-import type { ReactNode } from "react";
+import { router } from 'expo-router';
+import type { ReactNode } from 'react';
 import React, {
   createContext,
   useCallback,
@@ -18,115 +7,117 @@ import React, {
   useEffect,
   useMemo,
   useState,
-} from "react";
+} from 'react';
 
-const AUTH_ROUTES = {
-  login: "/",
-  dashboard: "/dashboard",
-} as const;
-
-const AUTH_MESSAGES = {
-  logoutError: "Erro ao fazer logout",
-} as const;
+import type { AuthContextData } from '@/shared/interfaces/auth.interfaces';
+import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
+import type { AuthenticatedUser, UserData } from '@domain/entities/User';
+import type { AuthRepository } from '@domain/repositories/AuthRepository';
+import { AuthUseCasesFactory } from '@domain/use-cases/AuthUseCaseFactory';
+import { auth, db } from '@infrastructure/config/firebaseConfig';
+import { secureTokenStorage } from '@infrastructure/persistence/SecureTokenStorage';
+import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect((): (() => void) => {
-    let unsubscribeUser: () => void = (): void => {
-      // função inicial vazia para evitar erro antes da definição real
-    };
-
-    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser: User | null): void => {
-      setUser(currentUser);
-      unsubscribeUser();
-
-      if (currentUser) {
-        const docRef = doc(db, "users", currentUser.uid);
-        unsubscribeUser = onSnapshot(docRef, (docSnap) => {
-          if (docSnap.exists()) {
-            setUserData(docSnap.data() as UserData);
-          } else {
-            setUserData(null);
-          }
-        });
-      } else {
-        setUserData(null);
-      }
-
-      setLoading(false);
-    });
-
-    return (): void => {
-      unsubscribeAuth();
-      unsubscribeUser();
-    };
+  
+  const authUseCases = useMemo(() => {
+    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db, secureTokenStorage);
+    return new AuthUseCasesFactory(firebaseAuthRepository);
   }, []);
 
-  // 🔹 Cria usuário e retorna o UserCredential
-  const signup = useCallback(
-    async (email: string, password: string, name: string): Promise<UserCredential> => {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const newUser = userCredential.user;
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-      await setDoc(doc(db, "users", newUser.uid), {
-        uuid: newUser.uid,
-        name,
-        email,
-        createdAt: serverTimestamp(),
-      });
+  useEffect(() => {
+    let unsubscribeAuth: (() => void) | null = null;
+    let unsubscribeUserData: (() => void) | null = null;
 
-      return userCredential;
-    },
-    []
-  );
+    unsubscribeAuth = authUseCases.observeAuth.execute((authUser): void => {
+      setUser(authUser);
 
-  // 🔹 Login do usuário
-  const login = useCallback(
-    (email: string, password: string): Promise<UserCredential> =>
-      signInWithEmailAndPassword(auth, email, password),
-    []
-  );
+      if (unsubscribeUserData) {
+        unsubscribeUserData();
+        unsubscribeUserData = null;
+        setUserData(null); 
+      }
 
-  // 🔹 Reset de senha
-  const resetPassword = useCallback(
-    (email: string): Promise<void> => sendPasswordResetEmail(auth, email),
-    []
-  );
+      if (authUser) {
+         unsubscribeUserData = authUseCases.observeUserData.execute(authUser.uid, (data): void => {
+             setUserData(data);
+             setLoading(false);
+         });
+      } else {
+         setUserData(null);
+         setLoading(false); 
+      }
+    });
 
-  // 🔹 Logout do usuário
-  const handleSignOut = async (): Promise<void> => {
+    return () => {
+      if (unsubscribeAuth) unsubscribeAuth();
+      if (unsubscribeUserData) unsubscribeUserData();
+    };
+  }, [authUseCases]);
+
+  const handleSignup = useCallback(async (credentials: SignupCredentials) => {
+      await authUseCases.signup.execute(credentials);
+      router.replace('/dashboard'); 
+  }, [authUseCases]);
+
+  const handleSignupWrapper = useCallback(async (
+    ...args: [SignupCredentials] | [string, string, string?]
+  ) => {
+    if (args.length === 1) return await handleSignup(args[0]);
+    const [email, password, name] = args;
+    await handleSignup({ email, password, name: name ?? '' });
+  }, [handleSignup]);
+
+  const handleLogin = useCallback(async (credentials: AuthCredentials) => {
+      await authUseCases.login.execute(credentials);
+      router.replace('/dashboard');
+  }, [authUseCases]);
+
+  const handleLoginWrapper = useCallback(async (
+    ...args: [AuthCredentials] | [string, string]
+  ) => {
+    if (args.length === 1) return await handleLogin(args[0]);
+    const [email, password] = args;
+    await handleLogin({ email, password });
+  }, [handleLogin]);
+
+  const handleResetPassword = useCallback(async (email: string) => {
+      await authUseCases.resetPassword.execute(email);
+  }, [authUseCases]);
+
+    const handleSignOut = useCallback(async () => {
     try {
-      await signOut(auth);
-      router.replace(AUTH_ROUTES.login);
+      await authUseCases.logout.execute();
+      router.replace('/');
     } catch (error) {
-      console.error(`${AUTH_MESSAGES.logoutError}:`, error);
+      console.error("Erro ao fazer logout no AuthContext:", error);
     }
-  };
+  }, [authUseCases]);
 
-  // 🔹 Contexto com função síncrona que chama o async internamente
-  const contextValue = useMemo<AuthContextData>(
+
+  const contextValue = useMemo(
     () => ({
       user,
       userData,
       isAuthenticated: !!user,
       loading,
-      signup,
-      login,
-      resetPassword,
-      // ✅ Corrigido: evita o erro no-misused-promises
-      signOut: (): void => {
-        void handleSignOut();
-      },
+      signup: handleSignupWrapper,
+      login: handleLoginWrapper,
+      resetPassword: handleResetPassword,
+      signOut: handleSignOut,
     }),
-    [user, userData, loading, signup, login, resetPassword]
+    [user, userData, loading, handleSignupWrapper, handleLoginWrapper, handleResetPassword, handleSignOut]
   );
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
 };
 
 export function useAuth(): AuthContextData {

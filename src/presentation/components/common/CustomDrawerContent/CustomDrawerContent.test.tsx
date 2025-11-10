@@ -4,7 +4,7 @@ import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { CustomDrawerContent } from "./CustomDrawerContent";
 
-jest.mock("@/src/contexts/AuthContext", () => ({
+jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 

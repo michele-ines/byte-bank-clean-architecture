@@ -1,10 +1,16 @@
-import type { CreateTransaction } from "@/application/use-cases/CreateTransaction";
-import type { ListUserTransactions } from "@/application/use-cases/ListUserTransactions";
 import type { UserInfo } from "firebase/auth";
 import type { ReactNode } from "react";
 import type { StyleProp, TextStyle, ViewStyle } from "react-native";
 import type { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
 import type { ITransaction } from "../interfaces/auth.interfaces";
+
+export interface CreateTransaction {
+  exec: (tx: Transaction) => Promise<void>;
+}
+
+export interface ListUserTransactions {
+  exec: (userId: string) => () => void;
+}
 
 export interface ProfileStyles {
   container: ViewStyle;

@@ -120,8 +120,6 @@ const MainScreen: React.FC = () => {
 };
 
 export default MainScreen;
-
-/* ============================ Feature Card ============================ */
 interface FeatureCardProps {
   Icon: React.FC<SvgProps>;
   title: string;

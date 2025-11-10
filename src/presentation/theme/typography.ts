@@ -33,7 +33,6 @@ export const typography = {
   justifyEnd: "flex-end" as const,
   overflow: "hidden" as const,
   flexDirection: "column" as const,
-  // justifyStart: "flex-start" as const,
   liveRegionPolite:'polite' as const,
 
   textAlignCenter: "center" as const,

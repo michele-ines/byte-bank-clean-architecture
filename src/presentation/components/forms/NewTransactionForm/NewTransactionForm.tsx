@@ -2,13 +2,14 @@ import CardPixelsTop from "@assets/images/dash-card-new-transacao/card-pixels-3.
 import CardPixelBotton from "@assets/images/dash-card-new-transacao/card-pixels-4.svg";
 import TransactionIllustration from "@assets/images/dash-card-new-transacao/Ilustracao-2.svg";
 
+import type { AttachmentFile, NewTransactionData } from "@domain/entities/TransactionData";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { layout, texts } from "@presentation/theme";
-import type { INewTransactionInput } from "@shared/interfaces/auth.interfaces";
 import type { TransactionType } from "@shared/ProfileStyles/profile.styles.types";
 import { TransactionTypeItems } from "@shared/ProfileStyles/profile.styles.types";
 import { formatTransactionDescription, showToast } from "@shared/utils/transactions.utils";
+import { Timestamp } from "firebase/firestore";
 import type { JSX } from "react";
 import React, { useState } from "react";
 import {
@@ -56,11 +57,20 @@ export const NewTransactionForm: React.FC = (): JSX.Element => {
         numericAmount
       );
 
-      await addTransaction({
-        tipo: transactionType,
+      const mapToDomainType = (t: TransactionType | undefined): "entrada" | "saida" => {
+        if (t === "deposito") return "entrada";
+        return "saida";
+      };
+
+      const newTransaction: NewTransactionData = {
+        descricao: description,
         valor: numericAmount,
-        description,
-      } satisfies INewTransactionInput);
+        tipo: mapToDomainType(transactionType),
+        categoria: "",
+        data: Timestamp.now(),
+      };
+
+      await addTransaction(newTransaction, [] as AttachmentFile[]);
 
       showToast("success", t.toasts.success.title, t.toasts.success.message);
       setTransactionType(undefined);

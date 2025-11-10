@@ -8,7 +8,6 @@ const mockUpdateEmail = jest.fn();
 const mockUpdatePassword = jest.fn();
 const mockOnClose = jest.fn();
 
-// ✅ use o MESMO alias que o componente usa
 jest.mock("@presentation/hooks/useEditField", () => ({
   useEditField: () => ({
     value: "valor-inicial",
@@ -29,26 +28,32 @@ jest.mock("@presentation/hooks/useEditField", () => ({
   }),
 }));
 
-// ✅ corrige ts(2571) sem usar "as unknown"
 jest.mock("@expo/vector-icons", () => {
   const MaterialIcons: FC = () => null;
   MaterialIcons.displayName = "MaterialIconsMock";
   return { MaterialIcons };
 });
 
-// ✅ garante strings estáveis para os botões/labels
-jest.mock("@presentation/theme", () => ({
-  texts: {
-    modal: {
-      buttons: {
-        cancel: "Cancelar",
-        save: "Salvar",
-        accessibilityCancel: "Cancelar",
-        accessibilitySave: "Salvar",
+jest.mock("@presentation/theme", () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const actual = jest.requireActual("@presentation/theme");
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return {
+    ...actual,
+    texts: {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      ...(actual.texts as Record<string, unknown>),
+      modal: {
+        buttons: {
+          cancel: "Cancelar",
+          save: "Salvar",
+          accessibilityCancel: "Cancelar",
+          accessibilitySave: "Salvar",
+        },
       },
     },
-  },
-}));
+  };
+});
 
 describe("EditFieldModal", () => {
   beforeEach(() => {

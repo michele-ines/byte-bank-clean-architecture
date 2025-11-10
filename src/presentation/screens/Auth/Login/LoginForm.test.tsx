@@ -3,24 +3,21 @@ import { texts } from "@presentation/theme";
 import { showToast } from "@shared/utils/transactions.utils";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { router } from "expo-router";
-import type { JSX } from "react";
-import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import type React from "react";
+import type { JSX, ReactNode } from "react";
+import type { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { LoginForm } from "./LoginForm";
 
-// ✅ Evita arrow function vazia — adiciona comentário interno
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation(() => {
-    /* silence console.error */
-  });
+  jest.spyOn(console, "error").mockImplementation((): void => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
 const mockLogin = jest.fn();
 
-// ✅ Corrige path e tipagem do mock
 jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
@@ -30,15 +27,25 @@ jest.mock("@shared/utils/transactions.utils", () => ({
   formatTransactionDescription: jest.fn(),
 }));
 
-// ✅ Tipagem explícita e nullish coalescing (`??`)
 jest.mock("expo-router", () => {
+  const ReactLib = require("react") as {
+    createElement: <P>(
+      type: React.ComponentType<P> | string,
+      props: P | null,
+      ...children: React.ReactNode[]
+    ) => JSX.Element;
+  };
+  const RN = require("react-native") as {
+    TouchableOpacity: typeof TouchableOpacity;
+  };
+  const TouchableOpacityMock = RN.TouchableOpacity;
   const Link = ({
     children,
     ...props
   }: {
-    children: React.ReactNode;
+    children: ReactNode;
     [key: string]: unknown;
-  }): JSX.Element => <TouchableOpacity {...props}>{children}</TouchableOpacity>;
+  }): JSX.Element => ReactLib.createElement(TouchableOpacityMock, props, children);
 
   (Link as unknown as { displayName: string }).displayName = "MockLink";
 
@@ -51,25 +58,39 @@ jest.mock("expo-router", () => {
   };
 });
 
-jest.mock("@/src/routes", () => ({
-  routes: {
-    dashboard: "/dashboard",
-    signup: "/signup",
-    forgotPassword: "/forgot-password",
+jest.mock("@shared/constants/routes", () => ({
+  ROUTES: {
+    DASHBOARD: "/dashboard",
+    SIGNUP: "/signup",
+    FORGOT_PASSWORD: "/forgot-password",
   },
 }));
 
-jest.mock("react-native-gesture-handler", () => ({
-  ScrollView,
-}));
-(Object.assign(
-  jest.requireMock("react-native-gesture-handler"),
-  { displayName: "MockScrollView" }
-));
+jest.mock("react-native-gesture-handler", () => {
+  const RN = require("react-native") as {
+    ScrollView: typeof ScrollView;
+  };
+  return { ScrollView: RN.ScrollView };
+});
+Object.assign(jest.requireMock("react-native-gesture-handler"), {
+  displayName: "MockScrollView",
+});
 
-// ✅ Tipagem segura e uso de ?? no disabled
-jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
-  DefaultButton: ({
+jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
+  const ReactLib = require("react") as {
+    createElement: <P>(
+      type: React.ComponentType<P> | string,
+      props: P | null,
+      ...children: React.ReactNode[]
+    ) => JSX.Element;
+  };
+  const RN = require("react-native") as {
+    TouchableOpacity: typeof TouchableOpacity;
+    Text: typeof Text;
+  };
+  const TouchableOpacityMock = RN.TouchableOpacity;
+  const TextMock = RN.Text;
+  const DefaultButton = ({
     title,
     onPress,
     disabled,
@@ -81,42 +102,45 @@ jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
     disabled?: boolean;
     loading?: boolean;
     accessibilityLabel?: string;
-  }): JSX.Element => (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={(disabled ?? false) || (loading ?? false)}
-      accessibilityLabel={accessibilityLabel}
-    >
-      <Text>{loading ? "Loading..." : title}</Text>
-    </TouchableOpacity>
-  ),
-}));
-(Object.assign(
-  jest.requireMock("@/src/components/common/DefaultButton/DefaultButton"),
-  { displayName: "MockDefaultButton" }
-));
+  }): JSX.Element =>
+    ReactLib.createElement(
+      TouchableOpacityMock,
+      { onPress, disabled: (disabled ?? false) || (loading ?? false), accessibilityLabel },
+      ReactLib.createElement(TextMock, null, loading ? "Loading..." : title)
+    );
 
-jest.mock("@/assets/images/login/ilustracao-login.svg", () => ({
-  __esModule: true,
-  default: ({
+  return { DefaultButton };
+});
+Object.assign(jest.requireMock("@presentation/components/common/common/DefaultButton/DefaultButton"), {
+  displayName: "MockDefaultButton",
+});
+
+jest.mock("@assets/images/login/ilustracao-login.svg", () => {
+  const ReactLib = require("react") as {
+    createElement: <P>(
+      type: React.ComponentType<P> | string,
+      props: P | null,
+      ...children: React.ReactNode[]
+    ) => JSX.Element;
+  };
+  const RN = require("react-native") as {
+    View: typeof View;
+  };
+  const ViewMock = RN.View;
+  const SvgMock = ({
     accessible,
     accessibilityLabel,
     ...props
   }: {
     accessible?: boolean;
     accessibilityLabel?: string;
-  }): JSX.Element => (
-    <View
-      accessible={accessible}
-      accessibilityLabel={accessibilityLabel}
-      {...props}
-    />
-  ),
-}));
-(Object.assign(
-  jest.requireMock("@/assets/images/login/ilustracao-login.svg"),
-  { displayName: "MockSvgImage" }
-));
+  }): JSX.Element => ReactLib.createElement(ViewMock, { accessible, accessibilityLabel, ...props });
+
+  return { __esModule: true, default: SvgMock };
+});
+Object.assign(jest.requireMock("@assets/images/login/ilustracao-login.svg"), {
+  displayName: "MockSvgImage",
+});
 
 describe("LoginForm", () => {
   const mockOnLoginSuccess = jest.fn();
@@ -128,9 +152,6 @@ describe("LoginForm", () => {
     jest.clearAllMocks();
   });
 
-  // ==============================================================
-  // handleLogin function
-  // ==============================================================
   describe("handleLogin function", () => {
     it("deve fazer login com sucesso quando campos estão preenchidos", async (): Promise<void> => {
       mockLogin.mockResolvedValueOnce(undefined);
@@ -149,11 +170,11 @@ describe("LoginForm", () => {
       fireEvent.press(loginButton);
 
       await waitFor(() => {
-        expect(mockLogin).toHaveBeenCalledWith("test@example.com", "password123");
+        expect(mockLogin).toHaveBeenCalledWith({ email: "test@example.com", password: "password123" });
       });
 
-      expect(mockOnLoginSuccess).toHaveBeenCalledWith("test@example.com");
-      expect(router.replace).toHaveBeenCalledWith("/dashboard");
+  expect(mockOnLoginSuccess).toHaveBeenCalledWith("test@example.com");
+  expect(router.replace).not.toHaveBeenCalled();
       expect(showToast).not.toHaveBeenCalled();
     });
 
@@ -174,7 +195,7 @@ describe("LoginForm", () => {
       fireEvent.press(loginButton);
 
       await waitFor(() => {
-        expect(mockLogin).toHaveBeenCalledWith("test@example.com", "wrongpassword");
+        expect(mockLogin).toHaveBeenCalledWith({ email: "test@example.com", password: "wrongpassword" });
       });
 
       expect(showToast).toHaveBeenCalledWith(
@@ -187,7 +208,6 @@ describe("LoginForm", () => {
     });
 
     it("deve mostrar toast de erro inesperado quando login falha com erro desconhecido", async (): Promise<void> => {
-      // ✅ Tipagem segura do erro genérico
       const unknownError: unknown = "Unknown error";
       mockLogin.mockRejectedValueOnce(unknownError);
 
@@ -206,7 +226,7 @@ describe("LoginForm", () => {
       fireEvent.press(loginButton);
 
       await waitFor(() => {
-        expect(mockLogin).toHaveBeenCalledWith("test@example.com", "password123");
+        expect(mockLogin).toHaveBeenCalledWith({ email: "test@example.com", password: "password123" });
       });
 
       expect(showToast).toHaveBeenCalledWith(
@@ -219,9 +239,7 @@ describe("LoginForm", () => {
     });
   });
 
-  // ==============================================================
-  // handleCreateAccount
-  // ==============================================================
+
   describe("handleCreateAccount function", () => {
     it("deve navegar para página de cadastro quando botão criar conta é pressionado", (): void => {
       const { getByLabelText } = render(
@@ -254,9 +272,6 @@ describe("LoginForm", () => {
     });
   });
 
-  // ==============================================================
-  // Renderização e comportamento geral
-  // ==============================================================
   describe("Renderização e comportamento geral", () => {
     it("renderiza todos os elementos do formulário", (): void => {
       const { getByText, getByLabelText } = render(

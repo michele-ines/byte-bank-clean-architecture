@@ -4,11 +4,12 @@ import { showToast } from "@shared/utils/transactions.utils";
 import { validateEmail, validateName, validatePassword } from "@shared/utils/validation";
 import { FirebaseError } from "firebase/app";
 import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updatePassword,
-  updateProfile,
-  verifyBeforeUpdateEmail,
+    EmailAuthProvider,
+    reauthenticateWithCredential,
+    updatePassword,
+    updateProfile,
+    verifyBeforeUpdateEmail,
+    type User,
 } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
@@ -70,8 +71,8 @@ export function useEditField(
       return false;
     }
     try {
-      const credential = EmailAuthProvider.credential(user.email, currentPassword);
-      await reauthenticateWithCredential(user, credential);
+  const credential = EmailAuthProvider.credential(user.email, currentPassword);
+  await reauthenticateWithCredential(user as unknown as User, credential);
       return true;
     } catch (error) {
       if (error instanceof FirebaseError && error.code === "auth/wrong-password") {
@@ -92,7 +93,7 @@ export function useEditField(
       return;
     }
     try {
-      await updateProfile(user, { displayName: name });
+  await updateProfile(user as unknown as User, { displayName: name });
       await updateUserDataInFirestore(name);
       showToast("success", texts.formToasts.success.name.title, texts.formToasts.success.name.message);
       onClose();
@@ -117,9 +118,9 @@ export function useEditField(
       return;
     }
     try {
-      const reauthSuccess = await reauthenticate();
-      if (!reauthSuccess) return;
-      await verifyBeforeUpdateEmail(user, email);
+  const reauthSuccess = await reauthenticate();
+  if (!reauthSuccess) return;
+  await verifyBeforeUpdateEmail(user as unknown as User, email);
       await updateUserDataInFirestore(undefined, email);
       showToast("success", texts.formToasts.success.email.title, texts.formToasts.success.email.message);
       onClose();
@@ -150,9 +151,9 @@ export function useEditField(
       return;
     }
     try {
-      const reauthSuccess = await reauthenticate();
-      if (!reauthSuccess) return;
-      await updatePassword(user, newPassword);
+  const reauthSuccess = await reauthenticate();
+  if (!reauthSuccess) return;
+  await updatePassword(user as unknown as User, newPassword);
       showToast("success", texts.formToasts.success.password.title, texts.formToasts.success.password.message);
       onClose();
     } catch (error) {

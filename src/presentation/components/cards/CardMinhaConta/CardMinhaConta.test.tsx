@@ -1,46 +1,54 @@
-import { useAuth } from "@/presentation/state/AuthContext";
+import { useAuth } from "@presentation/state/AuthContext";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import type { JSX } from "react";
 import React from "react";
-import { Text, TouchableOpacity, View } from "react-native";
 import { CardMinhaConta } from "./CardMinhaConta";
 
-jest.mock("@/src/contexts/AuthContext", () => ({
+jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
-jest.mock("@expo/vector-icons", () => ({
-  MaterialIcons: (props: Record<string, unknown>): JSX.Element => (
-    <Text testID="icon-mock" {...props}>
-      IconMock
-    </Text>
-  ),
-}));
+jest.mock("@expo/vector-icons", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ Text: unknown }>("react-native");
+  const mockText = reactNative.Text;
+  const MaterialIcons = (props: Record<string, unknown>): JSX.Element =>
+    mockReact.createElement(mockText, { testID: "icon-mock", ...props }, "IconMock");
+
+  return { MaterialIcons };
+});
 
 jest.mock("../../modal/EditFieldModal/EditFieldModal", () => {
-  interface MockModalProps {
-    visible: boolean;
-    field: string;
-    initialValue: string;
-    onClose: () => void;
-  }
-
-  const MockModal: React.FC<MockModalProps> = ({
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown; TouchableOpacity: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const mockText = reactNative.Text;
+  const mockTouchableOpacity = reactNative.TouchableOpacity;
+  const MockModal = ({
     visible,
     field,
     initialValue,
     onClose,
-  }) =>
-    visible ? (
-      <View>
-        <Text testID="modal-field">{field}</Text>
-        <Text testID="modal-initial">{initialValue}</Text>
-        <Text testID="modal-visible">true</Text>
-        <TouchableOpacity testID="modal-onClose" onPress={onClose}>
-          <Text>fechar</Text>
-        </TouchableOpacity>
-      </View>
-    ) : null;
+  }: {
+    visible: boolean;
+    field: string;
+    initialValue: string;
+    onClose: () => void;
+  }): JSX.Element | null =>
+    visible
+      ? mockReact.createElement(
+          mockView,
+          null,
+          mockReact.createElement(mockText, { testID: "modal-field" }, field),
+          mockReact.createElement(mockText, { testID: "modal-initial" }, initialValue),
+          mockReact.createElement(mockText, { testID: "modal-visible" }, "true"),
+          mockReact.createElement(
+            mockTouchableOpacity,
+            { testID: "modal-onClose", onPress: onClose },
+            mockReact.createElement(mockText, null, "fechar")
+          )
+        )
+      : null;
 
   return { EditFieldModal: MockModal };
 });

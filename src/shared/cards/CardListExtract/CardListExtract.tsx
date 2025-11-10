@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
+import type { AttachmentFile } from "@/domain/entities/TransactionData";
 import { Feather } from "@expo/vector-icons";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { colors, spacing, texts, typography } from "@presentation/theme";
+import type { ITransaction as LegacyITransaction } from "@shared/interfaces/auth.interfaces";
 import { truncateString } from "@shared/utils/string";
 import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";
@@ -19,7 +21,6 @@ import { MaskedTextInput } from "react-native-mask-text";
 import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
-import type { IAnexo } from "../../interfaces/auth.interfaces";
 import type {
   CardListExtractProps,
   EditedValuesMap,
@@ -33,13 +34,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   const {
     transactions,
     loading,
-    loadingMore,
-    hasMore,
-    loadMoreTransactions,
     updateTransaction,
-    uploadAttachmentAndUpdateTransaction,
-    deleteAttachment,
-    deleteTransactions,
+    deleteTransaction,
   } = useTransactions();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -47,10 +43,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   const [editedValues, setEditedValues] = useState<EditedValuesMap>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-
-  const filtered = filterFn ? transactions.filter(filterFn) : transactions;
-
-  // -------------------- Funções auxiliares --------------------
+  const filtered = filterFn
+    ? ((transactions as unknown as LegacyITransaction[]).filter(filterFn) as unknown as typeof transactions)
+    : transactions;
 
   const handleOpenReceipt = async (url: string): Promise<void> => {
     const supported = await Linking.canOpenURL(url);
@@ -95,11 +90,11 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
       const result = await DocumentPicker.getDocumentAsync({});
       if (!result.canceled && result.assets?.length) {
         const file = result.assets[0];
-        await uploadAttachmentAndUpdateTransaction(
-          transactionId,
-          file.uri,
-          file.name
-        );
+        const response = await fetch(file.uri);
+        const blob = await response.blob();
+        const attachment = Object.assign(blob, { name: file.name }) as unknown as AttachmentFile;
+
+        await updateTransaction(transactionId, {}, [attachment], []);
         showToast(
           "success",
           texts.cardList.toasts.attachSuccess.title,
@@ -120,7 +115,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
 
   const handleDeleteAttachment = (
     transactionId: string,
-    file: IAnexo
+    fileUrl: string
   ): void => {
     const dialog = texts.cardList.dialogs.deleteAttachment;
     Alert.alert(dialog.title, dialog.message, [
@@ -129,10 +124,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         text: dialog.confirmButton,
         style: "destructive",
         onPress: () => {
-          // ✅ Corrigido: executa async com void
           void (async () => {
             try {
-              await deleteAttachment(transactionId, file);
+              await updateTransaction(transactionId, {}, [], [fileUrl]);
               showToast(
                 "success",
                 texts.cardList.toasts.deleteAttachmentSuccess.title,
@@ -172,7 +166,13 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
 
     try {
-      await deleteTransactions(Array.from(selectedItems));
+      await Promise.all(
+          Array.from(selectedItems).map(async (id) => {
+          const tx = transactions.find((t) => t.id === id);
+          const attachments = tx?.attachments ?? [];
+          await deleteTransaction(id, attachments);
+        })
+      );
       showToast(
         "success",
         texts.cardList.toasts.deleteTransactionsSuccess.title,
@@ -215,7 +215,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     try {
       await Promise.all(
         transacoesAlteradas.map(([id, raw]) =>
-          updateTransaction(id, { valor: parseFloat(raw) / 100 })
+          updateTransaction(id, { valor: parseFloat(raw) / 100 }, [], [])
         )
       );
       showToast(
@@ -236,13 +236,11 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     }
   };
 
-  // -------------------- Render --------------------
-
   return (
     <View style={styles.container}>
       <FlatList
         data={filtered}
-        keyExtractor={(item) => item.id!}
+  keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <ListHeader
             title={title}
@@ -268,29 +266,29 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
                   groupSeparator: ".",
                   precision: 2,
                 }}
-                value={editedValues[item.id!] ?? ""}
-                onChangeText={(_, raw) => handleValueChange(item.id!, raw)}
+                value={editedValues[item.id] ?? ""}
+                onChangeText={(_, raw) => handleValueChange(item.id, raw)}
               />
             ) : (
               <Text>R$ {item.valor.toFixed(2).replace(".", ",")}</Text>
             )}
 
-            {item.anexos?.map((file, i) => (
+            {item.attachments?.map((url: string, i: number) => (
               <Fragment key={i}>
                 <Pressable
                   onPress={() => {
-                    void handleOpenReceipt(file.url);
+                    void handleOpenReceipt(url);
                   }}
                 >
                   <Text style={styles.attachmentLink}>
-                    {truncateString(file.name, 20)}
+                    {truncateString(decodeURIComponent(url.split("/").pop() ?? url), 20)}
                   </Text>
                 </Pressable>
 
                 {isEditing && (
                   <Pressable
                     onPress={() => {
-                      handleDeleteAttachment(item.id!, file);
+                      handleDeleteAttachment(item.id, url);
                     }}
                   >
                     <Feather
@@ -310,7 +308,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
                 ) : (
                   <Pressable
                     onPress={() => {
-                      void handleAttachFile(item.id!);
+                      void handleAttachFile(item.id);
                     }}
                     disabled={!!uploadingId}
                   >
@@ -322,8 +320,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
 
             {isDeleting && (
               <Checkbox
-                value={selectedItems.has(item.id!)}
-                onValueChange={(v) => handleItemSelection(item.id!, v)}
+                value={selectedItems.has(item.id)}
+                onValueChange={(v) => handleItemSelection(item.id, v)}
               />
             )}
           </View>
@@ -338,12 +336,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
             </Text>
           ) : null
         }
-        ListFooterComponent={<ListFooter isLoadingMore={loadingMore} />}
-        onEndReached={() => {
-          if (hasMore && !loadingMore) {
-            void loadMoreTransactions(); 
-          }
-        }}
+        ListFooterComponent={<ListFooter isLoadingMore={false} />}
         onEndReachedThreshold={0.1}
         keyboardShouldPersistTaps="handled"
       />

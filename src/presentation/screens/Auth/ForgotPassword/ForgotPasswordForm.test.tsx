@@ -1,19 +1,17 @@
-// ✅ Todos os imports no topo
 import { fireEvent, render, screen } from "@testing-library/react-native";
+import type React from "react";
 import type { JSX } from "react";
-import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import type { Text, TouchableOpacity } from "react-native";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
-// 🔹 Mocks externos primeiro
 const mockShowToast = jest.fn();
-jest.mock("@/src/utils/transactions.utils", () => ({
+jest.mock("@shared/utils/transactions.utils", () => ({
   formatTransactionDescription: jest.fn(),
   showToast: mockShowToast,
 }));
 
 const mockResetPassword = jest.fn();
-jest.mock("@/src/contexts/AuthContext", () => ({
+jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: () => ({
     resetPassword: mockResetPassword,
   }),
@@ -28,15 +26,27 @@ jest.mock("expo-router", () => ({
   },
 }));
 
-jest.mock("@/src/routes", () => ({
-  routes: {
-    login: "/login",
+jest.mock("@shared/constants/routes", () => ({
+  ROUTES: {
+    LOGIN: "/login",
   },
 }));
 
-// ✅ Tipagem explícita e uso seguro do operador `??`
-jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
-  DefaultButton: ({
+jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
+  const ReactLib = require("react") as {
+    createElement: <P>(
+      type: React.ComponentType<P> | string,
+      props: P | null,
+      ...children: React.ReactNode[]
+    ) => JSX.Element;
+  };
+  const RN = require("react-native") as {
+    TouchableOpacity: typeof TouchableOpacity;
+    Text: typeof Text;
+  };
+  const TouchableOpacityMock = RN.TouchableOpacity;
+  const TextMock = RN.Text;
+  const DefaultButton = ({
     title,
     onPress,
     disabled,
@@ -50,20 +60,23 @@ jest.mock("@/src/components/common/DefaultButton/DefaultButton", () => ({
     loading?: boolean;
     accessibilityLabel?: string;
     accessibilityHint?: string;
-  }): JSX.Element => (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={(disabled ?? false) || (loading ?? false)}
-      testID={title === "Enviar" ? "button-enviar" : "button-voltar"}
-      accessibilityLabel={accessibilityLabel}
-      accessibilityHint={accessibilityHint}
-    >
-      <Text>{loading ? "Loading..." : title}</Text>
-    </TouchableOpacity>
-  ),
-}));
+  }): JSX.Element =>
+    ReactLib.createElement(
+      TouchableOpacityMock,
+      {
+        onPress,
+        disabled: (disabled ?? false) || (loading ?? false),
+        testID: title === "Enviar" ? "button-enviar" : "button-voltar",
+        accessibilityLabel,
+        accessibilityHint,
+      },
+      ReactLib.createElement(TextMock, null, loading ? "Loading..." : title)
+    );
 
-jest.mock("@/src/theme/texts", () => ({
+  return { DefaultButton };
+});
+
+jest.mock("@presentation/theme", () => ({
   texts: {
     forgotPasswordForm: {
       title: "Esqueci minha senha",
@@ -154,7 +167,6 @@ describe("ForgotPasswordForm", () => {
   });
 
   describe("Validação de formulário", () => {
-    // ✅ Removido async desnecessário — não há `await` dentro
     it("não chama resetPassword quando e-mail está vazio", (): void => {
       render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
 

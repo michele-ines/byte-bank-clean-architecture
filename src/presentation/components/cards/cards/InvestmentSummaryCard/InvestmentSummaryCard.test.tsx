@@ -7,13 +7,15 @@ import { texts } from "@presentation/theme";
 import { render } from "@testing-library/react-native";
 import type { JSX } from "react";
 import React from "react";
-import { Text, View } from "react-native";
 import { InvestmentSummaryCard } from "./InvestmentSummaryCard";
 import { investmentSummaryMock } from "./Mock/InvestmentSummaryCard.mock";
 
 jest.mock("@assets/images/dash-card-new-transacao/card-pixels-3.svg", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockView = reactNative.View;
   const SvgMock = (props: SvgMockProps): JSX.Element =>
-    React.createElement(View, {
+    mockReact.createElement(mockView, {
       accessible: props.accessible,
       accessibilityLabel: props.accessibilityLabel,
       testID: "TopIllustrationMock",
@@ -24,19 +26,31 @@ jest.mock("@assets/images/dash-card-new-transacao/card-pixels-3.svg", () => {
 });
 
 jest.mock("react-native-gesture-handler", () => {
-  const ScrollViewMock = ({ children, ...props }: ScrollViewMockProps): JSX.Element =>
-    React.createElement(View, props, children);
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const ScrollViewMock = ({
+    children,
+    ...props
+  }: ScrollViewMockProps): JSX.Element => mockReact.createElement(mockView, props, children);
 
   (ScrollViewMock as React.FC).displayName = "ScrollViewMock";
   return { __esModule: true, ScrollView: ScrollViewMock };
 });
 
-jest.mock("../../DonutChart/DonutChart", () => {
-  const DonutChartMock = ({ accessibilityLabel, data }: DonutChartMockProps): JSX.Element =>
-    React.createElement(
-      View,
+jest.mock("@presentation/components/charts/DonutChart", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const mockText = reactNative.Text;
+  const DonutChartMock = ({
+    accessibilityLabel,
+    data,
+  }: DonutChartMockProps): JSX.Element =>
+    mockReact.createElement(
+      mockView,
       { accessible: true, accessibilityLabel, testID: "DonutChart" },
-      React.createElement(Text, null, `donut(${Array.isArray(data) ? data.length : 0})`)
+      mockReact.createElement(mockText, null, `donut(${Array.isArray(data) ? data.length : 0})`)
     );
 
   (DonutChartMock as React.FC).displayName = "DonutChartMock";

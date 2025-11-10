@@ -1,15 +1,15 @@
 import { render, screen } from "@testing-library/react-native";
-import type { FC, JSX } from "react";
-import { Text, View } from "react-native";
+import type React from "react";
+import type { JSX } from "react";
 import { ScreenWrapper } from "./ScreenWrapper";
 
-jest.mock("@/src/contexts/AuthContext", () => ({
+jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: (): { userData: { name: string; uuid: string } } => ({
     userData: { name: "Michele", uuid: "user-123" },
   }),
 }));
 
-jest.mock("@/src/contexts/TransactionsContext", () => ({
+jest.mock("@presentation/state/TransactionsContext", () => ({
   useTransactions: (): {
     transactions: unknown[];
     loading: boolean;
@@ -27,16 +27,18 @@ interface BalanceProps {
   user?: { displayName?: string; name?: string };
 }
 
-// ✅ Tipo auxiliar seguro para mocks de componentes
-type MockedFC<P = Record<string, unknown>> = FC<P> & { displayName?: string };
+jest.mock("../../../../../shared/cards/balance/BalanceComponent", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const mockText = reactNative.Text;
 
-// Mock do componente de Balance (default export)
-jest.mock("@/src/shared/cards/balance/BalanceComponent", () => {
-  const BalanceMock: MockedFC<BalanceProps> = ({ user }): JSX.Element => (
-    <View testID="balance">
-      <Text>{`Balance para ${user?.displayName ?? user?.name ?? ""}`}</Text>
-    </View>
-  );
+  const BalanceMock = ({ user }: BalanceProps): JSX.Element =>
+    mockReact.createElement(
+      mockView,
+      { testID: "balance" },
+      mockReact.createElement(mockText, null, `Balance para ${user?.displayName ?? user?.name ?? ""}`)
+    );
 
   BalanceMock.displayName = "BalanceComponentMock";
 
@@ -47,15 +49,18 @@ interface CardListExtractProps {
   title: string;
 }
 
-// Mock do CardListExtract (named export)
-jest.mock("@/src/shared/cards/CardListExtract/CardListExtract", () => {
-  const CardListExtract: MockedFC<CardListExtractProps> = ({
-    title,
-  }): JSX.Element => (
-    <View testID="extract">
-      <Text>{`Extrato: ${title}`}</Text>
-    </View>
-  );
+jest.mock("../../../../../shared/cards/CardListExtract/CardListExtract", () => {
+  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
+  const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
+  const mockView = reactNative.View;
+  const mockText = reactNative.Text;
+
+  const CardListExtract = ({ title }: CardListExtractProps): JSX.Element =>
+    mockReact.createElement(
+      mockView,
+      { testID: "extract" },
+      mockReact.createElement(mockText, null, `Extrato: ${title}`)
+    );
 
   CardListExtract.displayName = "CardListExtractMock";
 

@@ -14,7 +14,6 @@ export const Header: React.FC = () => {
   const navigation = useNavigation();
   const { isAuthenticated } = useAuth();
 
-  // ✅ Tipagem explícita adicionada
   const openDrawer = (event: GestureResponderEvent): void => {
     event.preventDefault();
     navigation.dispatch(DrawerActions.openDrawer());

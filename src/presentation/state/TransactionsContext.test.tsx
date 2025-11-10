@@ -13,27 +13,25 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { useAuth } from "./AuthContext";
 import { TransactionsProvider, useTransactions } from "./TransactionsContext";
 
-// ▶️ Silencia console.error
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation((): void => {
-    // Silencia erros esperados nos testes
-  });
+  jest.spyOn(console, "error").mockImplementation((): void => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
 
-// ▶️ MOCK do useAuth
 const mockUser = { uid: "test-user-id" };
-jest.mock("@/src/contexts/AuthContext", () => ({
+
+jest.mock("./AuthContext", () => ({
   useAuth: jest.fn(),
 }));
 
-// ▶️ MOCK do Firebase Firestore
 jest.mock("firebase/firestore", () => ({
   addDoc: jest.fn(),
   collection: jest.fn(() => "mock-collection-ref"),
   doc: jest.fn(() => "mock-doc-ref"),
+  deleteDoc: jest.fn(),
   getDoc: jest.fn(),
   getDocs: jest.fn(),
   limit: jest.fn(() => "mock-limit"),
@@ -48,7 +46,9 @@ jest.mock("firebase/firestore", () => ({
   arrayRemove: jest.fn(() => "mock-array-remove"),
 }));
 
-// ▶️ MOCK do Firebase Storage
+const fsMock = require("firebase/firestore") as { Timestamp: { now: () => { seconds: number } } };
+fsMock.Timestamp = { now: () => ({ seconds: Math.floor(Date.now() / 1000) }) };
+
 jest.mock("firebase/storage", () => ({
   deleteObject: jest.fn(),
   getDownloadURL: jest.fn(),
@@ -56,13 +56,11 @@ jest.mock("firebase/storage", () => ({
   uploadBytesResumable: jest.fn(),
 }));
 
-// ▶️ MOCK do Firebase Config
-jest.mock("../config/firebaseConfig", () => ({
+jest.mock("../../infrastructure/config/firebaseConfig", () => ({
   db: {},
   storage: {},
 }));
 
-// ▶️ Helper para criar um componente de teste
 const TestComponent: React.FC = (): JSX.Element => {
   const {
     transactions,
@@ -80,7 +78,6 @@ const TestComponent: React.FC = (): JSX.Element => {
 
   const [error, setError] = React.useState<string | null>(null);
 
-  // ✅ Cada função agora é síncrona e chama async internamente (para evitar no-misused-promises)
   const handleAddTransaction = (): void => {
     void (async (): Promise<void> => {
       try {
@@ -161,7 +158,6 @@ const TestComponent: React.FC = (): JSX.Element => {
       <Text testID="transactionsCount">{transactions.length}</Text>
       {error && <Text testID="error">{error}</Text>}
 
-      {/* Todos os handlers agora são void (sem async direto) */}
       <TouchableOpacity testID="addTransaction" onPress={handleAddTransaction}>
         <Text>Add Transaction</Text>
       </TouchableOpacity>
@@ -201,7 +197,6 @@ const TestComponent: React.FC = (): JSX.Element => {
   );
 };
 
-// ✅ Tipagem explícita
 const renderWithProvider = (
   component: React.ReactElement
 ): ReturnType<typeof render> => {
@@ -213,14 +208,18 @@ describe("TransactionsContext", (): void => {
     (useAuth as jest.Mock).mockReturnValue({ user: mockUser });
     jest.clearAllMocks();
 
-    // ✅ Mock padrão do onSnapshot sem uso de any
     (onSnapshot as jest.Mock).mockImplementation(
       (
         _query: unknown,
-        callback: (snapshot: { docs: unknown[]; empty: boolean }) => void
+        callback: (snapshot: { forEach: (fn: (d: unknown) => void) => void; empty: boolean }) => void
       ): (() => void) => {
-        callback({ docs: [], empty: true });
-        return jest.fn(); // função de unsubscribe mockada
+        const snapshot = {
+          docs: [],
+          empty: true,
+          forEach: (_fn: (d: unknown) => void): void => undefined,
+        };
+        callback(snapshot);
+        return jest.fn();
       }
     );
   });
@@ -232,14 +231,14 @@ describe("TransactionsContext", (): void => {
       const { getByTestId } = renderWithProvider(<TestComponent />);
       fireEvent.press(getByTestId("addTransaction"));
 
-      await waitFor(() => {
+await waitFor(() => {
         expect(addDoc).toHaveBeenCalledWith(
           expect.anything(),
           expect.objectContaining({
-            tipo: "deposito",
+            descricao: 'Test',
+            tipo: 'entrada',
+            userId: 'test-user-id', 
             valor: 100,
-            description: "Test",
-            userId: "test-user-id",
           })
         );
       });
@@ -253,7 +252,7 @@ describe("TransactionsContext", (): void => {
 
       await waitFor(() => {
         expect(getByTestId("error").children[0]).toBe(
-          "Usuário não autenticado."
+          "Usuário não autenticado"
         );
       });
     });
@@ -286,7 +285,8 @@ describe("TransactionsContext", (): void => {
       fireEvent.press(getByTestId("deleteTransactions"));
 
       await waitFor(() => {
-        expect(mockBatch.commit).toHaveBeenCalled();
+        const firestoreModule = require("firebase/firestore") as { deleteDoc: jest.Mock };
+        expect(firestoreModule.deleteDoc).toHaveBeenCalled();
       });
     });
   });
@@ -301,6 +301,7 @@ describe("TransactionsContext", (): void => {
       fireEvent.press(getByTestId("deleteAttachment"));
 
       await waitFor(() => {
+        
         expect(deleteObject).toHaveBeenCalled();
         expect(updateDoc).toHaveBeenCalled();
       });

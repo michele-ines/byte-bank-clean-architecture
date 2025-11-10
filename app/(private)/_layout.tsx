@@ -130,7 +130,7 @@ export default function AppLayout(): JSX.Element {
           listeners={{
             drawerItemPress: (e) => {
               e.preventDefault();
-              signOut();
+              void signOut();
             },
           }}
           options={{

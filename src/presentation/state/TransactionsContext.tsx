@@ -1,359 +1,230 @@
-import type { DocumentData, QueryDocumentSnapshot, Timestamp } from "firebase/firestore";
-import {
-  addDoc,
-  arrayRemove,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
-  startAfter,
-  updateDoc,
-  where,
-  writeBatch,
-} from "firebase/firestore";
-import {
-  deleteObject,
-  getDownloadURL,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
-import type { ReactNode } from "react";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import type { ReactNode } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
-import { db, storage } from "@infrastructure/config/firebaseConfig";
-import type {
-  IAnexo,
-  INewTransactionInput,
-  ITransaction,
-  ITransactionsContextData,
-} from "@shared/interfaces/auth.interfaces";
-import { useAuth } from "./AuthContext";
+import { TransactionUseCasesFactory } from '@/domain/use-cases/TransactionUseCasesFactory';
+import type { ITransaction } from '@domain/entities/Transaction';
+import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
+import { db, storage } from '@infrastructure/config/firebaseConfig';
+import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
+import { useAuth } from '@presentation/state/AuthContext';
+import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
+import { Timestamp } from 'firebase/firestore';
 
-const PAGE_SIZE = 5;
+const transactionRepository = new FirebaseTransactionRepository(db, storage);
+const transactionUseCases = new TransactionUseCasesFactory(transactionRepository);
 
-const TransactionsContext = createContext<ITransactionsContextData>(
-  {} as ITransactionsContextData
-);
-
-export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
-  const { user } = useAuth();
-  const [transactions, setTransactions] = useState<ITransaction[]>([]);
-  const [balance, setBalance] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [loadingMore, setLoadingMore] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [lastVisible, setLastVisible] =
-    useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-
-  // 🔹 Efeito 1: Ouve as transações em tempo real
-  useEffect((): (() => void) => {
-    if (!user) {
-      setTransactions([]);
-      setLoading(false);
-      return () => undefined;
-    }
-
-    setLoading(true);
-    const q = query(
-      collection(db, "transactions"),
-      where("userId", "==", user.uid),
-      orderBy("createdAt", "desc"),
-      limit(PAGE_SIZE)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const data: ITransaction[] = snapshot.docs.map((docSnap) => {
-        const docData = docSnap.data() as ITransaction;
-
-        // ✅ Conversão segura para Timestamp
-        const createdAtTimestamp =
-          typeof docData.createdAt === "object" &&
-          docData.createdAt !== null &&
-          "toDate" in docData.createdAt
-            ? (docData.createdAt as Timestamp)
-            : undefined;
-
-        const updatedAtTimestamp =
-          typeof docData.updateAt === "object" &&
-          docData.updateAt !== null &&
-          "toDate" in docData.updateAt
-            ? (docData.updateAt as Timestamp)
-            : undefined;
-
-        const convertedCreatedAt = createdAtTimestamp
-          ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR")
-          : new Date().toLocaleDateString("pt-BR");
-
-        const convertedUpdatedAt = updatedAtTimestamp
-          ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR")
-          : new Date().toLocaleDateString("pt-BR");
-
-        return {
-          ...docData,
-          id: docSnap.id,
-          createdAt: convertedCreatedAt,
-          updateAt: convertedUpdatedAt,
-        };
-      });
-
-      setTransactions(data);
-      setLoading(false);
-
-      if (snapshot.docs.length > 0) {
-        setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
-      }
-      setHasMore(snapshot.docs.length >= PAGE_SIZE);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
-  // 🔹 Efeito 2: Calcula saldo total em tempo real
-  useEffect((): (() => void) => {
-    if (!user) {
-      setBalance(0);
-      return () => undefined;
-    }
-
-    const balanceQuery = query(
-      collection(db, "transactions"),
-      where("userId", "==", user.uid)
-    );
-
-    const unsubscribe = onSnapshot(balanceQuery, (snapshot) => {
-      const total = snapshot.docs.reduce((acc, docSnap) => {
-        const transaction = docSnap.data() as ITransaction;
-        if (transaction.tipo === "transferencia") {
-          return acc - transaction.valor;
-        }
-        return acc + transaction.valor;
-      }, 0);
-      setBalance(total);
-    });
-
-    return () => unsubscribe();
-  }, [user]);
-
-  // 🔹 Adiciona nova transação
-  const addTransaction = async (transaction: INewTransactionInput): Promise<void> => {
-    if (!user) throw new Error("Usuário não autenticado.");
-    await addDoc(collection(db, "transactions"), {
-      ...transaction,
-      userId: user.uid,
-      anexos: [],
-      createdAt: serverTimestamp(),
-      updateAt: serverTimestamp(),
-    });
+interface TransactionsContextData {
+  transactions: ITransaction[];
+  loading: boolean;
+  addTransaction: {
+    (transactionData: NewTransactionData, attachments: AttachmentFile[]): Promise<string>;
+    (transaction: INewTransactionInput): Promise<void>;
   };
-
-  // 🔹 Atualiza transação existente
-  const updateTransaction = async (
+  updateTransaction: {
+    (id: string, updatedTransaction: Partial<ITransaction>, newAttachments: AttachmentFile[], attachmentsToRemove: string[]): Promise<void>;
+    (id: string, updatedTransaction: Partial<ITransaction>): Promise<void>;
+  };
+  deleteTransaction: (
     id: string,
-    data: Partial<ITransaction>
-  ): Promise<void> => {
-    try {
-      const transactionRef = doc(db, "transactions", id);
-      await updateDoc(transactionRef, {
-        ...data,
-        updateAt: serverTimestamp(),
-      });
-
-      const updatedDateString = new Date().toLocaleDateString("pt-BR");
-      setTransactions((prev) =>
-        prev.map((transaction) =>
-          transaction.id === id
-            ? { ...transaction, ...data, updateAt: updatedDateString }
-            : transaction
-        )
-      );
-    } catch (error) {
-      console.error("Erro ao atualizar transação:", error);
-      throw error;
-    }
-  };
-
-  // 🔹 Carrega mais transações (paginação)
-  const loadMoreTransactions = async (): Promise<void> => {
-    if (!user || loadingMore || !hasMore || !lastVisible) return;
-
-    setLoadingMore(true);
-    try {
-      const nextPageQuery = query(
-        collection(db, "transactions"),
-        where("userId", "==", user.uid),
-        orderBy("createdAt", "desc"),
-        startAfter(lastVisible),
-        limit(PAGE_SIZE)
-      );
-
-      const snapshot = await getDocs(nextPageQuery);
-      if (!snapshot.empty) {
-        const newTransactions: ITransaction[] = snapshot.docs.map((docSnap) => {
-          const docData = docSnap.data() as ITransaction;
-
-          const createdAtTimestamp =
-            typeof docData.createdAt === "object" &&
-            docData.createdAt !== null &&
-            "toDate" in docData.createdAt
-              ? (docData.createdAt as Timestamp)
-              : undefined;
-
-          const updatedAtTimestamp =
-            typeof docData.updateAt === "object" &&
-            docData.updateAt !== null &&
-            "toDate" in docData.updateAt
-              ? (docData.updateAt as Timestamp)
-              : undefined;
-
-          const convertedCreatedAt = createdAtTimestamp
-            ? createdAtTimestamp.toDate().toLocaleDateString("pt-BR")
-            : new Date().toLocaleDateString("pt-BR");
-
-          const convertedUpdatedAt = updatedAtTimestamp
-            ? updatedAtTimestamp.toDate().toLocaleDateString("pt-BR")
-            : new Date().toLocaleDateString("pt-BR");
-
-          return {
-            ...docData,
-            id: docSnap.id,
-            createdAt: convertedCreatedAt,
-            updateAt: convertedUpdatedAt,
-          };
-        });
-
-        setTransactions((prev) => [...prev, ...newTransactions]);
-        setLastVisible(snapshot.docs[snapshot.docs.length - 1]);
-        setHasMore(snapshot.docs.length >= PAGE_SIZE);
-      } else {
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error("Erro ao carregar mais transações:", error);
-    } finally {
-      setLoadingMore(false);
-    }
-  };
-
-  // 🔹 Exclui múltiplas transações
-  const deleteTransactions = async (ids: string[]): Promise<void> => {
-    if (!user) throw new Error("Usuário não autenticado.");
-    const batch = writeBatch(db);
-    ids.forEach((id) => {
-      batch.delete(doc(db, "transactions", id));
-    });
-    await batch.commit();
-    setTransactions((prev) => prev.filter((t) => !ids.includes(t.id!)));
-  };
-
-  // 🔹 Upload de anexo e atualização da transação
-  const uploadAttachmentAndUpdateTransaction = async (
+    attachments?: string[]
+  ) => Promise<void>;
+  balance: number | null;
+  loadingMore: boolean;
+  hasMore: boolean;
+  loadMoreTransactions: () => Promise<void>;
+  uploadAttachmentAndUpdateTransaction: (
     transactionId: string,
     fileUri: string,
     fileName: string
-  ): Promise<void> => {
-    if (!user) throw new Error("Usuário não autenticado para fazer upload.");
-    try {
-      const response = await fetch(fileUri);
-      const blob = await response.blob();
-      const storageRef = ref(storage, `attachments/${Date.now()}-${fileName}`);
-      const uploadTask = uploadBytesResumable(storageRef, blob);
-      await uploadTask;
+  ) => Promise<void>;
+  deleteAttachment: (transactionId: string, attachmentToDelete: IAnexo) => Promise<void>;
+  deleteTransactions: (ids: string[]) => Promise<void>;
+}
 
-      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-      const transactionRef = doc(db, "transactions", transactionId);
-      const transactionSnap = await getDoc(transactionRef);
+const TransactionsContext = createContext<TransactionsContextData>({} as TransactionsContextData);
 
-      // ✅ Tipagem segura para eliminar o erro no-unsafe-assignment
-      const transactionData = transactionSnap.data() as { anexos?: IAnexo[] } | undefined;
-      const existingAnexos: IAnexo[] = transactionData?.anexos ?? [];
+export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth(); 
 
-      const newAttachment: IAnexo = { name: fileName, url: downloadURL };
-
-      await updateDoc(transactionRef, {
-        anexos: [...existingAnexos, newAttachment],
-        updateAt: serverTimestamp(),
-      });
-
-      setTransactions((prev) =>
-        prev.map((t) =>
-          t.id === transactionId
-            ? { ...t, anexos: [...(t.anexos ?? []), newAttachment] }
-            : t
-        )
-      );
-    } catch (error) {
-      console.error("Erro ao fazer upload do anexo:", error);
-      throw error;
+  useEffect(() => {
+    if (!user) {
+      setTransactions([]);
+      setLoading(false);
+      return;
     }
-  };
 
-  // 🔹 Exclui anexo
-  const deleteAttachment = async (
-    transactionId: string,
-    attachmentToDelete: IAnexo
-  ): Promise<void> => {
-    if (!user) throw new Error("Usuário não autenticado para excluir.");
-    try {
-      const fileRef = ref(storage, attachmentToDelete.url);
-      await deleteObject(fileRef);
+    setLoading(true);
+    const unsubscribe = transactionUseCases.observe.execute(
+      user.uid,
+      (userTransactions): void => {
+        setTransactions(userTransactions);
+        setLoading(false);
+      }
+    );
 
-      const transactionRef = doc(db, "transactions", transactionId);
-      await updateDoc(transactionRef, {
-        anexos: arrayRemove(attachmentToDelete),
-      });
+    return () => unsubscribe();
+  }, [user]); 
 
-      setTransactions((prev) =>
-        prev.map((t) => {
-          if (t.id === transactionId) {
-            const updatedAnexos = t.anexos?.filter(
-              (anexo) => anexo.url !== attachmentToDelete.url
-            );
-            return { ...t, anexos: updatedAnexos };
-          }
-          return t;
-        })
+  const handleAddTransaction = useCallback(
+    async (
+      transactionData: NewTransactionData,
+      attachments: AttachmentFile[]
+    ) => {
+      if (!user) throw new Error('Usuário não autenticado');
+
+      return await transactionUseCases.add.execute(
+        user.uid,
+        transactionData,
+        attachments
       );
-    } catch (error) {
-      console.error("Erro ao excluir anexo:", error);
-      throw error;
-    }
-  };
+    },
+    [user] 
+  );
+
+  const addTransactionWrapper = useCallback(
+    async (...args: [NewTransactionData, AttachmentFile[]] | [INewTransactionInput]): Promise<void | string> => {
+      if (args.length === 2) {
+        return await handleAddTransaction(args[0], args[1]);
+      }
+
+      const legacy = args[0];
+      const mapToDomainType = (t: INewTransactionInput['tipo'] | undefined): 'entrada' | 'saida' => {
+        if (t === 'deposito') return 'entrada';
+        return 'saida';
+      };
+
+      const domainTx: NewTransactionData = {
+        descricao: legacy.description,
+        valor: legacy.valor,
+        tipo: mapToDomainType(legacy.tipo),
+        categoria: '',
+        data: Timestamp.now(),
+      };
+
+      await handleAddTransaction(domainTx, []);
+      return;
+    },
+    [handleAddTransaction]
+  );
+
+  const handleUpdateTransaction = useCallback(
+    async (
+      id: string,
+      updatedTransaction: Partial<ITransaction>,
+      newAttachments: AttachmentFile[],
+      attachmentsToRemove: string[]
+    ) => {
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const currentTx = transactions.find(t => t.id === id);
+      const currentAttachments = currentTx?.attachments ?? [];
+
+      await transactionUseCases.update.execute(
+        id,
+        user.uid,
+        updatedTransaction,
+        currentAttachments,
+        newAttachments,
+        attachmentsToRemove
+      );
+    },
+    [user, transactions]
+  );
+
+    const updateTransactionWrapper = useCallback(async (
+      ...args: [string, Partial<ITransaction>] | [string, Partial<ITransaction>, AttachmentFile[], string[]]
+    ) => {
+      if (args.length === 2) {
+        const [id, updatedTransaction] = args;
+        return await handleUpdateTransaction(id, updatedTransaction, [], []);
+      }
+      const [id, updatedTransaction, newAttachments, attachmentsToRemove] = args;
+      return await handleUpdateTransaction(id, updatedTransaction, newAttachments, attachmentsToRemove);
+    }, [handleUpdateTransaction]);
+
+  const handleDeleteTransaction = useCallback(
+    async (id: string, attachments?: string[]) => {
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const urlsToDelete = attachments ?? transactions.find(t => t.id === id)?.attachments ?? [];
+
+      await transactionUseCases.delete.execute(id, urlsToDelete);
+    },
+    [user, transactions]
+  );
+
+  const deleteTransactionsLegacy = useCallback(async (ids: string[]) => {
+    await Promise.all(ids.map(id => handleDeleteTransaction(id)));
+  }, [handleDeleteTransaction]);
+
+  const uploadAttachmentAndUpdateTransactionLegacy = useCallback(async (transactionId: string, fileUri: string, fileName: string) => {
+    const response = await fetch(fileUri);
+    const blob = await response.blob();
+    const attachment = Object.assign(blob, { name: fileName }) as unknown as AttachmentFile;
+    await handleUpdateTransaction(transactionId, {}, [attachment], []);
+  }, [handleUpdateTransaction]);
+
+  const deleteAttachmentLegacy = useCallback(async (transactionId: string, attachmentToDelete: IAnexo) => {
+    await handleUpdateTransaction(transactionId, {}, [], [attachmentToDelete.url]);
+  }, [handleUpdateTransaction]);
+
+  const loadMoreTransactionsLegacy = useCallback(async () => {
+    return Promise.resolve();
+  }, []);
+
+  const loadingMore = false;
+  const hasMore = false;
+
+  const contextValue = useMemo(
+    () => ({
+      transactions,
+      loading,
+      addTransaction: addTransactionWrapper as unknown as TransactionsContextData['addTransaction'],
+      updateTransaction: updateTransactionWrapper as unknown as TransactionsContextData['updateTransaction'],
+      deleteTransaction: handleDeleteTransaction,
+      balance: transactions.reduce((acc, t) => (t.tipo === 'entrada' ? acc + (t.valor ?? 0) : acc - (t.valor ?? 0)), 0),
+      loadingMore,
+      hasMore,
+      loadMoreTransactions: loadMoreTransactionsLegacy,
+      uploadAttachmentAndUpdateTransaction: uploadAttachmentAndUpdateTransactionLegacy,
+      deleteAttachment: deleteAttachmentLegacy,
+      deleteTransactions: deleteTransactionsLegacy,
+    }),
+    [
+      transactions,
+      loading,
+      addTransactionWrapper,
+      updateTransactionWrapper,
+      loadingMore,
+      hasMore,
+      handleDeleteTransaction,
+      loadMoreTransactionsLegacy,
+      uploadAttachmentAndUpdateTransactionLegacy,
+      deleteAttachmentLegacy,
+      deleteTransactionsLegacy,
+    ]
+  );
 
   return (
-    <TransactionsContext.Provider
-      value={{
-        transactions,
-        balance,
-        addTransaction,
-        loading,
-        loadingMore,
-        hasMore,
-        loadMoreTransactions,
-        updateTransaction,
-        uploadAttachmentAndUpdateTransaction,
-        deleteAttachment,
-        deleteTransactions,
-      }}
-    >
+    <TransactionsContext.Provider value={contextValue}>
       {children}
     </TransactionsContext.Provider>
   );
 };
 
-// 🔹 Hook de consumo do contexto
-export function useTransactions(): ITransactionsContextData {
+export function useTransactions(): TransactionsContextData {
   const context = useContext(TransactionsContext);
   if (!context) {
-    throw new Error(
-      "useTransactions deve ser usado dentro de um TransactionsProvider"
-    );
+    throw new Error('useTransactions deve ser usado dentro de um TransactionsProvider');
   }
   return context;
 }
