@@ -37,7 +37,6 @@ export default function WidgetSettingsModal({
           <Text style={styles.description}>{texts.textEscolhaWidgets}</Text>
 
           <ScrollView>
-            {/* CARD: Alerta de Gastos */}
             <Pressable
               style={[
                 styles.card,
@@ -84,7 +83,6 @@ export default function WidgetSettingsModal({
               </View>
             </Pressable>
 
-            {/* CARD: Meta de Economia */}
             <Pressable
               style={[
                 styles.card,
@@ -134,7 +132,6 @@ export default function WidgetSettingsModal({
             </Pressable>
           </ScrollView>
 
-          {/* Botões */}
           <View style={styles.actions}>
             <Pressable
               style={styles.cancelButton}

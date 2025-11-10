@@ -123,7 +123,6 @@ jest.mock("@assets/images/dash-card-new-transacao/Ilustracao-2.svg", () => "Tran
 
 beforeAll((): void => {
   jest.spyOn(console, "error").mockImplementation(() => {
-    /* ✅ evita erro de função vazia */
   });
 });
 afterAll((): void => {

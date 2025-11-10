@@ -14,7 +14,6 @@ export const Footer: React.FC = () => {
       style={styles.container}
       accessibilityLabel="Rodapé do aplicativo com informações de serviços, contato e redes sociais"
     >
-      {/* Serviços */}
       <View style={styles.section}>
         <Text style={styles.title} accessibilityRole="header">
           Serviços
@@ -30,7 +29,6 @@ export const Footer: React.FC = () => {
         </Pressable>
       </View>
 
-      {/* Contato */}
       <View style={styles.section}>
         <Text style={styles.title} accessibilityRole="header">
           Contato
@@ -46,7 +44,6 @@ export const Footer: React.FC = () => {
         </Text>
       </View>
 
-      {/* Desenvolvido */}
       <View style={styles.section}>
         <Text style={styles.title}>Desenvolvido por Front-End</Text>
         <LogoSvg

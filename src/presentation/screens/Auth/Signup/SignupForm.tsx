@@ -149,7 +149,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             accessibilityLabel={texts.signupForm.fields.password}
           />
 
-          {/* Confirmar Senha */}
           <Text style={styles.label}>{texts.signupForm.fields.confirmPassword}</Text>
           <TextInput
             placeholder={texts.signupForm.placeholders.confirmPassword}
@@ -187,7 +186,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
             accessibilityHint={texts.signupForm.accessibility.submitHint}
           />
 
-          {/* Botão Voltar */}
           <DefaultButton
             title={texts.signupForm.buttons.back}
             loading={false}

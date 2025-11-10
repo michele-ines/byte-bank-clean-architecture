@@ -14,9 +14,9 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { AuthProvider, useAuth } from "./AuthContext";
 
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation((): void => {
-  });
+  jest.spyOn(console, "error").mockImplementation((): void => undefined);
 });
+
 
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();

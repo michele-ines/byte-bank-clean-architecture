@@ -9,9 +9,9 @@ import type { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { LoginForm } from "./LoginForm";
 
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation(() => {
-  });
+  jest.spyOn(console, "error").mockImplementation((): void => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });

@@ -16,22 +16,20 @@ declare global {
 
 jest.mock("@assets/images/dash-card-my-cards/cartao-fisico.svg", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
-  const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
+  const reactNative = jest.requireActual<{ View: unknown }>("react-native");
   const mockView = reactNative.View;
   const CartaoFisicoImg = (props: SvgMockProps): JSX.Element =>
     mockReact.createElement(mockView, { ...props, testID: "CartaoFisicoImg" });
-
   (CartaoFisicoImg as React.FC).displayName = "CartaoFisicoImgMock";
   return { __esModule: true, default: CartaoFisicoImg };
 });
 
 jest.mock("@assets/images/dash-card-my-cards/cartao-digital.svg", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
-  const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
+  const reactNative = jest.requireActual<{ View: unknown }>("react-native");
   const mockView = reactNative.View;
   const CartaoDigitalImg = (props: SvgMockProps): JSX.Element =>
     mockReact.createElement(mockView, { ...props, testID: "CartaoDigitalImg" });
-
   (CartaoDigitalImg as React.FC).displayName = "CartaoDigitalImgMock";
   return { __esModule: true, default: CartaoDigitalImg };
 });
@@ -39,9 +37,7 @@ jest.mock("@assets/images/dash-card-my-cards/cartao-digital.svg", () => {
 jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
-  const mockView = reactNative.View;
-  const mockText = reactNative.Text;
-  const mockPressable = reactNative.Pressable;
+  const { View, Text, Pressable } = reactNative;
   const ConfirmModal = ({
     visible,
     title,
@@ -51,19 +47,19 @@ jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", ()
   }: ConfirmModalProps): JSX.Element | null => {
     if (!visible) return null;
     return mockReact.createElement(
-      mockView,
+      View,
       { testID: "ConfirmModal" },
-      mockReact.createElement(mockText, null, title),
-      mockReact.createElement(mockText, null, message),
+      mockReact.createElement(Text, null, title),
+      mockReact.createElement(Text, null, message),
       mockReact.createElement(
-        mockPressable,
+        Pressable,
         { accessibilityLabel: "confirm", onPress: onConfirm },
-        mockReact.createElement(mockText, null, "confirm")
+        mockReact.createElement(Text, null, "confirm")
       ),
       mockReact.createElement(
-        mockPressable,
+        Pressable,
         { accessibilityLabel: "cancel", onPress: onCancel },
-        mockReact.createElement(mockText, null, "cancel")
+        mockReact.createElement(Text, null, "cancel")
       )
     );
   };
@@ -73,20 +69,18 @@ jest.mock("@presentation/components/common/common/ConfirmModal/ConfirmModal", ()
 
 jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
-  const reactNative = jest.requireActual<{ View: unknown; Text: unknown; Pressable: unknown }>("react-native");
-  const mockPressable = reactNative.Pressable;
-  const mockText = reactNative.Text;
+  const reactNative = jest.requireActual<{ Pressable: unknown; Text: unknown }>("react-native");
+  const { Pressable, Text } = reactNative;
   const DefaultButton = ({
     title,
     onPress,
     accessibilityLabel,
   }: DefaultButtonProps): JSX.Element =>
     mockReact.createElement(
-      mockPressable,
+      Pressable,
       { accessibilityLabel, onPress },
-      mockReact.createElement(mockText, null, title)
+      mockReact.createElement(Text, null, title)
     );
-
   (DefaultButton as React.FC).displayName = "DefaultButtonMock";
   return { __esModule: true, DefaultButton };
 });
@@ -99,12 +93,8 @@ const mockToggle: jest.MockedFunction<
   (type: string, state: string) => Promise<ToggleResponse>
 > = jest.fn((_type: string, state: string) => Promise.resolve({ state }));
 
-const impactAsync: jest.MockedFunction<() => Promise<void>> = jest.fn(() =>
-  Promise.resolve()
-);
-const notificationAsync: jest.MockedFunction<() => Promise<void>> = jest.fn(() =>
-  Promise.resolve()
-);
+const impactAsync: jest.MockedFunction<() => Promise<void>> = jest.fn(() => Promise.resolve());
+const notificationAsync: jest.MockedFunction<() => Promise<void>> = jest.fn(() => Promise.resolve());
 
 jest.mock("@presentation/screens/OtherServices/cards", () => ({
   apiToggleCardState: (type: string, state: string): Promise<ToggleResponse> =>
@@ -118,12 +108,13 @@ jest.mock("expo-haptics", () => ({
   NotificationFeedbackType: { Error: "error", Success: "success" },
 }));
 
-/* ---------------------- 🔹 Setup antes dos testes ---------------------- */
 beforeEach((): void => {
   globalThis.__mockToggle__ = mockToggle;
   globalThis.__impactAsync__ = impactAsync;
   globalThis.__notificationAsync__ = notificationAsync;
   jest.clearAllMocks();
+
+  jest.spyOn(console, "warn").mockImplementation(jest.fn());
 });
 
 function createApiError(message: string): { message: string } {

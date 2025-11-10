@@ -8,9 +8,9 @@ import type { JSX } from "react";
 import { SignupForm } from "./SignupForm";
 
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation(() => {
-  });
+  jest.spyOn(console, "error").mockImplementation((): void => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });

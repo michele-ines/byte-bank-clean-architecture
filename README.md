@@ -55,6 +55,7 @@ npm run android
 npm run ios
 npm test
 npm run lint
+npm run typescript
 ```
 
 ---

@@ -1,7 +1,7 @@
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
-import type { Auth } from 'firebase/auth'; // Importa o TIPO
+import type { Auth } from 'firebase/auth';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,

@@ -14,9 +14,9 @@ import { useAuth } from "./AuthContext";
 import { TransactionsProvider, useTransactions } from "./TransactionsContext";
 
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation((): void => {
-  });
+  jest.spyOn(console, "error").mockImplementation((): void => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
@@ -216,8 +216,7 @@ describe("TransactionsContext", (): void => {
         const snapshot = {
           docs: [],
           empty: true,
-          forEach: (fn: (d: unknown) => void) => {
-          },
+          forEach: (_fn: (d: unknown) => void): void => undefined,
         };
         callback(snapshot);
         return jest.fn();
@@ -238,7 +237,7 @@ await waitFor(() => {
           expect.objectContaining({
             descricao: 'Test',
             tipo: 'entrada',
-            userId: 'test-user-id', // <-- Linha corrigida
+            userId: 'test-user-id', 
             valor: 100,
           })
         );
