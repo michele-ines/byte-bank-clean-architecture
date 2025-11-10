@@ -1,3 +1,4 @@
+import type { TokenStorage } from '@domain/auth/TokenStorage';
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
@@ -21,7 +22,8 @@ export class FirebaseAuthRepository implements AuthRepository {
 
   constructor(
     private readonly auth: Auth, 
-    private readonly firestore: Firestore
+    private readonly firestore: Firestore,
+    private readonly tokenStorage: TokenStorage
   ) {}
 
   getCurrentUser(): AuthenticatedUser | null {
@@ -55,6 +57,14 @@ export class FirebaseAuthRepository implements AuthRepository {
     const pw = credentials.password;
     if (!pw) throw new Error('Password is required for login');
     const userCredential = await signInWithEmailAndPassword(this.auth, credentials.email, pw);
+    
+    try {
+      const token = await userCredential.user.getIdToken();
+      await this.tokenStorage.saveToken(token);
+    } catch (error) {
+      console.error('Erro ao salvar token no login:', error);
+    }
+    
     const authenticatedUser = mapFirebaseUserToAuthenticatedUser(userCredential.user);
     if (!authenticatedUser) {
         throw new Error('Falha ao mapear usuário após login.');
@@ -69,6 +79,13 @@ export class FirebaseAuthRepository implements AuthRepository {
     const newUserProfile = mapSignupToNewUserProfile(credentials, newUser.uid);
     await this.createUserProfile(newUserProfile);
 
+    try {
+      const token = await newUser.getIdToken();
+      await this.tokenStorage.saveToken(token);
+    } catch (error) {
+      console.error('Erro ao salvar token no signup:', error);
+    }
+
     const authenticatedUser = mapFirebaseUserToAuthenticatedUser(newUser);
      if (!authenticatedUser) {
         throw new Error('Falha ao mapear usuário após signup.');
@@ -81,6 +98,11 @@ export class FirebaseAuthRepository implements AuthRepository {
   }
 
   async logout(): Promise<void> {
+    try {
+      await this.tokenStorage.removeToken();
+    } catch (error) {
+      console.error('Erro ao remover token no logout:', error);
+    }
     await signOut(this.auth);
   }
 

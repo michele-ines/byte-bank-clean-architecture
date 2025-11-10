@@ -1,17 +1,11 @@
 import type { TokenStorage } from '@domain/auth/TokenStorage';
 import * as SecureStore from 'expo-secure-store';
 
-/**
- * Implementação concreta do armazenamento seguro de tokens usando expo-secure-store
- * Esta classe está na camada de infrastructure, isolando a dependência externa
- */
+
 export class SecureTokenStorage implements TokenStorage {
   private readonly TOKEN_KEY = 'bytebankjwttoken';
 
-  /**
-   * Salva o token JWT no SecureStore
-   * @param token - Token JWT a ser armazenado
-   */
+
   async saveToken(token: string): Promise<void> {
     try {
       await SecureStore.setItemAsync(this.TOKEN_KEY, token);
@@ -21,10 +15,6 @@ export class SecureTokenStorage implements TokenStorage {
     }
   }
 
-  /**
-   * Recupera o token JWT do SecureStore
-   * @returns Token JWT ou null se não existir
-   */
   async getToken(): Promise<string | null> {
     try {
       const token = await SecureStore.getItemAsync(this.TOKEN_KEY);
@@ -35,9 +25,6 @@ export class SecureTokenStorage implements TokenStorage {
     }
   }
 
-  /**
-   * Remove o token JWT do SecureStore
-   */
   async removeToken(): Promise<void> {
     try {
       await SecureStore.deleteItemAsync(this.TOKEN_KEY);
@@ -47,10 +34,7 @@ export class SecureTokenStorage implements TokenStorage {
     }
   }
 
-  /**
-   * Verifica se existe um token armazenado
-   * @returns true se existe token, false caso contrário
-   */
+
   async hasToken(): Promise<boolean> {
     try {
       const token = await this.getToken();
@@ -62,5 +46,4 @@ export class SecureTokenStorage implements TokenStorage {
   }
 }
 
-// Exporta uma instância única (singleton pattern)
 export const secureTokenStorage = new SecureTokenStorage();

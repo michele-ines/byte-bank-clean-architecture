@@ -1,11 +1,14 @@
 import { secureTokenStorage } from '@infrastructure/persistence/SecureTokenStorage';
 import { useCallback } from 'react';
 
-/**
- * Hook customizado para gerenciar o token JWT de forma segura
- * Encapsula a lógica de acesso ao SecureTokenStorage
- */
-export const useSecureToken = () => {
+interface UseSecureTokenReturn {
+  saveToken: (token: string) => Promise<void>;
+  getToken: () => Promise<string | null>;
+  removeToken: () => Promise<void>;
+  hasToken: () => Promise<boolean>;
+}
+
+export const useSecureToken = (): UseSecureTokenReturn => {
 
   const saveToken = useCallback(async (token: string): Promise<void> => {
     await secureTokenStorage.saveToken(token);

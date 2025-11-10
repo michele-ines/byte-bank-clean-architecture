@@ -15,6 +15,7 @@ import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
 import { AuthUseCasesFactory } from '@domain/use-cases/AuthUseCaseFactory';
 import { auth, db } from '@infrastructure/config/firebaseConfig';
+import { secureTokenStorage } from '@infrastructure/persistence/SecureTokenStorage';
 import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -22,9 +23,9 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   
   const authUseCases = useMemo(() => {
-    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db);
+    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db, secureTokenStorage);
     return new AuthUseCasesFactory(firebaseAuthRepository);
-  }, []); 
+  }, []);
 
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
