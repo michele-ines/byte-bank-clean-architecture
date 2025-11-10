@@ -122,9 +122,9 @@ jest.mock("@assets/images/dash-card-new-transacao/card-pixels-4.svg", () => "Car
 jest.mock("@assets/images/dash-card-new-transacao/Ilustracao-2.svg", () => "TransactionIllustration");
 
 beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation(() => {
-  });
+  jest.spyOn(console, "error").mockImplementation(() => undefined);
 });
+
 afterAll((): void => {
   (console.error as jest.Mock).mockRestore();
 });
