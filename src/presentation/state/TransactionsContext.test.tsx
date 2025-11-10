@@ -61,6 +61,15 @@ jest.mock("../../infrastructure/config/firebaseConfig", () => ({
   storage: {},
 }));
 
+jest.mock("../../infrastructure/security/CryptoEncryptionService", () => ({
+  cryptoEncryptionService: {
+    encrypt: jest.fn((value: string) => Promise.resolve(value)),
+    decrypt: jest.fn((value: string) => Promise.resolve(value)),
+    encryptNumber: jest.fn((value: number) => Promise.resolve(String(value))),
+    decryptNumber: jest.fn((value: string) => Promise.resolve(parseFloat(value))),
+  },
+}));
+
 const TestComponent: React.FC = (): JSX.Element => {
   const {
     transactions,
@@ -238,7 +247,7 @@ await waitFor(() => {
             descricao: 'Test',
             tipo: 'entrada',
             userId: 'test-user-id', 
-            valor: 100,
+            valor: '100',
           })
         );
       });

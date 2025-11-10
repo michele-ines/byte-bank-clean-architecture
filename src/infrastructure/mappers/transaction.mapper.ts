@@ -23,7 +23,7 @@ export const mapDocumentToTransaction = (id: string, raw: DocumentData): ITransa
     
     const userId = safeGet(raw, 'userId', (v): v is string => typeof v === 'string', '');
     const descricao = safeGet(raw, 'descricao', (v): v is string => typeof v === 'string', '');
-    const valor = safeGet(raw, 'valor', (v): v is number => typeof v === 'number', 0);
+    const valor = safeGet(raw, 'valor', (v): v is number => typeof v === 'number' || typeof v === 'string', 0);
     const tipo = safeGet(raw, 'tipo', (v): v is 'entrada' | 'saida' => v === 'entrada' || v === 'saida', 'saida');
     const categoria = safeGet(raw, 'categoria', (v): v is string => typeof v === 'string', '');
     const data = safeGet(raw, 'data', isTimestamp, Timestamp.now());

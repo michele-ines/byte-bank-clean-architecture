@@ -1,3 +1,4 @@
+import type { EncryptionService } from '@domain/security/EncryptionService';
 import type { Firestore } from 'firebase/firestore';
 import {
   addDoc,
@@ -31,8 +32,22 @@ export class FirebaseTransactionRepository implements TransactionRepository {
 
   constructor(
     private readonly db: Firestore,
-    private readonly storage: FirebaseStorage
+    private readonly storage: FirebaseStorage,
+    private readonly encryptionService: EncryptionService
   ) {}
+
+  private isEncryptedString(value: string): boolean {
+    if (!value || typeof value !== 'string') return false;
+    return value.length % 4 === 0 && value.length > 20;
+  }
+
+  private isEncryptedNumber(value: unknown): boolean {
+    if (typeof value === 'number') return false;
+    if (typeof value === 'string') {
+    return this.isEncryptedString(value);
+  }
+    return false;
+  }
 
   private async uploadAttachments(
     userId: string, 
@@ -75,11 +90,34 @@ export class FirebaseTransactionRepository implements TransactionRepository {
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(transactionsQuery, (snapshot) => {
+    const unsubscribe = onSnapshot(transactionsQuery, async (snapshot) => {
       const userTransactions: ITransaction[] = [];
-      snapshot.forEach((doc) => {
-        userTransactions.push(mapDocumentToTransaction(doc.id, doc.data()));
-      });
+      
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data();
+        const transaction = mapDocumentToTransaction(docSnap.id, data);
+        
+        try {
+          const decryptedTransaction: ITransaction = {
+            ...transaction,
+            descricao: this.isEncryptedString(transaction.descricao)
+              ? await this.encryptionService.decrypt(transaction.descricao)
+              : transaction.descricao,
+            valor: this.isEncryptedNumber(transaction.valor)
+              ? await this.encryptionService.decryptNumber(String(transaction.valor))
+              : transaction.valor,
+            categoria: this.isEncryptedString(transaction.categoria)
+              ? await this.encryptionService.decrypt(transaction.categoria)
+              : transaction.categoria,
+          };
+
+          userTransactions.push(decryptedTransaction);
+        } catch (error) {
+          console.error('Erro ao descriptografar transação:', error);
+          userTransactions.push(transaction);
+        }
+      }
+      
       callback(userTransactions);
     });
 
@@ -102,7 +140,14 @@ export class FirebaseTransactionRepository implements TransactionRepository {
         attachmentUrls
     );
 
-    const docRef = await addDoc(collection(this.db, 'transactions'), newTransaction);
+    const encryptedTransaction = {
+      ...newTransaction,
+      descricao: await this.encryptionService.encrypt(newTransaction.descricao as string),
+      valor: await this.encryptionService.encryptNumber(newTransaction.valor as number),
+      categoria: await this.encryptionService.encrypt(newTransaction.categoria as string),
+    };
+
+    const docRef = await addDoc(collection(this.db, 'transactions'), encryptedTransaction);
     return docRef.id;
   }
 
@@ -133,10 +178,22 @@ export class FirebaseTransactionRepository implements TransactionRepository {
       ...newAttachmentUrls
     ];
 
+    const encryptedUpdates: Partial<ITransaction> = { ...updates };
+    
+    if (updates.descricao) {
+      encryptedUpdates.descricao = await this.encryptionService.encrypt(updates.descricao);
+    }
+    if (updates.valor !== undefined) {
+      encryptedUpdates.valor = await this.encryptionService.encryptNumber(updates.valor) as unknown as number;
+    }
+    if (updates.categoria) {
+      encryptedUpdates.categoria = await this.encryptionService.encrypt(updates.categoria);
+    }
+    
     const docRef = doc(this.db, 'transactions', transactionId);
     
     const dataToUpdate = mapUpdateTransactionToDocument(
-        updates, 
+        encryptedUpdates, 
         finalAttachments
     );
 
