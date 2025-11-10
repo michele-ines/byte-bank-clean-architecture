@@ -16,9 +16,9 @@ import { db, storage } from '@infrastructure/config/firebaseConfig';
 import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
 import { useAuth } from '@presentation/state/AuthContext';
 import { Timestamp } from 'firebase/firestore';
+import { loggerService } from './LoggerContext';
 
-const transactionRepository = new FirebaseTransactionRepository(db, storage);
-const transactionUseCases = new TransactionUseCasesFactory(transactionRepository);
+
 
 interface TransactionsContextData {
   transactions: ITransaction[];
@@ -53,7 +53,16 @@ const TransactionsContext = createContext<TransactionsContextData>({} as Transac
 export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth(); 
+  const { user } = useAuth();
+
+  const transactionUseCases = useMemo(() => {
+    const transactionRepository = new FirebaseTransactionRepository(
+      db,
+      storage,
+      loggerService 
+    );
+    return new TransactionUseCasesFactory(transactionRepository);
+  }, []); 
 
   useEffect(() => {
     if (!user) {
@@ -72,7 +81,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     );
 
     return () => unsubscribe();
-  }, [user]); 
+  }, [user, transactionUseCases]); 
 
   const handleAddTransaction = useCallback(
     async (
@@ -87,7 +96,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
         attachments
       );
     },
-    [user] 
+    [user, transactionUseCases] 
   );
 
   const addTransactionWrapper = useCallback(
@@ -137,7 +146,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
         attachmentsToRemove
       );
     },
-    [user, transactions]
+    [user, transactions, transactionUseCases] 
   );
 
     const updateTransactionWrapper = useCallback(async (
@@ -159,7 +168,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       await transactionUseCases.delete.execute(id, urlsToDelete);
     },
-    [user, transactions]
+    [user, transactions, transactionUseCases] 
   );
 
   const deleteTransactionsLegacy = useCallback(async (ids: string[]) => {
