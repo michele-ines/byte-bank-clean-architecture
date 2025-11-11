@@ -1,4 +1,4 @@
-import type { ITransaction, ScreenWrapperProps } from "@/domain/interfaces/auth.interfaces";
+import type { ITransaction, ScreenWrapperProps } from "@/shared/interfaces/auth.interfaces";
 import { useAuth } from "@presentation/state/AuthContext";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import Balance from "@shared/cards/balance/BalanceComponent";

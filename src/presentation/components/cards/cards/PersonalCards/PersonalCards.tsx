@@ -1,4 +1,4 @@
-import type { CardPanelProps } from "@/domain/interfaces/auth.interfaces";
+import type { CardPanelProps } from "@/shared/interfaces/auth.interfaces";
 import CartaoDigitalImg from "@assets/images/dash-card-my-cards/cartao-digital.svg";
 import CartaoFisicoImg from "@assets/images/dash-card-my-cards/cartao-fisico.svg";
 import ConfirmModal from "@presentation/components/common/common/ConfirmModal/ConfirmModal";

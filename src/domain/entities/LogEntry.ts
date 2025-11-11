@@ -1,4 +1,4 @@
-import type { LogLevel } from '@domain/interfaces/log.Interfaces';
+import type { LogLevel } from '@/shared/interfaces/log.Interfaces';
 
 export interface LogEntry {
   id?: string;

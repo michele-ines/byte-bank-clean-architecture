@@ -1,7 +1,7 @@
 import { colors } from "@presentation/theme";
 import ExpoCheckbox from "expo-checkbox";
 import React from "react";
-import type { CheckboxProps } from "../../../domain/interfaces/auth.interfaces";
+import type { CheckboxProps } from "../../interfaces/auth.interfaces";
 
 export const Checkbox: React.FC<CheckboxProps> = ({
   value,

@@ -1,7 +1,7 @@
+import type { ILoggerService } from '@/shared/interfaces/log.Interfaces';
 import type { TokenStorage } from '@domain/auth/TokenStorage';
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
-import type { ILoggerService } from '@domain/interfaces/log.Interfaces';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
 import type { Auth } from 'firebase/auth';
 import {

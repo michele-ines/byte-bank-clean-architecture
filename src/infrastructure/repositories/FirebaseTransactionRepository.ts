@@ -18,9 +18,9 @@ import {
   uploadBytes,
 } from 'firebase/storage';
 
+import type { ILoggerService } from '@/shared/interfaces/log.Interfaces';
 import type { ITransaction } from '@domain/entities/Transaction';
 import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
-import type { ILoggerService } from '@domain/interfaces/log.Interfaces';
 import type { TransactionRepository } from '@domain/repositories/TransactionRepository';
 import {
   mapDocumentToTransaction,

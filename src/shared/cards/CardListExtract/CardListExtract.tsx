@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import type { AttachmentFile } from "@/domain/entities/TransactionData";
-import type { ITransaction as LegacyITransaction } from "@/domain/interfaces/auth.interfaces";
+import type { ITransaction as LegacyITransaction } from "@/shared/interfaces/auth.interfaces";
 import { Feather } from "@expo/vector-icons";
 import { useTransactions } from "@presentation/state/TransactionsContext";
 import { colors, spacing, texts, typography } from "@presentation/theme";
@@ -9,21 +9,21 @@ import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";
 import React, { Fragment, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Linking,
-  Pressable,
-  Text,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Linking,
+    Pressable,
+    Text,
+    View,
 } from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
 import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
 import type {
-  CardListExtractProps,
-  EditedValuesMap,
+    CardListExtractProps,
+    EditedValuesMap,
 } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./CardListExtract.styles";
 

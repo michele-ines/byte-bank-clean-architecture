@@ -9,9 +9,9 @@ import React, {
   useState,
 } from 'react';
 
+import type { AuthContextData } from '@/shared/interfaces/auth.interfaces';
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
-import type { AuthContextData } from '@domain/interfaces/auth.interfaces';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
 import { AuthUseCasesFactory } from '@domain/use-cases/AuthUseCaseFactory';
 import { auth, db } from '@infrastructure/config/firebaseConfig';

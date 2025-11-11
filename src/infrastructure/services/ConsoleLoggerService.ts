@@ -1,4 +1,4 @@
-import type { ILoggerService } from "@domain/interfaces/log.Interfaces";
+import type { ILoggerService } from "@/shared/interfaces/log.Interfaces";
 import type { LogLevel } from "firebase/firestore";
 
 

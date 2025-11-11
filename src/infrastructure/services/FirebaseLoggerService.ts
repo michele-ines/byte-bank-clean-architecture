@@ -1,6 +1,6 @@
 import type { CreateLogUseCase } from '@/domain/use-cases/CreateLogUseCaseFactory';
+import type { ILoggerService, LogLevel } from '@/shared/interfaces/log.Interfaces';
 import type { LogEntry } from '@domain/entities/LogEntry';
-import type { ILoggerService, LogLevel } from '@domain/interfaces/log.Interfaces';
 
 export class FirebaseLoggerService implements ILoggerService {
   private readonly createLogUseCase: CreateLogUseCase;

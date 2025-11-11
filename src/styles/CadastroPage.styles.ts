@@ -1,4 +1,4 @@
-import type { CadastroPageStyles } from "@/domain/interfaces/auth.interfaces";
+import type { CadastroPageStyles } from "@/shared/interfaces/auth.interfaces";
 import { colors, layout, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
 

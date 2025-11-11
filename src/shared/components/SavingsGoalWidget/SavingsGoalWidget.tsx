@@ -3,7 +3,7 @@ import type { JSX } from "react";
 import React from "react";
 import { Text, View } from "react-native";
 import * as Progress from "react-native-progress";
-import type { SavingsGoalProps } from "../../../domain/interfaces/auth.interfaces";
+import type { SavingsGoalProps } from "../../interfaces/auth.interfaces";
 import { styles } from "./SavingsGoalWidget.styles";
 
 export default function SavingsGoalWidget({

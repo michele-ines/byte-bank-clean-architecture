@@ -1,4 +1,4 @@
-import type { ILoggerService, LoggerContextType } from '@domain/interfaces/log.Interfaces';
+import type { ILoggerService, LoggerContextType } from '@/shared/interfaces/log.Interfaces';
 import React, { createContext, useContext } from 'react';
 import { loggerService } from '../config/loggerService';
 

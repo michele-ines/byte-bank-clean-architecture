@@ -1,9 +1,9 @@
-import type { ILoggerService } from "@/domain/interfaces/log.Interfaces";
+import type { ILoggerService } from "@/shared/interfaces/log.Interfaces";
 import type { UserInfo } from "firebase/auth";
 import type { ReactNode } from "react";
 import type { StyleProp, TextStyle, ViewStyle } from "react-native";
 import type { ViewProps } from "react-native-svg/lib/typescript/fabric/utils";
-import type { ITransaction } from "../../domain/interfaces/auth.interfaces";
+import type { ITransaction } from "../interfaces/auth.interfaces";
 
 export interface CreateTransaction {
   exec: (tx: Transaction) => Promise<void>;

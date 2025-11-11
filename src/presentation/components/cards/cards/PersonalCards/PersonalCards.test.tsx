@@ -1,4 +1,4 @@
-import type { DefaultButtonProps, SvgMockProps } from "@/domain/interfaces/auth.interfaces";
+import type { DefaultButtonProps, SvgMockProps } from "@/shared/interfaces/auth.interfaces";
 import type { ConfirmModalProps } from "@/shared/ProfileStyles/profile.styles.types";
 import { texts } from "@presentation/theme";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";

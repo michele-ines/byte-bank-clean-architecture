@@ -1,11 +1,11 @@
 
-import type { DefaultButtonProps } from "@/domain/interfaces/auth.interfaces";
+import type { DefaultButtonProps } from "@/shared/interfaces/auth.interfaces";
 import { colors, layout } from "@presentation/theme";
 import React from "react";
 import {
-  ActivityIndicator,
-  Text,
-  TouchableOpacity
+    ActivityIndicator,
+    Text,
+    TouchableOpacity
 } from "react-native";
 
 
