@@ -1,15 +1,16 @@
-import type { ILoggerService } from '@domain/interfaces/log.Interfaces';
-import type { JSX, ReactNode } from 'react';
+import type { ILoggerService, LoggerContextType } from '@domain/interfaces/log.Interfaces';
 import React, { createContext, useContext } from 'react';
-import { ConsoleLoggerService } from '../../infrastructure/services/ConsoleLoggerService';
+import { loggerService } from '../config/loggerService';
 
-export const loggerService: ILoggerService = new ConsoleLoggerService();
 
-const LoggerContext = createContext<ILoggerService | undefined>(undefined);
 
-export const LoggerProvider = ({ children }: { children: ReactNode }): JSX.Element => {
+const LoggerContext = createContext<LoggerContextType | null>(null);
+
+export const LoggerProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   return (
-    <LoggerContext.Provider value={loggerService}>
+    <LoggerContext.Provider value={{ logger: loggerService }}>
       {children}
     </LoggerContext.Provider>
   );
@@ -18,7 +19,7 @@ export const LoggerProvider = ({ children }: { children: ReactNode }): JSX.Eleme
 export const useLogger = (): ILoggerService => {
   const context = useContext(LoggerContext);
   if (!context) {
-    throw new Error('useLogger must be used within a LoggerProvider');
+    throw new Error('useLogger deve ser usado dentro de um LoggerProvider');
   }
-  return context;
+  return context.logger;
 };

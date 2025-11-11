@@ -16,7 +16,7 @@ import { db, storage } from '@infrastructure/config/firebaseConfig';
 import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
 import { useAuth } from '@presentation/state/AuthContext';
 import { Timestamp } from 'firebase/firestore';
-import { loggerService } from './LoggerContext';
+import { loggerService } from '../config/loggerService';
 
 
 

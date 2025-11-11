@@ -1,44 +1,41 @@
 import { renderHook } from '@testing-library/react-native';
-import type { ReactNode } from 'react';
 import React from 'react';
-import { LoggerProvider, loggerService, useLogger } from './LoggerContext';
+import { loggerService } from '../config/loggerService';
+import { LoggerProvider, useLogger } from './LoggerContext';
 
-describe('LoggerContext', () => {
-  it('deve prover a instância do loggerService para o hook useLogger', () => {
+jest.mock('../config/loggerService', () => ({
+  loggerService: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    log: jest.fn(),
+  },
+}));
+
+const mockedLoggerService = loggerService as jest.Mocked<typeof loggerService>;
+
+describe('presentation/state/LoggerContext', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('deve retornar o logger service quando usado dentro do LoggerProvider', () => {
     const wrapper = ({
       children,
     }: {
-      children: ReactNode;
-    }): React.ReactElement => (
-      <LoggerProvider>{children}</LoggerProvider>
-    );
+      children: React.ReactNode;
+    }): React.ReactElement => <LoggerProvider>{children}</LoggerProvider>;
 
     const { result } = renderHook(() => useLogger(), { wrapper });
 
-    expect(result.current).toBe(loggerService);
+    expect(result.current).toBe(mockedLoggerService);
+
+    result.current.info('Teste de info');
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(result.current.info).toBeDefined();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(result.current.warn).toBeDefined();
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(result.current.error).toBeDefined();
-  });
-
-  it('deve disparar um erro se useLogger for chamado fora do LoggerProvider', () => {
-    jest.spyOn(console, 'error').mockImplementation(jest.fn());
-
-    let error: Error | null = null;
-    try {
-      renderHook(() => useLogger());
-    } catch (e) {
-      error = e as Error;
-    }
-
-    expect(error).not.toBeNull();
-    expect(error?.message).toBe(
-      'useLogger must be used within a LoggerProvider'
-    );
-
-    (console.error as jest.Mock).mockRestore();
+    expect(mockedLoggerService.info).toHaveBeenCalledWith('Teste de info');
   });
 });

@@ -17,7 +17,8 @@ import { AuthUseCasesFactory } from '@domain/use-cases/AuthUseCaseFactory';
 import { auth, db } from '@infrastructure/config/firebaseConfig';
 import { secureTokenStorage } from '@infrastructure/persistence/SecureTokenStorage';
 import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
-import { loggerService, useLogger } from './LoggerContext';
+import { loggerService } from '../config/loggerService';
+import { useLogger } from './LoggerContext';
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 

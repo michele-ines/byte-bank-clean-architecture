@@ -6,3 +6,7 @@ export interface ILoggerService {
   warn(message: string, context?: object): void;
   error(message: string, error?: Error, context?: object): void;
 }
+
+export interface LoggerContextType {
+  logger: ILoggerService;
+}

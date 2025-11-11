@@ -1,3 +1,4 @@
+import type { ILoggerService } from "@/domain/interfaces/log.Interfaces";
 import type { UserInfo } from "firebase/auth";
 import type { ReactNode } from "react";
 import type { StyleProp, TextStyle, ViewStyle } from "react-native";
@@ -305,6 +306,7 @@ export type DonutChartProps = {
 } & ViewProps;
 
 export interface DI {
+  logger: ILoggerService;
   createTransaction: CreateTransaction;
   listUserTransactions: ListUserTransactions;
 }
