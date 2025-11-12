@@ -1,19 +1,16 @@
 import { Redirect } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import React from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { CustomDrawerContent } from "@presentation/components/common/CustomDrawerContent/CustomDrawerContent";
 import { Header } from "@presentation/layout/Header/Header";
 import { useAuth } from "@presentation/state/AuthContext";
-import { colors, layout, radius, spacing, typography } from "@presentation/theme";
+import { colors, radius, spacing, typography } from "@presentation/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import LoadingFallback from "@/presentation/components/common/LoadingFallback/LoadingFallback";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import type { AppLayoutStyles } from "@shared/ProfileStyles/profile.styles.types";
 import type { JSX } from "react";
@@ -31,20 +28,7 @@ export default function AppLayout(): JSX.Element {
   const { isAuthenticated, loading, signOut } = useAuth();
 
   if (loading) {
-    return (
-      <View
-        style={styles.loaderContainer}
-        accessibilityRole="progressbar"
-        accessibilityLabel="Carregando conteúdo"
-        accessibilityLiveRegion="polite"
-      >
-        <ActivityIndicator
-          size="large"
-          color={colors.byteColorGreen500}
-          accessibilityElementsHidden={false}
-        />
-      </View>
-    );
+    return <LoadingFallback />;
   }
 
   if (!isAuthenticated) {
@@ -146,7 +130,7 @@ export default function AppLayout(): JSX.Element {
           listeners={{
             drawerItemPress: (e) => {
               e.preventDefault();
-                void signOut();
+              void signOut();
             },
           }}
           options={{
@@ -168,12 +152,6 @@ export default function AppLayout(): JSX.Element {
 }
 
 const styles = StyleSheet.create<AppLayoutStyles>({
-  loaderContainer: {
-    flex: layout.one,
-    justifyContent: typography.alignFlexStart,
-    alignItems: typography.alignCenter,
-    backgroundColor: colors.byteBgDefault,
-  },
   drawerStyle: {
     backgroundColor: colors.byteColorDash,
   },

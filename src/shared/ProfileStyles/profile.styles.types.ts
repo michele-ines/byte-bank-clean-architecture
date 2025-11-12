@@ -58,7 +58,6 @@ export interface DashboardStyles {
 }
 
 export interface AppLayoutStyles {
-  loaderContainer: ViewStyle;
   drawerStyle: ViewStyle;
   drawerLabel: TextStyle;
   drawerItem: ViewStyle;
