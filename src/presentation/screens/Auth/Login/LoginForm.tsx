@@ -5,6 +5,7 @@ import { texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
 import type { LoginFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
+import { validateEmail, validatePassword } from "@shared/utils/validation";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -20,12 +21,30 @@ import { styles } from "./LoginForm.styles";
 export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
+  const [passwordError, setPasswordError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { login } = useAuth();
 
+  const handleEmailChange = (text: string): void => {
+    setEmail(text);
+    setEmailError(validateEmail(text));
+  };
+
+  const handlePasswordChange = (text: string): void => {
+    setPassword(text);
+    setPasswordError(validatePassword(text));
+  };
+
   const handleLogin = async (): Promise<void> => {
-    if (!email || !password) {
+    const finalEmailError = validateEmail(email);
+    const finalPasswordError = validatePassword(password);
+
+    setEmailError(finalEmailError);
+    setPasswordError(finalPasswordError);
+
+    if (finalEmailError || finalPasswordError) {
       showToast(
         "error",
         texts.loginForm.toasts.emptyFields.title,
@@ -55,7 +74,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     router.push(ROUTES.SIGNUP);
   };
 
-  const isFormInvalid = !email || !password || isLoading;
+  const isFormInvalid = !!emailError || !!passwordError || !email || !password || isLoading;
 
   return (
     <KeyboardAvoidingView
@@ -82,23 +101,33 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         <TextInput
           placeholder={texts.loginForm.placeholders.email}
           value={email}
-          onChangeText={setEmail}
-          style={styles.input}
+          onChangeText={handleEmailChange}
+          style={[styles.input, emailError ? styles.inputError : null]}
           keyboardType="email-address"
           autoCapitalize="none"
           accessibilityLabel={texts.loginForm.accessibility.emailInput}
         />
+        {emailError ? (
+          <Text style={styles.errorText} accessibilityLiveRegion="polite">
+            {emailError}
+          </Text>
+        ) : null}
 
         <Text style={styles.label}>{texts.loginForm.labels.password}</Text>
         <TextInput
           placeholder={texts.loginForm.placeholders.password}
           value={password}
-          onChangeText={setPassword}
-          style={styles.input}
+          onChangeText={handlePasswordChange}
+          style={[styles.input, passwordError ? styles.inputError : null]}
           secureTextEntry
           accessibilityLabel={texts.loginForm.accessibility.passwordInput}
           accessibilityHint={texts.loginForm.accessibility.passwordHint}
         />
+        {passwordError ? (
+          <Text style={styles.errorText} accessibilityLiveRegion="polite">
+            {passwordError}
+          </Text>
+        ) : null}
 
         <Link
           href={ROUTES.FORGOT_PASSWORD}

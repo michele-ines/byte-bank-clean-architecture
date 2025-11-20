@@ -1,179 +1,134 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
-import type React from "react";
-import type { JSX } from "react";
-import type { Text, TouchableOpacity } from "react-native";
+import { router } from "expo-router";
+import React from "react";
+
+import { useAuth } from "@presentation/state/AuthContext";
+import { texts } from "@presentation/theme";
+import { ROUTES } from "@shared/constants/routes";
+import { showToast } from "@shared/utils/transactions.utils";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import { ForgotPasswordForm } from "./ForgotPasswordForm";
 
-const mockShowToast = jest.fn();
-jest.mock("@shared/utils/transactions.utils", () => ({
-  formatTransactionDescription: jest.fn(),
-  showToast: mockShowToast,
-}));
-
-const mockResetPassword = jest.fn();
-jest.mock("@presentation/state/AuthContext", () => ({
-  useAuth: () => ({
-    resetPassword: mockResetPassword,
-  }),
-}));
-
-const mockReplace = jest.fn();
-const mockPush = jest.fn();
 jest.mock("expo-router", () => ({
   router: {
-    replace: mockReplace,
-    push: mockPush,
+    push: jest.fn(),
+    replace: jest.fn(),
   },
 }));
 
-jest.mock("@shared/constants/routes", () => ({
-  ROUTES: {
-    LOGIN: "/login",
-  },
+jest.mock("@presentation/state/AuthContext", () => ({
+  useAuth: jest.fn(),
 }));
 
-jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
-  const ReactLib = require("react") as {
-    createElement: <P>(
-      type: React.ComponentType<P> | string,
-      props: P | null,
-      ...children: React.ReactNode[]
-    ) => JSX.Element;
-  };
-  const RN = require("react-native") as {
-    TouchableOpacity: typeof TouchableOpacity;
-    Text: typeof Text;
-  };
-  const TouchableOpacityMock = RN.TouchableOpacity;
-  const TextMock = RN.Text;
-  const DefaultButton = ({
-    title,
-    onPress,
-    disabled,
-    loading,
-    accessibilityLabel,
-    accessibilityHint,
-  }: {
-    title: string;
-    onPress: () => void;
-    disabled?: boolean;
-    loading?: boolean;
-    accessibilityLabel?: string;
-    accessibilityHint?: string;
-  }): JSX.Element =>
-    ReactLib.createElement(
-      TouchableOpacityMock,
-      {
-        onPress,
-        disabled: (disabled ?? false) || (loading ?? false),
-        testID: title === "Enviar" ? "button-enviar" : "button-voltar",
-        accessibilityLabel,
-        accessibilityHint,
-      },
-      ReactLib.createElement(TextMock, null, loading ? "Loading..." : title)
-    );
-
-  return { DefaultButton };
-});
-
-jest.mock("@presentation/theme", () => ({
-  texts: {
-    forgotPasswordForm: {
-      title: "Esqueci minha senha",
-      label: "Digite seu e-mail para recuperar a senha:",
-      placeholder: "Digite seu e-mail",
-      buttons: {
-        submit: "Enviar",
-        back: "Voltar",
-      },
-      toasts: {
-        emptyEmail: {
-          title: "Campo obrigatório",
-          message: "Por favor, digite seu e-mail",
-        },
-        success: {
-          title: "E-mail enviado",
-          message: "Verifique sua caixa de entrada",
-        },
-        error: {
-          title: "Erro",
-          message: "Erro ao enviar e-mail de recuperação",
-        },
-      },
-      accessibility: {
-        form: "Formulário de recuperação de senha",
-        emailInput: "Campo de e-mail",
-        submitButton: "Botão enviar",
-        submitHint: "Toque para enviar e-mail de recuperação",
-        backButton: "Botão voltar",
-      },
-    },
-  },
-}));
-
-jest.mock("./ForgotPasswordForm.styles", () => ({
-  styles: {
-    card: {},
-    title: {},
-    label: {},
-    input: {},
-    submit: {},
-    submitText: {},
-    backButton: {},
-    backText: {},
-  },
+jest.mock("@shared/utils/transactions.utils", () => ({
+  showToast: jest.fn(),
 }));
 
 describe("ForgotPasswordForm", () => {
+  const mockResetPassword = jest.fn();
   const mockOnSubmitSuccess = jest.fn();
+  const validEmail = "test@example.com";
 
-  beforeEach((): void => {
-    jest.clearAllMocks();
+  beforeEach(() => {
+    (useAuth as jest.Mock).mockReturnValue({
+      resetPassword: mockResetPassword,
+      login: jest.fn(),
+      logout: jest.fn(),
+      signup: jest.fn(),
+      user: null,
+    });
+    mockResetPassword.mockClear();
+    mockOnSubmitSuccess.mockClear();
+    (router.push as jest.Mock).mockClear();
+    (router.replace as jest.Mock).mockClear();
+    (showToast as jest.Mock).mockClear();
   });
 
-  describe("Renderização", () => {
-    it("renderiza todos os elementos do formulário", (): void => {
-      render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
+  const renderForgotPasswordForm = () => render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
 
-      expect(screen.getByText("Esqueci minha senha")).toBeTruthy();
-      expect(
-        screen.getByText("Digite seu e-mail para recuperar a senha:")
-      ).toBeTruthy();
-      expect(screen.getByPlaceholderText("Digite seu e-mail")).toBeTruthy();
-      expect(screen.getByText("Enviar")).toBeTruthy();
-      expect(screen.getByText("Voltar")).toBeTruthy();
-    });
+  const getElements = () => ({
+    emailInput: screen.getByPlaceholderText(texts.forgotPasswordForm.placeholder),
+    submitButton: screen.getByText(texts.forgotPasswordForm.buttons.submit),
+    backButton: screen.getByText(texts.forgotPasswordForm.buttons.back),
+  });
 
-    it("renderiza com acessibilidade correta", (): void => {
-      render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
-
-      const form = screen.getByLabelText("Formulário de recuperação de senha");
-      const emailInput = screen.getByLabelText("Campo de e-mail");
-
-      expect(form).toBeTruthy();
+  describe("Renderização e Estado Inicial", () => {
+    it("deve renderizar o campo de email e o botão de envio desabilitado", () => {
+      renderForgotPasswordForm();
+      const { emailInput, submitButton } = getElements();
       expect(emailInput).toBeTruthy();
+      expect(submitButton).toBeDisabled();
     });
   });
 
-  describe("Interações do usuário", () => {
-    it("permite digitar no campo de e-mail", (): void => {
-      render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
+  describe("Validação e Submissão", () => {
+    it("deve habilitar o botão para um email válido", () => {
+      renderForgotPasswordForm();
+      const { emailInput, submitButton } = getElements();
 
-      const emailInput = screen.getByPlaceholderText("Digite seu e-mail");
-      fireEvent.changeText(emailInput, "test@example.com");
-
-      expect(emailInput.props.value).toBe("test@example.com");
+      fireEvent.changeText(emailInput, validEmail);
+      expect(submitButton).not.toBeDisabled();
     });
-  });
 
-  describe("Validação de formulário", () => {
-    it("não chama resetPassword quando e-mail está vazio", (): void => {
-      render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
+    it("deve exibir erro inline e desabilitar o botão para email inválido", async () => {
+      renderForgotPasswordForm();
+      const { emailInput, submitButton } = getElements();
 
-      const submitButton = screen.getByTestId("button-enviar");
+      fireEvent.changeText(emailInput, "email-invalido");
+      expect(submitButton).toBeDisabled();
+      
       fireEvent.press(submitButton);
 
-      expect(mockResetPassword).not.toHaveBeenCalled();
+      await waitFor(() => {
+        expect(screen.getByText(texts.formToasts.error.invalidEmail.message)).toBeTruthy();
+      });
+    });
+
+    it("deve chamar resetPassword, mostrar toast de sucesso e navegar para o login em caso de sucesso", async () => {
+      mockResetPassword.mockResolvedValue(true);
+      renderForgotPasswordForm();
+      const { emailInput, submitButton } = getElements();
+
+      fireEvent.changeText(emailInput, validEmail);
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(mockResetPassword).toHaveBeenCalledWith(validEmail);
+        expect(showToast).toHaveBeenCalledWith(
+          "success",
+          texts.forgotPasswordForm.toasts.success.title,
+          texts.forgotPasswordForm.toasts.success.message
+        );
+        expect(mockOnSubmitSuccess).toHaveBeenCalledWith(validEmail);
+        expect(router.replace).toHaveBeenCalledWith(ROUTES.LOGIN);
+      });
+    });
+
+    it("deve mostrar toast de erro em caso de falha no reset de senha", async () => {
+      const resetError = new Error("Reset failed");
+      mockResetPassword.mockRejectedValue(resetError);
+      renderForgotPasswordForm();
+      const { emailInput, submitButton } = getElements();
+
+      fireEvent.changeText(emailInput, validEmail);
+      fireEvent.press(submitButton);
+
+      await waitFor(() => {
+        expect(showToast).toHaveBeenCalledWith(
+          "error",
+          texts.forgotPasswordForm.toasts.error.title,
+          resetError.message
+        );
+        expect(router.replace).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("Navegação", () => {
+    it("deve navegar para a tela de login ao pressionar o botão Voltar", () => {
+      renderForgotPasswordForm();
+      const { backButton } = getElements();
+      fireEvent.press(backButton);
+      expect(router.push).toHaveBeenCalledWith(ROUTES.LOGIN);
     });
   });
 });

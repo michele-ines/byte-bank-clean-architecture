@@ -414,7 +414,7 @@ export const texts = {
       },
       weakPassword: {
         title: "Erro",
-        message: "A senha deve ter no mínimo 8 caracteres.",
+        message: "A senha deve ter no mínimo 8 caracteres, incluindo letras maiúsculas, minúsculas e números.",
       },
       generic: {
         title: "Erro",
