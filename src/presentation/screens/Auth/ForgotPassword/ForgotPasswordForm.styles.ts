@@ -1,5 +1,5 @@
 
-import { colors, radius, spacing, typography } from "@presentation/theme";
+import { border, colors, radius, spacing, typography } from "@presentation/theme";
 import type { ForgotPasswordFormStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
 import { sharedStyles } from "src/styles/shared.styles";
@@ -48,5 +48,17 @@ export const styles = StyleSheet.create<ForgotPasswordFormStyles>({
     color: colors.byteColorDash,
     fontWeight: typography.fontSemibold,
     fontSize: typography.textSm,
+  },
+
+  inputError: {
+    borderColor: colors.byteColorError,
+    borderWidth:border.width2,
+  },
+  errorText: {
+    color: colors.byteColorError,
+    fontSize: typography.textXs,
+    textAlign: typography.textAlignLeft,
+    marginBottom: spacing.sm,
+    marginTop: spacing.xs2,
   },
 });

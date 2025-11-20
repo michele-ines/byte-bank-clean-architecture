@@ -18,7 +18,9 @@ export const validatePassword = (password: string): string => {
     return texts.formToasts.error.passwordRequired.message;
   }
 
-  if (password.length < 8) {
+  const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/;
+  
+  if (!strongRegex.test(password)) {
     return texts.formToasts.error.weakPassword.message;
   }
 

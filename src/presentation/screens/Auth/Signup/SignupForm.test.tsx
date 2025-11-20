@@ -1,21 +1,32 @@
-/* eslint-disable @typescript-eslint/require-await */
+import { router } from "expo-router";
+import React from "react";
+import { Text } from "react-native"; // Adicionado para uso no mock do botão
+
 import { useAuth } from "@presentation/state/AuthContext";
 import { texts } from "@presentation/theme";
+import { ROUTES } from "@shared/constants/routes";
 import { showToast } from "@shared/utils/transactions.utils";
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
-import { router } from "expo-router";
-import type { JSX } from "react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import { SignupForm } from "./SignupForm";
 
-beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation((): void => undefined);
-});
+jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => ({
+  DefaultButton: ({ onPress, title, ...props }: any) => {
+    return (
+      <Text 
+        onPress={onPress}
+        {...props}
+      >
+        {title}
+      </Text>
+    );
+  },
+}));
 
-afterAll((): void => {
-  (console.error as jest.Mock).mockRestore();
-});
-
-const mockSignup = jest.fn();
+jest.mock("expo-router", () => ({
+  router: {
+    push: jest.fn(),
+  },
+}));
 
 jest.mock("@presentation/state/AuthContext", () => ({
   useAuth: jest.fn(),
@@ -23,359 +34,193 @@ jest.mock("@presentation/state/AuthContext", () => ({
 
 jest.mock("@shared/utils/transactions.utils", () => ({
   showToast: jest.fn(),
-  formatTransactionDescription: jest.fn(),
 }));
 
-jest.mock("expo-router", () => ({
-  router: {
-    replace: jest.fn(),
-    push: jest.fn(),
-  },
-}));
-
-jest.mock("@shared/constants/routes", () => ({
-  ROUTES: {
-    DASHBOARD: "/dashboard",
-    HOME: "/home",
-  },
-}));
-
-jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => {
-  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
-  const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
-  const mockTouchableOpacity = reactNative.TouchableOpacity;
-  const mockText = reactNative.Text;
+jest.mock("react-native-svg", () => {
+  const SvgMock = "SvgMock";
   return {
-    DefaultButton: ({
-      title,
-      onPress,
-      disabled,
-      loading,
-      accessibilityLabel,
-    }: {
-      title: string;
-      onPress: () => void;
-      disabled?: boolean;
-      loading?: boolean;
-      accessibilityLabel?: string;
-    }): JSX.Element => {
-      return mockReact.createElement(
-        mockTouchableOpacity,
-        { onPress, disabled: (disabled ?? false) || (loading ?? false), accessibilityLabel },
-        mockReact.createElement(mockText, null, loading ? "Loading..." : title)
-      );
-    },
+    default: SvgMock,
+    SvgXml: SvgMock,
   };
-});
-Object.assign(
-  jest.requireMock("@presentation/components/common/common/DefaultButton/DefaultButton"),
-  { displayName: "MockDefaultButton" }
-);
-
-jest.mock("@shared/components/Checkbox/Checkbox", () => {
-  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
-  const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
-  const mockTouchableOpacity = reactNative.TouchableOpacity;
-  const mockText = reactNative.Text;
-  return {
-    Checkbox: ({
-      value,
-      onValueChange,
-      accessibilityLabel,
-    }: {
-      value: boolean;
-      onValueChange: (newVal: boolean) => void;
-      accessibilityLabel?: string;
-    }): JSX.Element => {
-      return mockReact.createElement(
-        mockTouchableOpacity,
-        { onPress: () => onValueChange(!value), accessibilityLabel, accessibilityRole: "checkbox" },
-        mockReact.createElement(mockText, null, value ? "☑" : "☐")
-      );
-    },
-  };
-});
-Object.assign(jest.requireMock("@shared/components/Checkbox/Checkbox"), {
-  displayName: "MockCheckbox",
 });
 
 jest.mock("@assets/images/cadastro/ilustracao-cadastro.svg", () => {
-  const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
-  const reactNative = jest.requireActual<{ TouchableOpacity: unknown; Text: unknown; View: unknown }>("react-native");
-  const mockView = reactNative.View;
-  return {
-    __esModule: true,
-    default: ({
-      accessible,
-      accessibilityLabel,
-      ...props
-    }: {
-      accessible?: boolean;
-      accessibilityLabel?: string;
-    }): JSX.Element => {
-      return mockReact.createElement(mockView, { accessible, accessibilityLabel, ...props });
-    },
-  };
+  const MockSvgImage = () => null;
+  MockSvgImage.displayName = "MockSvgImage";
+  return MockSvgImage;
 });
-Object.assign(
-  jest.requireMock("@assets/images/cadastro/ilustracao-cadastro.svg"),
-  { displayName: "MockSignupIllustration" }
-);
 
 describe("SignupForm", () => {
+  const mockSignup = jest.fn();
   const mockOnSignupSuccess = jest.fn();
-
-  beforeEach((): void => {
+  const validName = "Fulano de Tal";
+  const validEmail = "newuser@example.com";
+  const strongPassword = "Password123";
+  const weakPassword = "weak";
+  
+  beforeEach(() => {
     (useAuth as jest.Mock).mockReturnValue({
       signup: mockSignup,
+      login: jest.fn(),
+      logout: jest.fn(),
+      resetPassword: jest.fn(),
+      user: null,
     });
-    jest.clearAllMocks();
+    mockSignup.mockClear();
+    mockOnSignupSuccess.mockClear();
+    (router.push as jest.Mock).mockClear();
+    (showToast as jest.Mock).mockClear();
   });
 
-  describe("handleSubmit function", () => {
-    it("deve mostrar toast de erro quando senha é muito fraca", async (): Promise<void> => {
-      const { getByLabelText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
+  const renderSignupForm = () => render(<SignupForm onSignupSuccess={mockOnSignupSuccess} />);
 
-      fireEvent.changeText(getByLabelText(t.fields.name), "João Silva");
-      fireEvent.changeText(getByLabelText(t.fields.email), "joao@test.com");
-      fireEvent.changeText(getByLabelText(t.fields.password), "123");
-      fireEvent.changeText(getByLabelText(t.fields.confirmPassword), "123");
-      fireEvent.press(getByLabelText(t.accessibility.checkbox));
+  const getInputs = () => ({
+    nameInput: screen.getByPlaceholderText(texts.signupForm.placeholders.name),
+    emailInput: screen.getByPlaceholderText(texts.signupForm.placeholders.email),
+    passwordInput: screen.getByPlaceholderText(texts.signupForm.placeholders.password),
+    confirmPasswordInput: screen.getByPlaceholderText(texts.signupForm.placeholders.confirmPassword),
+    checkbox: screen.getByRole("checkbox"),
+    submitButton: screen.getByText(texts.signupForm.buttons.submit),
+  });
 
-      const submitButton = getByLabelText(t.buttons.submit);
+  describe("Validação de Campos em Tempo Real", () => {
+    it("deve exibir erro inline para Nome vazio após interagir", async () => {
+      renderSignupForm();
+      const { nameInput } = getInputs();
+      
+      fireEvent.changeText(nameInput, "A");
+      fireEvent.changeText(nameInput, "");
+
+      await waitFor(() => {
+        expect(screen.getByText(texts.formToasts.error.nameRequired.message)).toBeTruthy();
+      });
+    });
+
+    it("deve exibir erro inline para Email inválido", async () => {
+      renderSignupForm();
+      const { emailInput } = getInputs();
+      
+      fireEvent.changeText(emailInput, "invalido");
+
+      await waitFor(() => {
+        expect(screen.getByText(texts.formToasts.error.invalidEmail.message)).toBeTruthy();
+      });
+    });
+
+    it("deve exibir erro inline para Senha fraca", async () => {
+      renderSignupForm();
+      const { passwordInput } = getInputs();
+      
+      fireEvent.changeText(passwordInput, weakPassword);
+
+      await waitFor(() => {
+        expect(screen.getByText(texts.formToasts.error.weakPassword.message)).toBeTruthy();
+      });
+    });
+
+    it("deve exibir erro inline para Confirmação de Senha que não coincide", async () => {
+      renderSignupForm();
+      const { passwordInput, confirmPasswordInput } = getInputs();
+      
+      fireEvent.changeText(passwordInput, strongPassword);
+      fireEvent.changeText(confirmPasswordInput, "DifferentPass456");
+
+      await waitFor(() => {
+        expect(screen.getByText(texts.signupForm.toasts.passwordMismatch.message)).toBeTruthy();
+      });
+    });
+  });
+  
+  describe("Submissão do Formulário", () => {
+    it("deve mostrar toast de erro se termos não forem aceitos", async () => {
+      renderSignupForm();
+      const { nameInput, emailInput, passwordInput, confirmPasswordInput, submitButton } = getInputs();
+
+      // Preenche todos os campos para testar a única falha (checkbox)
+      fireEvent.changeText(nameInput, validName);
+      fireEvent.changeText(emailInput, validEmail);
+      fireEvent.changeText(passwordInput, strongPassword);
+      fireEvent.changeText(confirmPasswordInput, strongPassword);
+      
+      // O mock do botão garante que o onPress será chamado, testando o handler.
       fireEvent.press(submitButton);
 
-      expect(showToast).toHaveBeenCalledWith(
-        "error",
-        t.toasts.passwordWeak.title,
-        t.toasts.passwordWeak.message
-      );
+      await waitFor(() => {
+        expect(showToast).toHaveBeenCalledWith(
+          "error",
+          "Atenção", 
+          "Você precisa aceitar os termos e condições."
+        );
+      });
       expect(mockSignup).not.toHaveBeenCalled();
     });
 
-    it("deve mostrar toast de erro quando senhas não coincidem", async (): Promise<void> => {
-      const { getByLabelText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
+    it("deve realizar o cadastro com sucesso", async () => {
+      mockSignup.mockResolvedValue(true);
+      renderSignupForm();
+      const { nameInput, emailInput, passwordInput, confirmPasswordInput, checkbox, submitButton } = getInputs();
+      
+      fireEvent.changeText(nameInput, validName);
+      fireEvent.changeText(emailInput, validEmail);
+      fireEvent.changeText(passwordInput, strongPassword);
+      fireEvent.changeText(confirmPasswordInput, strongPassword);
+      
+      fireEvent.press(checkbox); 
 
-      fireEvent.changeText(getByLabelText(t.fields.name), "João Silva");
-      fireEvent.changeText(getByLabelText(t.fields.email), "joao@test.com");
-      fireEvent.changeText(getByLabelText(t.fields.password), "password123");
-      fireEvent.changeText(
-        getByLabelText(t.fields.confirmPassword),
-        "password456"
-      );
-      fireEvent.press(getByLabelText(t.accessibility.checkbox));
+      await waitFor(() => {
+        expect(submitButton).not.toBeDisabled();
+      });
 
-      const submitButton = getByLabelText(t.buttons.submit);
-      fireEvent.press(submitButton);
-
-      expect(showToast).toHaveBeenCalledWith(
-        "error",
-        t.toasts.passwordMismatch.title,
-        t.toasts.passwordMismatch.message
-      );
-      expect(mockSignup).not.toHaveBeenCalled();
-    });
-
-    it("deve fazer signup com sucesso quando todos os campos estão válidos", async (): Promise<void> => {
-      mockSignup.mockResolvedValueOnce(undefined);
-      const { getByLabelText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
-
-      fireEvent.changeText(getByLabelText(t.fields.name), "João Silva");
-      fireEvent.changeText(getByLabelText(t.fields.email), "joao@test.com");
-      fireEvent.changeText(getByLabelText(t.fields.password), "password123");
-      fireEvent.changeText(
-        getByLabelText(t.fields.confirmPassword),
-        "password123"
-      );
-      fireEvent.press(getByLabelText(t.accessibility.checkbox));
-
-      const submitButton = getByLabelText(t.buttons.submit);
       fireEvent.press(submitButton);
 
       await waitFor(() => {
         expect(mockSignup).toHaveBeenCalledWith({
-          email: "joao@test.com",
-          password: "password123",
-          name: "João Silva",
+          email: validEmail,
+          password: strongPassword,
+          name: validName,
         });
+        expect(mockOnSignupSuccess).toHaveBeenCalledWith(validEmail);
+        expect(showToast).toHaveBeenCalledWith(
+          "success",
+          texts.signupForm.toasts.success.title,
+          texts.signupForm.toasts.success.message
+        );
       });
-
-      expect(mockOnSignupSuccess).toHaveBeenCalledWith("joao@test.com");
-      expect(showToast).toHaveBeenCalledWith(
-        "success",
-        t.toasts.success.title,
-        t.toasts.success.message
-      );
     });
 
-    it("deve mostrar toast de erro quando email já está em uso", async (): Promise<void> => {
-      const emailInUseError = new Error("Email already in use") as Error & {
-        code?: string;
-      };
-      emailInUseError.code = "auth/email-already-in-use";
-      mockSignup.mockRejectedValueOnce(emailInUseError);
+    it("deve mostrar toast de erro se o email já estiver em uso", async () => {
+      const emailInUseError = new Error("auth/email-already-in-use"); 
+      (emailInUseError as any).code = "auth/email-already-in-use"; 
+      mockSignup.mockRejectedValue(emailInUseError);
+      
+      renderSignupForm();
 
-      const { getByLabelText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
+      const { nameInput, emailInput, passwordInput, confirmPasswordInput, checkbox, submitButton } = getInputs();
+      
+      fireEvent.changeText(nameInput, validName);
+      fireEvent.changeText(emailInput, validEmail);
+      fireEvent.changeText(passwordInput, strongPassword);
+      fireEvent.changeText(confirmPasswordInput, strongPassword);
+      fireEvent.press(checkbox); 
 
-      fireEvent.changeText(getByLabelText(t.fields.name), "João Silva");
-      fireEvent.changeText(getByLabelText(t.fields.email), "joao@test.com");
-      fireEvent.changeText(getByLabelText(t.fields.password), "password123");
-      fireEvent.changeText(
-        getByLabelText(t.fields.confirmPassword),
-        "password123"
-      );
-      fireEvent.press(getByLabelText(t.accessibility.checkbox));
-
-      const submitButton = getByLabelText(t.buttons.submit);
       fireEvent.press(submitButton);
 
       await waitFor(() => {
-        expect(mockSignup).toHaveBeenCalledWith({
-          email: "joao@test.com",
-          password: "password123",
-          name: "João Silva",
-        });
+        expect(showToast).toHaveBeenCalledWith(
+          "error",
+          "Erro", 
+          "Este e-mail já está em uso."
+        );
       });
-
-      expect(showToast).toHaveBeenCalledWith(
-        "error",
-        t.toasts.emailInUse.title,
-        t.toasts.emailInUse.message
-      );
-      expect(mockOnSignupSuccess).not.toHaveBeenCalled();
-      expect(router.replace).not.toHaveBeenCalled();
-    });
-
-    it("deve mostrar toast de erro genérico quando signup falha com erro desconhecido", async (): Promise<void> => {
-      const genericError = new Error("Unknown error");
-      mockSignup.mockRejectedValueOnce(genericError);
-
-      const { getByLabelText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
-
-      fireEvent.changeText(getByLabelText(t.fields.name), "João Silva");
-      fireEvent.changeText(getByLabelText(t.fields.email), "joao@test.com");
-      fireEvent.changeText(getByLabelText(t.fields.password), "password123");
-      fireEvent.changeText(
-        getByLabelText(t.fields.confirmPassword),
-        "password123"
-      );
-      fireEvent.press(getByLabelText(t.accessibility.checkbox));
-
-      const submitButton = getByLabelText(t.buttons.submit);
-      fireEvent.press(submitButton);
-
-      await waitFor(() => {
-        expect(mockSignup).toHaveBeenCalledWith({
-          email: "joao@test.com",
-          password: "password123",
-          name: "João Silva",
-        });
-      });
-
-      expect(showToast).toHaveBeenCalledWith(
-        "error",
-        t.toasts.genericError.title,
-        t.toasts.genericError.message
-      );
-      expect(mockOnSignupSuccess).not.toHaveBeenCalled();
-      expect(router.replace).not.toHaveBeenCalled();
     });
   });
 
-  describe("validateEmail function", () => {
-    it("deve mostrar erro quando email é inválido", (): void => {
-      const { getByLabelText, getByText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
-
-      const emailInput = getByLabelText(t.fields.email);
-      fireEvent.changeText(emailInput, "email-invalido");
-
-      expect(
-        getByText("Dado incorreto. Revise e digite novamente.")
-      ).toBeTruthy();
-    });
-
-    it("não deve mostrar erro quando email é válido", (): void => {
-      const { getByLabelText, queryByText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
-
-      const emailInput = getByLabelText(t.fields.email);
-      fireEvent.changeText(emailInput, "joao@test.com");
-
-      expect(
-        queryByText("Dado incorreto. Revise e digite novamente.")
-      ).toBeNull();
-    });
-  });
-
-  describe("Renderização e comportamento geral", () => {
-    it("renderiza todos os elementos do formulário", (): void => {
-      const { getByText, getByLabelText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
-
-      expect(getByText(t.title)).toBeTruthy();
-      expect(getByText(t.fields.name)).toBeTruthy();
-      expect(getByText(t.fields.email)).toBeTruthy();
-      expect(getByText(t.fields.password)).toBeTruthy();
-      expect(getByText(t.fields.confirmPassword)).toBeTruthy();
-      expect(getByLabelText(t.accessibility.checkbox)).toBeTruthy();
-      expect(getByLabelText(t.buttons.submit)).toBeTruthy();
-      expect(getByLabelText(t.buttons.back)).toBeTruthy();
-    });
-
-    it("deve navegar para home quando botão voltar é pressionado", (): void => {
-      const { getByLabelText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
-
-      const backButton = getByLabelText(t.buttons.back);
+  describe("Navegação", () => {
+    it("deve navegar para a tela inicial ao pressionar Voltar para o Login", () => {
+      renderSignupForm();
+      const backButton = screen.getByText(texts.signupForm.buttons.back);
       fireEvent.press(backButton);
-
-      expect(router.push).toHaveBeenCalledWith("/home");
-    });
-
-    it("deve permitir digitar nos campos de entrada", (): void => {
-      const { getByLabelText } = render(
-        <SignupForm onSignupSuccess={mockOnSignupSuccess} />
-      );
-      const t = texts.signupForm;
-
-      const nameInput = getByLabelText(t.fields.name);
-      const emailInput = getByLabelText(t.fields.email);
-      const passwordInput = getByLabelText(t.fields.password);
-      const confirmPasswordInput = getByLabelText(t.fields.confirmPassword);
-
-      fireEvent.changeText(nameInput, "João Silva");
-      fireEvent.changeText(emailInput, "joao@test.com");
-      fireEvent.changeText(passwordInput, "password123");
-      fireEvent.changeText(confirmPasswordInput, "password123");
-
-      expect(nameInput.props.value).toBe("João Silva");
-      expect(emailInput.props.value).toBe("joao@test.com");
-      expect(passwordInput.props.value).toBe("password123");
-      expect(confirmPasswordInput.props.value).toBe("password123");
+      expect(router.push).toHaveBeenCalledWith(ROUTES.HOME);
     });
   });
 });

@@ -6,6 +6,7 @@ import { Checkbox } from "@shared/components/Checkbox/Checkbox";
 import { ROUTES } from "@shared/constants/routes";
 import type { SignupFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
+import { validateEmail, validateName, validatePassword } from "@shared/utils/validation";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -24,41 +25,69 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChecked, setIsChecked] = useState(false);
+  const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const { signup } = useAuth();
 
-  const validateEmail = (text: string): void => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!regex.test(text) && text.length > 0) {
-      setEmailError("Dado incorreto. Revise e digite novamente.");
-    } else {
-      setEmailError("");
+  const validateConfirmPassword = (text: string): string => {
+    if (text.length === 0) {
+      // Assumindo que você tem uma mensagem para campo obrigatório em texts.formToasts.error
+      // Caso não, usará a mensagem de mismatch se o campo for preenchido
+      return validatePassword(text); 
     }
+    if (text !== password) {
+      return texts.signupForm.toasts.passwordMismatch.message;
+    }
+    return "";
+  };
+
+  const handleNameChange = (text: string): void => {
+    setName(text);
+    setNameError(validateName(text));
+  };
+
+  const handleEmailChange = (text: string): void => {
     setEmail(text);
+    setEmailError(validateEmail(text));
+  };
+
+  const handlePasswordChange = (text: string): void => {
+    setPassword(text);
+    setPasswordError(validatePassword(text));
+    setConfirmPasswordError(validateConfirmPassword(confirmPassword));
+  };
+
+  const handleConfirmPasswordChange = (text: string): void => {
+    setConfirmPassword(text);
+    setConfirmPasswordError(validateConfirmPassword(text));
   };
 
   const handleSubmit = async (): Promise<void> => {
     const { toasts } = texts.signupForm;
-    if (!name || !email || !password || !confirmPassword) {
-      showToast("error", toasts.emptyFields.title, toasts.emptyFields.message);
+    
+    // Roda a validação final em todos os campos para garantir que os estados de erro estejam atualizados
+    const finalNameError = validateName(name);
+    const finalEmailError = validateEmail(email);
+    const finalPasswordError = validatePassword(password);
+    const finalConfirmPasswordError = validateConfirmPassword(confirmPassword);
+    
+    setNameError(finalNameError);
+    setEmailError(finalEmailError);
+    setPasswordError(finalPasswordError);
+    setConfirmPasswordError(finalConfirmPasswordError);
+
+    // Checagem se há algum erro de validação
+    if (finalNameError || finalEmailError || finalPasswordError || finalConfirmPasswordError) {
+      showToast("error", toasts.emptyFields.title, toasts.emptyFields.message); // Reutilizando para erro de validação genérico
       return;
     }
-    if (password.length < 8) {
-      showToast("error", toasts.passwordWeak.title, toasts.passwordWeak.message);
-      return;
-    }
-    if (password !== confirmPassword) {
-      showToast("error", toasts.passwordMismatch.title, toasts.passwordMismatch.message);
-      return;
-    }
+    
     if (!isChecked) {
       showToast("error", toasts.termsNotAccepted.title, toasts.termsNotAccepted.message);
-      return;
-    }
-    if (emailError) {
-      showToast("error", toasts.emailInvalid.title, toasts.emailInvalid.message);
       return;
     }
 
@@ -85,7 +114,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   };
 
   const isFormInvalid =
-    !name || !email || !password || !confirmPassword || !isChecked || isLoading;
+    !!nameError || !!emailError || !!passwordError || !!confirmPasswordError || !isChecked || isLoading;
 
   return (
     <KeyboardAvoidingView
@@ -118,16 +147,21 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           <TextInput
             placeholder={texts.signupForm.placeholders.name}
             value={name}
-            onChangeText={setName}
-            style={styles.input}
+            onChangeText={handleNameChange}
+            style={[styles.input, nameError ? styles.inputError : null]}
             accessibilityLabel={texts.signupForm.fields.name}
           />
+          {nameError ? (
+            <Text style={styles.errorText} accessibilityLiveRegion="polite">
+              {nameError}
+            </Text>
+          ) : null}
 
           <Text style={styles.label}>{texts.signupForm.fields.email}</Text>
           <TextInput
             placeholder={texts.signupForm.placeholders.email}
             value={email}
-            onChangeText={validateEmail}
+            onChangeText={handleEmailChange}
             style={[styles.input, emailError ? styles.inputError : null]}
             keyboardType="email-address"
             autoCapitalize="none"
@@ -143,21 +177,31 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           <TextInput
             placeholder={texts.signupForm.placeholders.password}
             value={password}
-            onChangeText={setPassword}
-            style={styles.input}
+            onChangeText={handlePasswordChange}
+            style={[styles.input, passwordError ? styles.inputError : null]}
             secureTextEntry
             accessibilityLabel={texts.signupForm.fields.password}
           />
+          {passwordError ? (
+            <Text style={styles.errorText} accessibilityLiveRegion="polite">
+              {passwordError}
+            </Text>
+          ) : null}
 
           <Text style={styles.label}>{texts.signupForm.fields.confirmPassword}</Text>
           <TextInput
             placeholder={texts.signupForm.placeholders.confirmPassword}
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            style={styles.input}
+            onChangeText={handleConfirmPasswordChange}
+            style={[styles.input, confirmPasswordError ? styles.inputError : null]}
             secureTextEntry
             accessibilityLabel={texts.signupForm.fields.confirmPassword}
           />
+          {confirmPasswordError ? (
+            <Text style={styles.errorText} accessibilityLiveRegion="polite">
+              {confirmPasswordError}
+            </Text>
+          ) : null}
 
           <View style={styles.checkboxContainer}>
             <Checkbox
