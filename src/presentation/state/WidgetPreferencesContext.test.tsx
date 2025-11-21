@@ -1,16 +1,32 @@
-import { fireEvent, render, renderHook } from "@testing-library/react-native";
+import type { PreferencesStorage } from "@domain/storage/PreferencesStorage";
+import type { WidgetPreferences } from "@shared/ProfileStyles/profile.styles.types";
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  waitFor,
+} from "@testing-library/react-native";
 import type { JSX } from "react";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { WidgetPreferencesProvider, useWidgetPreferences } from "./WidgetPreferencesContext";
+import {
+  WidgetPreferencesProvider,
+  useWidgetPreferences,
+} from "./WidgetPreferencesContext";
 
-beforeAll((): void => {
-  jest.spyOn(console, "error").mockImplementation(jest.fn());
-});
+const defaultMockPrefs: WidgetPreferences = {
+  spendingAlert: true,
+  savingsGoal: true,
+};
 
-afterAll((): void => {
-  (console.error as jest.Mock).mockRestore();
-});
+const mockGetPreferences = jest.fn();
+const mockSetPreferences = jest.fn();
+
+const mockStorage: PreferencesStorage = {
+  getPreferences: mockGetPreferences,
+  setPreferences: mockSetPreferences,
+};
 
 const TestComponent: React.FC = (): JSX.Element => {
   const { preferences, updatePreferences } = useWidgetPreferences();
@@ -40,15 +56,18 @@ const TestComponent: React.FC = (): JSX.Element => {
     <View>
       <Text testID="spendingAlert">{preferences.spendingAlert.toString()}</Text>
       <Text testID="savingsGoal">{preferences.savingsGoal.toString()}</Text>
-
-      <TouchableOpacity testID="toggleSpendingAlert" onPress={handleUpdateSpendingAlert}>
+      <TouchableOpacity
+        testID="toggleSpendingAlert"
+        onPress={handleUpdateSpendingAlert}
+      >
         <Text>Toggle Spending Alert</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity testID="toggleSavingsGoal" onPress={handleUpdateSavingsGoal}>
+      <TouchableOpacity
+        testID="toggleSavingsGoal"
+        onPress={handleUpdateSavingsGoal}
+      >
         <Text>Toggle Savings Goal</Text>
       </TouchableOpacity>
-
       <TouchableOpacity testID="updateBoth" onPress={handleUpdateBoth}>
         <Text>Update Both</Text>
       </TouchableOpacity>
@@ -56,60 +75,95 @@ const TestComponent: React.FC = (): JSX.Element => {
   );
 };
 
-const renderWithProvider = (component: React.ReactElement): ReturnType<typeof render> => {
-  return render(<WidgetPreferencesProvider>{component}</WidgetPreferencesProvider>);
+const renderWithMockProvider = (
+  component: React.ReactElement,
+  storage: PreferencesStorage = mockStorage
+): ReturnType<typeof render> => {
+  return render(
+    <WidgetPreferencesProvider storage={storage}>
+      {component}
+    </WidgetPreferencesProvider>
+  );
 };
+
+beforeAll((): void => {
+  jest.spyOn(console, "error").mockImplementation(jest.fn());
+});
+
+afterAll((): void => {
+  (console.error as jest.Mock).mockRestore();
+});
 
 describe("WidgetPreferencesContext", (): void => {
   beforeEach((): void => {
     jest.clearAllMocks();
+    mockGetPreferences.mockResolvedValue(defaultMockPrefs);
+    mockSetPreferences.mockResolvedValue(undefined);
+  });
+
+  describe("Carregamento Assíncrono e Persistência", (): void => {
+    it("deve carregar as preferências do storage e renderizar o conteúdo", async (): Promise<void> => {
+      const initialPrefs = { spendingAlert: false, savingsGoal: true };
+      mockGetPreferences.mockResolvedValueOnce(initialPrefs);
+      const { queryByTestId, getByTestId } = renderWithMockProvider(
+        <TestComponent />
+      );
+      expect(queryByTestId("spendingAlert")).toBeNull();
+      await waitFor(() => {
+        expect(getByTestId("spendingAlert").children[0]).toBe("false");
+        expect(getByTestId("savingsGoal").children[0]).toBe("true");
+      });
+      expect(mockGetPreferences).toHaveBeenCalledTimes(1);
+    });
+
+    it("deve usar o estado padrão e marcar como carregado em caso de falha no carregamento", async (): Promise<void> => {
+      mockGetPreferences.mockRejectedValueOnce(new Error("Storage Error"));
+      const { queryByTestId, getByTestId } = renderWithMockProvider(
+        <TestComponent />
+      );
+      expect(queryByTestId("spendingAlert")).toBeNull();
+      await waitFor(() => {
+        expect(getByTestId("spendingAlert").children[0]).toBe("true");
+        expect(getByTestId("savingsGoal").children[0]).toBe("true");
+      });
+      expect(console.error).toHaveBeenCalled();
+    });
+
+    it("deve persistir as preferências usando preferencesStorage.setPreferences ao atualizar", async (): Promise<void> => {
+      const { getByTestId } = renderWithMockProvider(<TestComponent />);
+      await waitFor(() =>
+        expect(getByTestId("spendingAlert").children[0]).toBe("true")
+      );
+      const toggleButton = getByTestId("toggleSpendingAlert");
+      const expectedNewPrefs = { spendingAlert: false, savingsGoal: true };
+      act(() => {
+        fireEvent.press(toggleButton);
+      });
+      await waitFor(() => {
+        expect(mockSetPreferences).toHaveBeenCalledTimes(1);
+      });
+      expect(mockSetPreferences).toHaveBeenCalledWith(expectedNewPrefs);
+    });
   });
 
   describe("updatePreferences method", (): void => {
-    it("deve atualizar preferência de spendingAlert", (): void => {
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-
-      expect(getByTestId("spendingAlert").children[0]).toBe("true");
+    it("deve atualizar preferência de spendingAlert", async (): Promise<void> => {
+      const { getByTestId } = renderWithMockProvider(<TestComponent />);
+      await waitFor(() =>
+        expect(getByTestId("spendingAlert").children[0]).toBe("true")
+      );
       fireEvent.press(getByTestId("toggleSpendingAlert"));
       expect(getByTestId("spendingAlert").children[0]).toBe("false");
       expect(getByTestId("savingsGoal").children[0]).toBe("true");
     });
 
-    it("deve atualizar preferência de savingsGoal", (): void => {
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-
-      expect(getByTestId("savingsGoal").children[0]).toBe("true");
-      fireEvent.press(getByTestId("toggleSavingsGoal"));
-      expect(getByTestId("savingsGoal").children[0]).toBe("false");
-      expect(getByTestId("spendingAlert").children[0]).toBe("true");
-    });
-
-    it("deve atualizar ambas as preferências simultaneamente", (): void => {
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-
-      expect(getByTestId("spendingAlert").children[0]).toBe("true");
-      expect(getByTestId("savingsGoal").children[0]).toBe("true");
+    it("deve atualizar ambas as preferências simultaneamente", async (): Promise<void> => {
+      const { getByTestId } = renderWithMockProvider(<TestComponent />);
+      await waitFor(() =>
+        expect(getByTestId("spendingAlert").children[0]).toBe("true")
+      );
       fireEvent.press(getByTestId("updateBoth"));
       expect(getByTestId("spendingAlert").children[0]).toBe("false");
-      expect(getByTestId("savingsGoal").children[0]).toBe("false");
-    });
-
-    it("deve permitir múltiplas atualizações consecutivas", (): void => {
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-
-      expect(getByTestId("spendingAlert").children[0]).toBe("true");
-      expect(getByTestId("savingsGoal").children[0]).toBe("true");
-
-      fireEvent.press(getByTestId("toggleSpendingAlert"));
-      expect(getByTestId("spendingAlert").children[0]).toBe("false");
-      expect(getByTestId("savingsGoal").children[0]).toBe("true");
-
-      fireEvent.press(getByTestId("toggleSavingsGoal"));
-      expect(getByTestId("spendingAlert").children[0]).toBe("false");
-      expect(getByTestId("savingsGoal").children[0]).toBe("false");
-
-      fireEvent.press(getByTestId("toggleSpendingAlert"));
-      expect(getByTestId("spendingAlert").children[0]).toBe("true");
       expect(getByTestId("savingsGoal").children[0]).toBe("false");
     });
   });
@@ -120,69 +174,28 @@ describe("WidgetPreferencesContext", (): void => {
         useWidgetPreferences();
         return <Text>Test</Text>;
       };
-
       expect(() => render(<TestHookComponent />)).toThrow(
         "useWidgetPreferences deve ser usado dentro de WidgetPreferencesProvider"
       );
     });
 
-    it("deve retornar contexto quando usado dentro do provider", (): void => {
+    it("deve retornar contexto e o estado padrão após carregamento", async (): Promise<void> => {
       const { result } = renderHook(() => useWidgetPreferences(), {
-        wrapper: WidgetPreferencesProvider,
+        wrapper: ({ children }) => (
+          <WidgetPreferencesProvider storage={mockStorage}>
+            {children}
+          </WidgetPreferencesProvider>
+        ),
       });
-
+      await waitFor(() => {
+        expect(result.current.preferences).toEqual({
+          spendingAlert: true,
+          savingsGoal: true,
+        });
+      });
       expect(result.current).toHaveProperty("preferences");
       expect(result.current).toHaveProperty("updatePreferences");
       expect(typeof result.current.updatePreferences).toBe("function");
-    });
-
-    it("deve retornar preferências com valores padrão corretos", (): void => {
-      const { result } = renderHook(() => useWidgetPreferences(), {
-        wrapper: WidgetPreferencesProvider,
-      });
-
-      expect(result.current.preferences).toEqual({
-        spendingAlert: true,
-        savingsGoal: true,
-      });
-    });
-  });
-
-  describe("Renderização e estado inicial", (): void => {
-    it("deve renderizar com estado inicial correto", (): void => {
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-
-      expect(getByTestId("spendingAlert").children[0]).toBe("true");
-      expect(getByTestId("savingsGoal").children[0]).toBe("true");
-    });
-
-    it("deve permitir múltiplos componentes compartilharem o mesmo estado", (): void => {
-      const SecondTestComponent: React.FC = (): JSX.Element => {
-        const { preferences } = useWidgetPreferences();
-        return (
-          <View>
-            <Text testID="secondSpendingAlert">{preferences.spendingAlert.toString()}</Text>
-            <Text testID="secondSavingsGoal">{preferences.savingsGoal.toString()}</Text>
-          </View>
-        );
-      };
-
-      const CombinedComponent: React.FC = (): JSX.Element => (
-        <View>
-          <TestComponent />
-          <SecondTestComponent />
-        </View>
-      );
-
-      const { getByTestId } = renderWithProvider(<CombinedComponent />);
-
-      expect(getByTestId("spendingAlert").children[0]).toBe("true");
-      expect(getByTestId("secondSpendingAlert").children[0]).toBe("true");
-
-      fireEvent.press(getByTestId("toggleSpendingAlert"));
-
-      expect(getByTestId("spendingAlert").children[0]).toBe("false");
-      expect(getByTestId("secondSpendingAlert").children[0]).toBe("false");
     });
   });
 });

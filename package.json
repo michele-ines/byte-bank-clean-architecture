@@ -24,6 +24,9 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "setupFiles": [
+      "./__mocks__/@react-native-async-storage/async-storage.js"
+    ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
     },
