@@ -1,5 +1,6 @@
 import { toastConfig } from "@/presentation/config/Toast.config";
 import { GlobalContextProvider } from "@presentation/state";
+import { LoggerProvider } from "@presentation/state/LoggerContext";
 import { WidgetPreferencesProvider } from "@presentation/state/WidgetPreferencesContext";
 import { layout } from "@presentation/theme";
 import { Slot } from "expo-router";
@@ -13,12 +14,14 @@ export default function RootLayout(): JSX.Element {
   return (
     <GestureHandlerRootView style={{ flex: layout.flex1 }}>
       <SafeAreaProvider>
-        <GlobalContextProvider>
-          <WidgetPreferencesProvider>
-            <Slot />
-            <Toast config={toastConfig} />
-          </WidgetPreferencesProvider>
-        </GlobalContextProvider>
+        <LoggerProvider>
+          <GlobalContextProvider>
+            <WidgetPreferencesProvider>
+              <Slot />
+              <Toast config={toastConfig} />
+            </WidgetPreferencesProvider>
+          </GlobalContextProvider>
+        </LoggerProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

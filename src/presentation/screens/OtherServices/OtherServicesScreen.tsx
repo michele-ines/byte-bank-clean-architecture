@@ -1,4 +1,3 @@
-
 import FinancialChart from "@presentation/components/charts/FinancialChart";
 import { ScreenWrapper } from "@presentation/components/common/common/ScreenWrapper/ScreenWrapper";
 import { useWidgetPreferences } from "@presentation/state/WidgetPreferencesContext";
@@ -6,10 +5,12 @@ import SavingsGoalWidget from "@shared/components/SavingsGoalWidget/SavingsGoalW
 import SpendingAlertWidget from "@shared/components/SpendingAlertWidget/SpendingAlertWidget";
 import WidgetPreferencesButton from "@shared/components/WidgetPreferencesButton/WidgetPreferencesButton";
 import type { Transaction } from "@shared/ProfileStyles/profile.styles.types";
-import React from "react";
+import { markEnd, markStart } from "@shared/utils/performance";
+import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 import { styles } from "./OtherServicesScreen.styles";
 
+markStart("ServicesScreen.direct");
 
 const transactions: Transaction[] = [
   { tipo: "entrada", valor: 500 },
@@ -20,13 +21,17 @@ const transactions: Transaction[] = [
 const ServicesScreen: React.FC = () => {
   const { preferences } = useWidgetPreferences();
 
+  useEffect(() => {
+    markEnd("ServicesScreen.direct");
+  }, []);
+
   return (
     <ScreenWrapper>
       <WidgetPreferencesButton style={styles.widgetButton} />
 
-      <View style={styles.container} >
+      <View style={styles.container}>
         <Text style={styles.title} accessibilityRole="header">
-          Outros serviços
+          Outros servios
         </Text>
 
         <FinancialChart />
