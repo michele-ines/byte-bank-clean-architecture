@@ -9,16 +9,17 @@ import React, {
 } from 'react';
 
 import { TransactionUseCasesFactory } from '@/domain/use-cases/TransactionUseCasesFactory';
-import type { IAnexo, INewTransactionInput } from '@/shared/interfaces/auth.interfaces';
 import type { ITransaction } from '@domain/entities/Transaction';
 import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
 import { db, storage } from '@infrastructure/config/firebaseConfig';
 import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
+import { cryptoEncryptionService } from '@infrastructure/security/CryptoEncryptionService';
 import { useAuth } from '@presentation/state/AuthContext';
+import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
 import { Timestamp } from 'firebase/firestore';
-import { loggerService } from '../config/loggerService';
 
-
+const transactionRepository = new FirebaseTransactionRepository(db, storage, cryptoEncryptionService);
+const transactionUseCases = new TransactionUseCasesFactory(transactionRepository);
 
 interface TransactionsContextData {
   transactions: ITransaction[];
@@ -53,16 +54,7 @@ const TransactionsContext = createContext<TransactionsContextData>({} as Transac
 export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
-
-  const transactionUseCases = useMemo(() => {
-    const transactionRepository = new FirebaseTransactionRepository(
-      db,
-      storage,
-      loggerService 
-    );
-    return new TransactionUseCasesFactory(transactionRepository);
-  }, []); 
+  const { user } = useAuth(); 
 
   useEffect(() => {
     if (!user) {
@@ -81,7 +73,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     );
 
     return () => unsubscribe();
-  }, [user, transactionUseCases]); 
+  }, [user]); 
 
   const handleAddTransaction = useCallback(
     async (
@@ -96,7 +88,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
         attachments
       );
     },
-    [user, transactionUseCases] 
+    [user] 
   );
 
   const addTransactionWrapper = useCallback(
@@ -146,7 +138,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
         attachmentsToRemove
       );
     },
-    [user, transactions, transactionUseCases] 
+    [user, transactions]
   );
 
     const updateTransactionWrapper = useCallback(async (
@@ -168,7 +160,7 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
 
       await transactionUseCases.delete.execute(id, urlsToDelete);
     },
-    [user, transactions, transactionUseCases] 
+    [user, transactions]
   );
 
   const deleteTransactionsLegacy = useCallback(async (ids: string[]) => {
