@@ -35,8 +35,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
 
   const validateConfirmPassword = (text: string): string => {
     if (text.length === 0) {
-      // Assumindo que você tem uma mensagem para campo obrigatório em texts.formToasts.error
-      // Caso não, usará a mensagem de mismatch se o campo for preenchido
       return validatePassword(text); 
     }
     if (text !== password) {
@@ -69,7 +67,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
   const handleSubmit = async (): Promise<void> => {
     const { toasts } = texts.signupForm;
     
-    // Roda a validação final em todos os campos para garantir que os estados de erro estejam atualizados
     const finalNameError = validateName(name);
     const finalEmailError = validateEmail(email);
     const finalPasswordError = validatePassword(password);
@@ -80,9 +77,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     setPasswordError(finalPasswordError);
     setConfirmPasswordError(finalConfirmPasswordError);
 
-    // Checagem se há algum erro de validação
     if (finalNameError || finalEmailError || finalPasswordError || finalConfirmPasswordError) {
-      showToast("error", toasts.emptyFields.title, toasts.emptyFields.message); // Reutilizando para erro de validação genérico
+      showToast("error", toasts.emptyFields.title, toasts.emptyFields.message); 
       return;
     }
     

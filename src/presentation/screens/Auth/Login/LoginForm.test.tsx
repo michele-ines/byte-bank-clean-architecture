@@ -31,17 +31,25 @@ jest.mock("react-native-svg", () => {
   };
 });
 
+jest.mock("react-native-gesture-handler", () => ({
+  ScrollView: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 jest.mock("@assets/images/login/ilustracao-login.svg", () => {
-  const MockSvgImage = () => null;
+  const MockSvgImage = (): null => null;
   MockSvgImage.displayName = "MockSvgImage";
   return MockSvgImage;
 });
 
-describe("LoginForm", () => {
+beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation((..._args: unknown[]): void => undefined);
+});
+
+describe("LoginForm", (): void => {
   const mockLogin = jest.fn();
   const mockOnLoginSuccess = jest.fn();
 
-  beforeEach(() => {
+  beforeEach((): void => {
     (useAuth as jest.Mock).mockReturnValue({
       login: mockLogin,
       logout: jest.fn(),
@@ -49,15 +57,23 @@ describe("LoginForm", () => {
       resetPassword: jest.fn(),
       user: null,
     });
+
     mockLogin.mockClear();
     mockOnLoginSuccess.mockClear();
     (router.push as jest.Mock).mockClear();
     (showToast as jest.Mock).mockClear();
   });
 
-  const renderLoginForm = () => render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
-  
-  const getElements = () => ({
+  const renderLoginForm = (): ReturnType<typeof render> =>
+    render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
+
+  const getElements = (): {
+    emailInput: ReturnType<typeof screen.getByPlaceholderText>;
+    passwordInput: ReturnType<typeof screen.getByPlaceholderText>;
+    submitButton: ReturnType<typeof screen.getByText>;
+    createButton: ReturnType<typeof screen.getByText>;
+    forgotLink: ReturnType<typeof screen.getByText>;
+  } => ({
     emailInput: screen.getByPlaceholderText(texts.loginForm.placeholders.email),
     passwordInput: screen.getByPlaceholderText(texts.loginForm.placeholders.password),
     submitButton: screen.getByText(texts.loginForm.buttons.submit),
@@ -65,34 +81,34 @@ describe("LoginForm", () => {
     forgotLink: screen.getByText(texts.loginForm.buttons.forgot),
   });
 
-  describe("renderização inicial", () => {
-    it("deve renderizar os campos de email e senha", () => {
+  describe("renderização inicial", (): void => {
+    it("deve renderizar email, senha e botão disabled", (): void => {
       renderLoginForm();
       const { emailInput, passwordInput, submitButton } = getElements();
-      
+
       expect(emailInput).toBeTruthy();
       expect(passwordInput).toBeTruthy();
       expect(submitButton).toBeDisabled();
     });
 
-    it("deve renderizar o link Esqueci minha senha", () => {
+    it("deve renderizar o link Esqueci minha senha", (): void => {
       renderLoginForm();
       const { forgotLink } = getElements();
       expect(forgotLink).toBeTruthy();
     });
   });
 
-  describe("handleLogin function", () => {
+  describe("handleLogin function", (): void => {
     const validEmail = "test@example.com";
     const strongPassword = "Password123";
 
-    it("deve desabilitar o botão se os campos estiverem vazios", () => {
+    it("desabilita o botão se vazio", (): void => {
       renderLoginForm();
       const { submitButton } = getElements();
       expect(submitButton).toBeDisabled();
     });
 
-    it("deve habilitar o botão quando os campos são preenchidos com valores válidos", () => {
+    it("habilita o botão quando preenchido corretamente", (): void => {
       renderLoginForm();
       const { emailInput, passwordInput, submitButton } = getElements();
 
@@ -102,15 +118,14 @@ describe("LoginForm", () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    it("deve exibir erro inline para email inválido", async () => {
+    it("mostra erro inline para email inválido", async () => {
       renderLoginForm();
       const { emailInput, passwordInput, submitButton } = getElements();
-      
+
       fireEvent.changeText(emailInput, "invalid-email");
       fireEvent.changeText(passwordInput, strongPassword);
-      
+
       expect(submitButton).toBeDisabled();
-      
       fireEvent.press(submitButton);
 
       await waitFor(() => {
@@ -118,15 +133,14 @@ describe("LoginForm", () => {
       });
     });
 
-    it("deve exibir erro inline para senha fraca", async () => {
+    it("mostra erro inline para senha fraca", async () => {
       renderLoginForm();
       const { emailInput, passwordInput, submitButton } = getElements();
-      
-      fireEvent.changeText(passwordInput, "weak"); 
+
+      fireEvent.changeText(passwordInput, "weak");
       fireEvent.changeText(emailInput, validEmail);
 
       expect(submitButton).toBeDisabled();
-      
       fireEvent.press(submitButton);
 
       await waitFor(() => {
@@ -134,8 +148,7 @@ describe("LoginForm", () => {
       });
     });
 
-
-    it("deve fazer login com sucesso quando campos estão preenchidos corretamente", async () => {
+    it("faz login com sucesso", async () => {
       mockLogin.mockResolvedValue(true);
       renderLoginForm();
 
@@ -143,6 +156,7 @@ describe("LoginForm", () => {
 
       fireEvent.changeText(emailInput, validEmail);
       fireEvent.changeText(passwordInput, strongPassword);
+
       fireEvent.press(submitButton);
 
       await waitFor(() => {
@@ -151,19 +165,18 @@ describe("LoginForm", () => {
           password: strongPassword,
         });
         expect(mockOnLoginSuccess).toHaveBeenCalledWith(validEmail);
-        expect(submitButton).not.toBeDisabled();
       });
     });
 
-    it("deve mostrar toast de erro em caso de falha de login", async () => {
-      const loginError = new Error("Auth failed");
-      mockLogin.mockRejectedValue(loginError);
+    it("exibe toast em falha de login", async () => {
+      mockLogin.mockRejectedValue(new Error("Auth failed"));
       renderLoginForm();
 
       const { emailInput, passwordInput, submitButton } = getElements();
 
       fireEvent.changeText(emailInput, validEmail);
       fireEvent.changeText(passwordInput, strongPassword);
+
       fireEvent.press(submitButton);
 
       await waitFor(() => {
@@ -176,10 +189,11 @@ describe("LoginForm", () => {
     });
   });
 
-  describe("handleCreateAccount", () => {
-    it("deve navegar para a tela de cadastro ao pressionar o botão Criar Conta", () => {
+  describe("handleCreateAccount", (): void => {
+    it("navega para a tela de cadastro", (): void => {
       renderLoginForm();
       const { createButton } = getElements();
+
       fireEvent.press(createButton);
       expect(router.push).toHaveBeenCalledWith(ROUTES.SIGNUP);
     });

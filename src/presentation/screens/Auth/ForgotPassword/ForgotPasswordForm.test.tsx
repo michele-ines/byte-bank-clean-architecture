@@ -23,6 +23,10 @@ jest.mock("@shared/utils/transactions.utils", () => ({
   showToast: jest.fn(),
 }));
 
+beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation((..._args: unknown[]): void => undefined);
+});
+
 describe("ForgotPasswordForm", () => {
   const mockResetPassword = jest.fn();
   const mockOnSubmitSuccess = jest.fn();
@@ -36,6 +40,7 @@ describe("ForgotPasswordForm", () => {
       signup: jest.fn(),
       user: null,
     });
+
     mockResetPassword.mockClear();
     mockOnSubmitSuccess.mockClear();
     (router.push as jest.Mock).mockClear();
@@ -43,9 +48,14 @@ describe("ForgotPasswordForm", () => {
     (showToast as jest.Mock).mockClear();
   });
 
-  const renderForgotPasswordForm = () => render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
+  const renderForgotPasswordForm = (): ReturnType<typeof render> =>
+    render(<ForgotPasswordForm onSubmitSuccess={mockOnSubmitSuccess} />);
 
-  const getElements = () => ({
+  const getElements = (): {
+    emailInput: ReturnType<typeof screen.getByPlaceholderText>;
+    submitButton: ReturnType<typeof screen.getByText>;
+    backButton: ReturnType<typeof screen.getByText>;
+  } => ({
     emailInput: screen.getByPlaceholderText(texts.forgotPasswordForm.placeholder),
     submitButton: screen.getByText(texts.forgotPasswordForm.buttons.submit),
     backButton: screen.getByText(texts.forgotPasswordForm.buttons.back),
@@ -55,6 +65,7 @@ describe("ForgotPasswordForm", () => {
     it("deve renderizar o campo de email e o botão de envio desabilitado", () => {
       renderForgotPasswordForm();
       const { emailInput, submitButton } = getElements();
+
       expect(emailInput).toBeTruthy();
       expect(submitButton).toBeDisabled();
     });
@@ -75,11 +86,13 @@ describe("ForgotPasswordForm", () => {
 
       fireEvent.changeText(emailInput, "email-invalido");
       expect(submitButton).toBeDisabled();
-      
+
       fireEvent.press(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText(texts.formToasts.error.invalidEmail.message)).toBeTruthy();
+        expect(
+          screen.getByText(texts.formToasts.error.invalidEmail.message)
+        ).toBeTruthy();
       });
     });
 
@@ -106,6 +119,7 @@ describe("ForgotPasswordForm", () => {
     it("deve mostrar toast de erro em caso de falha no reset de senha", async () => {
       const resetError = new Error("Reset failed");
       mockResetPassword.mockRejectedValue(resetError);
+
       renderForgotPasswordForm();
       const { emailInput, submitButton } = getElements();
 
@@ -127,6 +141,7 @@ describe("ForgotPasswordForm", () => {
     it("deve navegar para a tela de login ao pressionar o botão Voltar", () => {
       renderForgotPasswordForm();
       const { backButton } = getElements();
+
       fireEvent.press(backButton);
       expect(router.push).toHaveBeenCalledWith(ROUTES.LOGIN);
     });

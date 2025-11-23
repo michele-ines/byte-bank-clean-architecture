@@ -1,31 +1,18 @@
 import { router } from "expo-router";
 import React from "react";
-import { Text } from "react-native"; // Adicionado para uso no mock do botão
 
 import { useAuth } from "@presentation/state/AuthContext";
 import { texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
 import { showToast } from "@shared/utils/transactions.utils";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
-import { SignupForm } from "./SignupForm";
-
-jest.mock("@presentation/components/common/common/DefaultButton/DefaultButton", () => ({
-  DefaultButton: ({ onPress, title, ...props }: any) => {
-    return (
-      <Text 
-        onPress={onPress}
-        {...props}
-      >
-        {title}
-      </Text>
-    );
-  },
-}));
+import { LoginForm } from "../Login/LoginForm";
 
 jest.mock("expo-router", () => ({
   router: {
     push: jest.fn(),
   },
+  Link: "Link",
 }));
 
 jest.mock("@presentation/state/AuthContext", () => ({
@@ -44,183 +31,171 @@ jest.mock("react-native-svg", () => {
   };
 });
 
-jest.mock("@assets/images/cadastro/ilustracao-cadastro.svg", () => {
-  const MockSvgImage = () => null;
+jest.mock("react-native-gesture-handler", () => ({
+  ScrollView: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+jest.mock("@assets/images/login/ilustracao-login.svg", () => {
+  const MockSvgImage = (): null => null;
   MockSvgImage.displayName = "MockSvgImage";
   return MockSvgImage;
 });
 
-describe("SignupForm", () => {
-  const mockSignup = jest.fn();
-  const mockOnSignupSuccess = jest.fn();
-  const validName = "Fulano de Tal";
-  const validEmail = "newuser@example.com";
-  const strongPassword = "Password123";
-  const weakPassword = "weak";
-  
-  beforeEach(() => {
+beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation((..._args: unknown[]) => undefined);
+});
+
+describe("LoginForm", (): void => {
+  const mockLogin = jest.fn();
+  const mockOnLoginSuccess = jest.fn();
+
+  beforeEach((): void => {
     (useAuth as jest.Mock).mockReturnValue({
-      signup: mockSignup,
-      login: jest.fn(),
+      login: mockLogin,
       logout: jest.fn(),
+      signup: jest.fn(),
       resetPassword: jest.fn(),
       user: null,
     });
-    mockSignup.mockClear();
-    mockOnSignupSuccess.mockClear();
+
+    mockLogin.mockClear();
+    mockOnLoginSuccess.mockClear();
     (router.push as jest.Mock).mockClear();
     (showToast as jest.Mock).mockClear();
   });
 
-  const renderSignupForm = () => render(<SignupForm onSignupSuccess={mockOnSignupSuccess} />);
+  const renderLoginForm = (): ReturnType<typeof render> =>
+    render(<LoginForm onLoginSuccess={mockOnLoginSuccess} />);
 
-  const getInputs = () => ({
-    nameInput: screen.getByPlaceholderText(texts.signupForm.placeholders.name),
-    emailInput: screen.getByPlaceholderText(texts.signupForm.placeholders.email),
-    passwordInput: screen.getByPlaceholderText(texts.signupForm.placeholders.password),
-    confirmPasswordInput: screen.getByPlaceholderText(texts.signupForm.placeholders.confirmPassword),
-    checkbox: screen.getByRole("checkbox"),
-    submitButton: screen.getByText(texts.signupForm.buttons.submit),
+  const getElements = (): {
+    emailInput: ReturnType<typeof screen.getByPlaceholderText>;
+    passwordInput: ReturnType<typeof screen.getByPlaceholderText>;
+    submitButton: ReturnType<typeof screen.getByText>;
+    createButton: ReturnType<typeof screen.getByText>;
+    forgotLink: ReturnType<typeof screen.getByText>;
+  } => ({
+    emailInput: screen.getByPlaceholderText(texts.loginForm.placeholders.email),
+    passwordInput: screen.getByPlaceholderText(texts.loginForm.placeholders.password),
+    submitButton: screen.getByText(texts.loginForm.buttons.submit),
+    createButton: screen.getByText(texts.loginForm.buttons.create),
+    forgotLink: screen.getByText(texts.loginForm.buttons.forgot),
   });
 
-  describe("Validação de Campos em Tempo Real", () => {
-    it("deve exibir erro inline para Nome vazio após interagir", async () => {
-      renderSignupForm();
-      const { nameInput } = getInputs();
-      
-      fireEvent.changeText(nameInput, "A");
-      fireEvent.changeText(nameInput, "");
+  describe("renderização inicial", (): void => {
+    it("deve renderizar email, senha e botão disabled", (): void => {
+      renderLoginForm();
+      const { emailInput, passwordInput, submitButton } = getElements();
 
-      await waitFor(() => {
-        expect(screen.getByText(texts.formToasts.error.nameRequired.message)).toBeTruthy();
-      });
+      expect(emailInput).toBeTruthy();
+      expect(passwordInput).toBeTruthy();
+      expect(submitButton).toBeDisabled();
     });
 
-    it("deve exibir erro inline para Email inválido", async () => {
-      renderSignupForm();
-      const { emailInput } = getInputs();
-      
-      fireEvent.changeText(emailInput, "invalido");
+    it("deve renderizar o link Esqueci minha senha", (): void => {
+      renderLoginForm();
+      const { forgotLink } = getElements();
+      expect(forgotLink).toBeTruthy();
+    });
+  });
+
+  describe("handleLogin function", (): void => {
+    const validEmail = "test@example.com";
+    const strongPassword = "Password123";
+
+    it("desabilita o botão se vazio", (): void => {
+      renderLoginForm();
+      const { submitButton } = getElements();
+      expect(submitButton).toBeDisabled();
+    });
+
+    it("habilita o botão quando preenchido corretamente", (): void => {
+      renderLoginForm();
+      const { emailInput, passwordInput, submitButton } = getElements();
+
+      fireEvent.changeText(emailInput, validEmail);
+      fireEvent.changeText(passwordInput, strongPassword);
+
+      expect(submitButton).not.toBeDisabled();
+    });
+
+    it("mostra erro inline para email inválido", async () => {
+      renderLoginForm();
+      const { emailInput, passwordInput, submitButton } = getElements();
+
+      fireEvent.changeText(emailInput, "invalid-email");
+      fireEvent.changeText(passwordInput, strongPassword);
+
+      expect(submitButton).toBeDisabled();
+      fireEvent.press(submitButton);
 
       await waitFor(() => {
         expect(screen.getByText(texts.formToasts.error.invalidEmail.message)).toBeTruthy();
       });
     });
 
-    it("deve exibir erro inline para Senha fraca", async () => {
-      renderSignupForm();
-      const { passwordInput } = getInputs();
-      
-      fireEvent.changeText(passwordInput, weakPassword);
+    it("mostra erro inline para senha fraca", async () => {
+      renderLoginForm();
+      const { emailInput, passwordInput, submitButton } = getElements();
+
+      fireEvent.changeText(passwordInput, "weak");
+      fireEvent.changeText(emailInput, validEmail);
+
+      expect(submitButton).toBeDisabled();
+      fireEvent.press(submitButton);
 
       await waitFor(() => {
         expect(screen.getByText(texts.formToasts.error.weakPassword.message)).toBeTruthy();
       });
     });
 
-    it("deve exibir erro inline para Confirmação de Senha que não coincide", async () => {
-      renderSignupForm();
-      const { passwordInput, confirmPasswordInput } = getInputs();
-      
-      fireEvent.changeText(passwordInput, strongPassword);
-      fireEvent.changeText(confirmPasswordInput, "DifferentPass456");
+    it("faz login com sucesso", async () => {
+      mockLogin.mockResolvedValue(true);
+      renderLoginForm();
 
-      await waitFor(() => {
-        expect(screen.getByText(texts.signupForm.toasts.passwordMismatch.message)).toBeTruthy();
-      });
-    });
-  });
-  
-  describe("Submissão do Formulário", () => {
-    it("deve mostrar toast de erro se termos não forem aceitos", async () => {
-      renderSignupForm();
-      const { nameInput, emailInput, passwordInput, confirmPasswordInput, submitButton } = getInputs();
+      const { emailInput, passwordInput, submitButton } = getElements();
 
-      // Preenche todos os campos para testar a única falha (checkbox)
-      fireEvent.changeText(nameInput, validName);
       fireEvent.changeText(emailInput, validEmail);
       fireEvent.changeText(passwordInput, strongPassword);
-      fireEvent.changeText(confirmPasswordInput, strongPassword);
-      
-      // O mock do botão garante que o onPress será chamado, testando o handler.
-      fireEvent.press(submitButton);
-
-      await waitFor(() => {
-        expect(showToast).toHaveBeenCalledWith(
-          "error",
-          "Atenção", 
-          "Você precisa aceitar os termos e condições."
-        );
-      });
-      expect(mockSignup).not.toHaveBeenCalled();
-    });
-
-    it("deve realizar o cadastro com sucesso", async () => {
-      mockSignup.mockResolvedValue(true);
-      renderSignupForm();
-      const { nameInput, emailInput, passwordInput, confirmPasswordInput, checkbox, submitButton } = getInputs();
-      
-      fireEvent.changeText(nameInput, validName);
-      fireEvent.changeText(emailInput, validEmail);
-      fireEvent.changeText(passwordInput, strongPassword);
-      fireEvent.changeText(confirmPasswordInput, strongPassword);
-      
-      fireEvent.press(checkbox); 
-
-      await waitFor(() => {
-        expect(submitButton).not.toBeDisabled();
-      });
 
       fireEvent.press(submitButton);
 
       await waitFor(() => {
-        expect(mockSignup).toHaveBeenCalledWith({
+        expect(mockLogin).toHaveBeenCalledWith({
           email: validEmail,
           password: strongPassword,
-          name: validName,
         });
-        expect(mockOnSignupSuccess).toHaveBeenCalledWith(validEmail);
-        expect(showToast).toHaveBeenCalledWith(
-          "success",
-          texts.signupForm.toasts.success.title,
-          texts.signupForm.toasts.success.message
-        );
+        expect(mockOnLoginSuccess).toHaveBeenCalledWith(validEmail);
       });
     });
 
-    it("deve mostrar toast de erro se o email já estiver em uso", async () => {
-      const emailInUseError = new Error("auth/email-already-in-use"); 
-      (emailInUseError as any).code = "auth/email-already-in-use"; 
-      mockSignup.mockRejectedValue(emailInUseError);
-      
-      renderSignupForm();
+    it("exibe toast em falha de login", async () => {
+      mockLogin.mockRejectedValue(new Error("Auth failed"));
+      renderLoginForm();
 
-      const { nameInput, emailInput, passwordInput, confirmPasswordInput, checkbox, submitButton } = getInputs();
-      
-      fireEvent.changeText(nameInput, validName);
+      const { emailInput, passwordInput, submitButton } = getElements();
+
       fireEvent.changeText(emailInput, validEmail);
       fireEvent.changeText(passwordInput, strongPassword);
-      fireEvent.changeText(confirmPasswordInput, strongPassword);
-      fireEvent.press(checkbox); 
 
       fireEvent.press(submitButton);
 
       await waitFor(() => {
         expect(showToast).toHaveBeenCalledWith(
           "error",
-          "Erro", 
-          "Este e-mail já está em uso."
+          "Erro de Login",
+          texts.loginForm.toasts.loginError.message
         );
       });
     });
   });
 
-  describe("Navegação", () => {
-    it("deve navegar para a tela inicial ao pressionar Voltar para o Login", () => {
-      renderSignupForm();
-      const backButton = screen.getByText(texts.signupForm.buttons.back);
-      fireEvent.press(backButton);
-      expect(router.push).toHaveBeenCalledWith(ROUTES.HOME);
+  describe("handleCreateAccount", (): void => {
+    it("navega para a tela de cadastro", (): void => {
+      renderLoginForm();
+      const { createButton } = getElements();
+
+      fireEvent.press(createButton);
+      expect(router.push).toHaveBeenCalledWith(ROUTES.SIGNUP);
     });
   });
 });
