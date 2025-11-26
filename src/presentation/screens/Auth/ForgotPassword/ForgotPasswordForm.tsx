@@ -8,17 +8,27 @@ import { texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
 import type { ForgotPasswordFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
+import { validateEmail } from "@shared/utils/validation";
 import { styles } from "./ForgotPasswordForm.styles";
 
 export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   onSubmitSuccess,
 }) => {
   const [email, setEmail] = useState<string>("");
+  const [emailError, setEmailError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { resetPassword } = useAuth();
 
+  const handleEmailChange = (text: string): void => {
+    setEmail(text);
+    setEmailError(validateEmail(text));
+  };
+
   const handleSubmit = async (): Promise<void> => {
-    if (!email) {
+    const finalEmailError = validateEmail(email);
+    setEmailError(finalEmailError);
+
+    if (finalEmailError) {
       showToast(
         "error",
         texts.forgotPasswordForm.toasts.emptyEmail.title,
@@ -49,7 +59,7 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
     }
   };
 
-  const isButtonDisabled = !email || isLoading;
+  const isButtonDisabled = !!emailError || !email || isLoading;
 
   return (
     <View
@@ -65,13 +75,18 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
       <TextInput
         placeholder={texts.forgotPasswordForm.placeholder}
         value={email}
-        onChangeText={setEmail}
-        style={styles.input}
+        onChangeText={handleEmailChange}
+        style={[styles.input, emailError ? styles.inputError : null]}
         autoCapitalize="none"
         keyboardType="email-address"
         textContentType="emailAddress"
         accessibilityLabel={texts.forgotPasswordForm.accessibility.emailInput}
       />
+      {emailError ? (
+        <Text style={styles.errorText} accessibilityLiveRegion="polite">
+          {emailError}
+        </Text>
+      ) : null}
 
       <DefaultButton
         title={texts.forgotPasswordForm.buttons.submit}

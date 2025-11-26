@@ -171,6 +171,8 @@ export interface ForgotPasswordFormStyles {
   backButton: ViewStyle;
   backText: TextStyle;
   submitDisabled: ViewStyle;
+  inputError: TextStyle;
+  errorText: TextStyle;
 }
 
 export interface BalanceComponentStyle {

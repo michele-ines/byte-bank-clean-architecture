@@ -1,5 +1,5 @@
 
-import { colors, layout, spacing, typography } from "@presentation/theme";
+import { border, colors, layout, spacing, typography } from "@presentation/theme";
 import { StyleSheet } from "react-native";
 import { sharedStyles } from "src/styles/shared.styles";
 
@@ -50,5 +50,17 @@ export const styles = StyleSheet.create({
     marginTop: spacing.xs2,
     marginBottom: spacing.md,
     textDecorationLine: typography.textDecorationUnderline,
+  },
+
+  inputError: {
+    borderColor: colors.byteColorError,
+    borderWidth: border.width2,
+  },
+  errorText: {
+    color: colors.byteColorError,
+    fontSize: typography.textXs,
+    textAlign: typography.textAlignLeft,
+    marginBottom: spacing.sm,
+    marginTop: spacing.xs2,
   },
 });
