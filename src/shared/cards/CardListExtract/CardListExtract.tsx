@@ -7,23 +7,23 @@ import { colors, spacing, texts, typography } from "@presentation/theme";
 import { truncateString } from "@shared/utils/string";
 import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Linking,
-    Pressable,
-    Text,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Linking,
+  Pressable,
+  Text,
+  View,
 } from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
 import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
 import type {
-    CardListExtractProps,
-    EditedValuesMap,
+  CardListExtractProps,
+  EditedValuesMap,
 } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./CardListExtract.styles";
 
@@ -31,12 +31,8 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   filterFn,
   title,
 }) => {
-  const {
-    transactions,
-    loading,
-    updateTransaction,
-    deleteTransaction,
-  } = useTransactions();
+  const { transactions, loading, updateTransaction, deleteTransaction } =
+    useTransactions();
 
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -44,7 +40,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const filtered = filterFn
-    ? ((transactions as unknown as LegacyITransaction[]).filter(filterFn) as unknown as typeof transactions)
+    ? ((transactions as unknown as LegacyITransaction[]).filter(
+        filterFn
+      ) as unknown as typeof transactions)
     : transactions;
 
   const handleOpenReceipt = async (url: string): Promise<void> => {
@@ -92,7 +90,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         const file = result.assets[0];
         const response = await fetch(file.uri);
         const blob = await response.blob();
-        const attachment = Object.assign(blob, { name: file.name }) as unknown as AttachmentFile;
+        const attachment = Object.assign(blob, {
+          name: file.name,
+        }) as unknown as AttachmentFile;
 
         await updateTransaction(transactionId, {}, [attachment], []);
         showToast(
@@ -167,7 +167,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
 
     try {
       await Promise.all(
-          Array.from(selectedItems).map(async (id) => {
+        Array.from(selectedItems).map(async (id) => {
           const tx = transactions.find((t) => t.id === id);
           const attachments = tx?.attachments ?? [];
           await deleteTransaction(id, attachments);
@@ -240,7 +240,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     <View style={styles.container}>
       <FlatList
         data={filtered}
-  keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <ListHeader
             title={title}
@@ -252,80 +252,114 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
             onDelete={() => setIsDeleting(true)}
           />
         }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.description}>{item.tipo}</Text>
+        renderItem={({ item }) => {
+          const dateObj = item.createdAt ? item.createdAt.toDate() : new Date();
 
-            {isEditing ? (
-              <MaskedTextInput
-                style={styles.input}
-                type="currency"
-                options={{
-                  prefix: "R$ ",
-                  decimalSeparator: ",",
-                  groupSeparator: ".",
-                  precision: 2,
-                }}
-                value={editedValues[item.id] ?? ""}
-                onChangeText={(_, raw) => handleValueChange(item.id, raw)}
-              />
-            ) : (
-              <Text>R$ {item.valor.toFixed(2).replace(".", ",")}</Text>
-            )}
+          const dataFormatada = dateObj.toLocaleDateString("pt-BR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          });
+          return (
+            <View style={styles.card}>
+              <View style={styles.row}>
+                <Text style={styles.description}>{item.tipo}</Text>
 
-            {item.attachments?.map((url: string, i: number) => (
-              <Fragment key={i}>
-                <Pressable
-                  onPress={() => {
-                    void handleOpenReceipt(url);
-                  }}
-                >
-                  <Text style={styles.attachmentLink}>
-                    {truncateString(decodeURIComponent(url.split("/").pop() ?? url), 20)}
-                  </Text>
-                </Pressable>
-
-                {isEditing && (
-                  <Pressable
-                    onPress={() => {
-                      handleDeleteAttachment(item.id, url);
+                {isEditing ? (
+                  <MaskedTextInput
+                    style={styles.input}
+                    type="currency"
+                    options={{
+                      prefix: "R$ ",
+                      decimalSeparator: ",",
+                      groupSeparator: ".",
+                      precision: 2,
                     }}
-                  >
-                    <Feather
-                      name="trash-2"
-                      size={spacing.md}
-                      color={colors.byteColorRed500}
-                    />
-                  </Pressable>
-                )}
-              </Fragment>
-            ))}
-
-            {isEditing && (
-              <View style={styles.editActionsContainer}>
-                {uploadingId === item.id ? (
-                  <ActivityIndicator color={colors.byteColorBlue500} />
+                    value={editedValues[item.id] ?? ""}
+                    onChangeText={(_, raw) => handleValueChange(item.id, raw)}
+                  />
                 ) : (
-                  <Pressable
-                    onPress={() => {
-                      void handleAttachFile(item.id);
-                    }}
-                    disabled={!!uploadingId}
+                  <Text
+                    style={
+                      item.valor < 0 || item.tipo.toLowerCase() === "saida"
+                        ? styles.amountNegative
+                        : styles.amount
+                    }
                   >
-                    <Text>{texts.cardList.item.attachButton}</Text>
-                  </Pressable>
+                    R$ {item.valor.toFixed(2).replace(".", ",")}
+                  </Text>
                 )}
               </View>
-            )}
 
-            {isDeleting && (
-              <Checkbox
-                value={selectedItems.has(item.id)}
-                onValueChange={(v) => handleItemSelection(item.id, v)}
-              />
-            )}
-          </View>
-        )}
+              <View style={styles.attachmentsContainer}>
+                {item.attachments?.map((url: string, i: number) => (
+                  <View key={i} style={styles.attachmentRow}>
+                    <Pressable onPress={() => void handleOpenReceipt(url)}>
+                      <Text style={styles.attachmentLink}>
+                        {truncateString(
+                          decodeURIComponent(url.split("/").pop() ?? url),
+                          20
+                        )}
+                      </Text>
+                    </Pressable>
+                    {isEditing && (
+                      <Pressable
+                        style={{ marginLeft: 10 }}
+                        onPress={() => handleDeleteAttachment(item.id, url)}
+                      >
+                        <Feather
+                          name="trash-2"
+                          size={spacing.md}
+                          color={colors.byteColorRed500}
+                        />
+                      </Pressable>
+                    )}
+                  </View>
+                ))}
+              </View>
+
+              {isEditing && (
+                <View style={styles.editActionsContainer}>
+                  {uploadingId === item.id ? (
+                    <ActivityIndicator color={colors.byteColorBlue500} />
+                  ) : (
+                    <Pressable
+                      style={styles.receiptButton}
+                      onPress={() => {
+                        void handleAttachFile(item.id);
+                      }}
+                      disabled={!!uploadingId}
+                    >
+                      <Text style={styles.receiptButtonText}>
+                        {texts.cardList.item.attachButton}
+                      </Text>
+                    </Pressable>
+                  )}
+                </View>
+              )}
+
+              <Text
+                style={[
+                  styles.date,
+                  {
+                    color: colors.byteColorGreen500,
+                    marginTop: spacing.xs,
+                  },
+                ]}
+              >
+                criado em: {dataFormatada}
+              </Text>
+
+              {/* Checkbox de deletar */}
+              {isDeleting && (
+                <Checkbox
+                  value={selectedItems.has(item.id)}
+                  onValueChange={(v) => handleItemSelection(item.id, v)}
+                />
+              )}
+            </View>
+          );
+        }}
         ListEmptyComponent={
           !loading ? (
             <Text

@@ -99,7 +99,8 @@ export const styles = StyleSheet.create<TransactionsStyles>({
     flexDirection: layout.row,
     alignItems: typography.alignCenter,
     justifyContent:typography.justifyBetween,
-    marginBottom: spacing.xs, 
+    marginBottom: spacing.xs,
+    marginTop:spacing.xs,
   },
   deleteButton: {
     marginLeft: spacing.sm2,

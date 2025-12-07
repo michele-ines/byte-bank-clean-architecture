@@ -181,7 +181,7 @@ describe("NewTransactionForm", () => {
           expect.objectContaining({
             descricao: "Descrição gerada",
             valor: 10,
-            tipo: "entrada",
+            tipo: "deposito",
             categoria: "",
           }),
           []
