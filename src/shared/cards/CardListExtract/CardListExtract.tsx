@@ -7,23 +7,23 @@ import { colors, spacing, texts, typography } from "@presentation/theme";
 import { truncateString } from "@shared/utils/string";
 import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useCallback, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Linking,
-    Pressable,
-    Text,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Linking,
+  Pressable,
+  Text,
+  View,
 } from "react-native";
 import { MaskedTextInput } from "react-native-mask-text";
 import { Checkbox } from "../../components/Checkbox/Checkbox";
 import { ListFooter } from "../../components/ListFooter/ListFooter";
 import { ListHeader } from "../../components/ListHeader/ListHeader";
 import type {
-    CardListExtractProps,
-    EditedValuesMap,
+  CardListExtractProps,
+  EditedValuesMap,
 } from "../../ProfileStyles/profile.styles.types";
 import { styles } from "./CardListExtract.styles";
 
@@ -43,11 +43,14 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   const [editedValues, setEditedValues] = useState<EditedValuesMap>({});
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
-  const filtered = filterFn
-    ? ((transactions as unknown as LegacyITransaction[]).filter(filterFn) as unknown as typeof transactions)
-    : transactions;
 
-  const handleOpenReceipt = async (url: string): Promise<void> => {
+  const filtered = useMemo(() => {
+    return filterFn
+      ? ((transactions as unknown as LegacyITransaction[]).filter(filterFn) as unknown as typeof transactions)
+      : transactions;
+  }, [transactions, filterFn]);
+
+  const handleOpenReceipt = useCallback(async (url: string): Promise<void> => {
     const supported = await Linking.canOpenURL(url);
     if (supported) {
       await Linking.openURL(url);
@@ -58,9 +61,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         texts.cardList.toasts.openReceiptError.message
       );
     }
-  };
+  }, []);
 
-  const handleEditClick = (): void => {
+  const handleEditClick = useCallback((): void => {
     const initialValues = filtered.reduce((acc, transaction) => {
       if (transaction.id) {
         const valorComDecimais = transaction.valor.toFixed(2);
@@ -71,20 +74,20 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
 
     setEditedValues(initialValues);
     setIsEditing(true);
-  };
+  }, [filtered]);
 
-  const handleCancelClick = (): void => {
+  const handleCancelClick = useCallback((): void => {
     setIsEditing(false);
     setIsDeleting(false);
     setEditedValues({});
     setSelectedItems(new Set());
-  };
+  }, []);
 
-  const handleValueChange = (id: string, newValue: string): void => {
+  const handleValueChange = useCallback((id: string, newValue: string): void => {
     setEditedValues((prevValues) => ({ ...prevValues, [id]: newValue }));
-  };
+  }, []);
 
-  const handleAttachFile = async (transactionId: string): Promise<void> => {
+  const handleAttachFile = useCallback(async (transactionId: string): Promise<void> => {
     setUploadingId(transactionId);
     try {
       const result = await DocumentPicker.getDocumentAsync({});
@@ -111,9 +114,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
     } finally {
       setUploadingId(null);
     }
-  };
+  }, [updateTransaction]);
 
-  const handleDeleteAttachment = (
+  const handleDeleteAttachment = useCallback((
     transactionId: string,
     fileUrl: string
   ): void => {
@@ -144,18 +147,18 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         },
       },
     ]);
-  };
+  }, [updateTransaction]);
 
-  const handleItemSelection = (itemId: string, isSelected: boolean): void => {
+  const handleItemSelection = useCallback((itemId: string, isSelected: boolean): void => {
     setSelectedItems((prev) => {
       const updated = new Set(prev);
       if (isSelected) updated.add(itemId);
       else updated.delete(itemId);
       return updated;
     });
-  };
+  }, []);
 
-  const handleDeleteSelected = async (): Promise<void> => {
+  const handleDeleteSelected = useCallback(async (): Promise<void> => {
     if (selectedItems.size === 0) {
       showToast(
         "error",
@@ -190,9 +193,9 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
         texts.cardList.toasts.deleteTransactionsError.message
       );
     }
-  };
+  }, [selectedItems, transactions, deleteTransaction]);
 
-  const handleSaveClick = async (): Promise<void> => {
+  const handleSaveClick = useCallback(async (): Promise<void> => {
     if (isDeleting) {
       await handleDeleteSelected();
       return;
@@ -234,7 +237,7 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
       setIsEditing(false);
       setEditedValues({});
     }
-  };
+  }, [isDeleting, handleDeleteSelected, editedValues, transactions, updateTransaction]);
 
   return (
     <View style={styles.container}>

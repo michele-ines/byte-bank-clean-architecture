@@ -1,19 +1,21 @@
 import LoginIllustration from "@assets/images/login/ilustracao-login.svg";
+import { Feather } from "@expo/vector-icons";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useAuth } from "@presentation/state/AuthContext";
-import { texts } from "@presentation/theme";
+import { colors, texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
 import type { LoginFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
 import { validateEmail, validatePassword } from "@shared/utils/validation";
 import { Link, router } from "expo-router";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { styles } from "./LoginForm.styles";
@@ -24,20 +26,25 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const { login } = useAuth();
 
-  const handleEmailChange = (text: string): void => {
+  const handleTogglePasswordVisibility = useCallback(() => {
+    setShowPassword((prev) => !prev);
+  }, []);
+
+  const handleEmailChange = useCallback((text: string): void => {
     setEmail(text);
     setEmailError(validateEmail(text));
-  };
+  }, []);
 
-  const handlePasswordChange = (text: string): void => {
+  const handlePasswordChange = useCallback((text: string): void => {
     setPassword(text);
     setPasswordError(validatePassword(text));
-  };
+  }, []);
 
-  const handleLogin = async (): Promise<void> => {
+  const handleLogin = useCallback(async (): Promise<void> => {
     const finalEmailError = validateEmail(email);
     const finalPasswordError = validatePassword(password);
 
@@ -68,13 +75,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [email, password, login, onLoginSuccess]);
 
-  const handleCreateAccount = (): void => {
+  const handleCreateAccount = useCallback((): void => {
     router.push(ROUTES.SIGNUP);
-  };
+  }, []);
 
-  const isFormInvalid = !!emailError || !!passwordError || !email || !password || isLoading;
+  const isFormValid = useMemo(() => {
+    return !emailError && !passwordError && email && password && !isLoading;
+  }, [emailError, passwordError, email, password, isLoading]);
 
   return (
     <KeyboardAvoidingView
@@ -114,15 +123,33 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         ) : null}
 
         <Text style={styles.label}>{texts.loginForm.labels.password}</Text>
-        <TextInput
-          placeholder={texts.loginForm.placeholders.password}
-          value={password}
-          onChangeText={handlePasswordChange}
-          style={[styles.input, passwordError ? styles.inputError : null]}
-          secureTextEntry
-          accessibilityLabel={texts.loginForm.accessibility.passwordInput}
-          accessibilityHint={texts.loginForm.accessibility.passwordHint}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder={texts.loginForm.placeholders.password}
+            value={password}
+            onChangeText={handlePasswordChange}
+            style={[
+              styles.input,
+              styles.passwordInput,
+              passwordError ? styles.inputError : null,
+            ]}
+            secureTextEntry={!showPassword}
+            accessibilityLabel={texts.loginForm.accessibility.passwordInput}
+            accessibilityHint={texts.loginForm.accessibility.passwordHint}
+          />
+          <Pressable
+            onPress={handleTogglePasswordVisibility}
+            style={styles.eyeIcon}
+            accessibilityLabel={showPassword ? "Ocultar senha" : "Mostrar senha"}
+            accessibilityRole="button"
+          >
+            <Feather
+              name={showPassword ? "eye-off" : "eye"}
+              size={20}
+              color={colors.byteGray450}
+            />
+          </Pressable>
+        </View>
         {passwordError ? (
           <Text style={styles.errorText} accessibilityLiveRegion="polite">
             {passwordError}
@@ -141,7 +168,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           <DefaultButton
             title={texts.loginForm.buttons.submit}
             loading={isLoading}
-            disabled={isFormInvalid}
+            disabled={!isFormValid}
             onPress={() => {
               void handleLogin();
             }}
