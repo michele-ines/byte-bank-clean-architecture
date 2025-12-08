@@ -1,20 +1,69 @@
-import type { WidgetPreferences, WidgetPreferencesContextType } from "@shared/ProfileStyles/profile.styles.types";
-import React, { createContext, useContext, useState } from "react";
+import type { PreferencesStorage } from "@domain/storage/PreferencesStorage";
+import { AsyncStoragePreferences } from "@infrastructure/persistence/AsyncStoragePreferences";
+import type {
+  WidgetPreferences,
+  WidgetPreferencesContextType,
+} from "@shared/ProfileStyles/profile.styles.types";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-const WidgetPreferencesContext = createContext<WidgetPreferencesContextType | undefined>(undefined);
+const WidgetPreferencesContext = createContext<
+  WidgetPreferencesContextType | undefined
+>(undefined);
 
-export const WidgetPreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const WidgetPreferencesProvider: React.FC<{
+  children: React.ReactNode;
+  storage?: PreferencesStorage;
+}> = ({ children, storage }) => {
+  const preferencesStorage = useMemo(
+    () => storage ?? new AsyncStoragePreferences(),
+    [storage]
+  );
   const [preferences, setPreferences] = useState<WidgetPreferences>({
     spendingAlert: true,
     savingsGoal: true,
   });
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  function updatePreferences(newPrefs: WidgetPreferences): void {
-    setPreferences(newPrefs);
+  useEffect(() => {
+    const loadPreferences = async (): Promise<void> => {
+      try {
+        const loaded = await preferencesStorage.getPreferences();
+        setPreferences(loaded);
+      } catch (error) {
+        console.error("Erro ao carregar preferências:", error);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+    void loadPreferences();
+  }, [preferencesStorage]);
+
+  const updatePreferences = useCallback(
+    (newPrefs: WidgetPreferences): void => {
+      setPreferences(newPrefs);
+      void preferencesStorage.setPreferences(newPrefs);
+    },
+    [preferencesStorage]
+  );
+
+  const contextValue = useMemo(
+    () => ({ preferences, updatePreferences }),
+    [preferences, updatePreferences]
+  );
+
+  if (!isLoaded) {
+    return null;
   }
 
   return (
-    <WidgetPreferencesContext.Provider value={{ preferences, updatePreferences }}>
+    <WidgetPreferencesContext.Provider value={contextValue}>
       {children}
     </WidgetPreferencesContext.Provider>
   );
@@ -23,7 +72,9 @@ export const WidgetPreferencesProvider: React.FC<{ children: React.ReactNode }> 
 export function useWidgetPreferences(): WidgetPreferencesContextType {
   const context = useContext(WidgetPreferencesContext);
   if (!context) {
-    throw new Error("useWidgetPreferences deve ser usado dentro de WidgetPreferencesProvider");
+    throw new Error(
+      "useWidgetPreferences deve ser usado dentro de WidgetPreferencesProvider"
+    );
   }
   return context;
 }

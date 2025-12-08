@@ -16,7 +16,6 @@ import { FirebaseTransactionRepository } from '@infrastructure/repositories/Fire
 import { cryptoEncryptionService } from '@infrastructure/security/CryptoEncryptionService';
 import { useAuth } from '@presentation/state/AuthContext';
 import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
-import { Timestamp } from 'firebase/firestore';
 
 const transactionRepository = new FirebaseTransactionRepository(db, storage, cryptoEncryptionService);
 const transactionUseCases = new TransactionUseCasesFactory(transactionRepository);
@@ -81,7 +80,6 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       attachments: AttachmentFile[]
     ) => {
       if (!user) throw new Error('Usuário não autenticado');
-
       return await transactionUseCases.add.execute(
         user.uid,
         transactionData,
@@ -96,23 +94,6 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (args.length === 2) {
         return await handleAddTransaction(args[0], args[1]);
       }
-
-      const legacy = args[0];
-      const mapToDomainType = (t: INewTransactionInput['tipo'] | undefined): 'entrada' | 'saida' => {
-        if (t === 'deposito') return 'entrada';
-        return 'saida';
-      };
-
-      const domainTx: NewTransactionData = {
-        descricao: legacy.description,
-        valor: legacy.valor,
-        tipo: mapToDomainType(legacy.tipo),
-        categoria: '',
-        data: Timestamp.now(),
-      };
-
-      await handleAddTransaction(domainTx, []);
-      return;
     },
     [handleAddTransaction]
   );
@@ -192,7 +173,9 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       addTransaction: addTransactionWrapper as unknown as TransactionsContextData['addTransaction'],
       updateTransaction: updateTransactionWrapper as unknown as TransactionsContextData['updateTransaction'],
       deleteTransaction: handleDeleteTransaction,
-      balance: transactions.reduce((acc, t) => (t.tipo === 'entrada' ? acc + (t.valor ?? 0) : acc - (t.valor ?? 0)), 0),
+      balance: transactions.reduce((acc, t) => {
+        return t.tipo === 'entrada' ? acc + (t.valor ?? 0) : acc - (t.valor ?? 0);
+      }, 0),
       loadingMore,
       hasMore,
       loadMoreTransactions: loadMoreTransactionsLegacy,

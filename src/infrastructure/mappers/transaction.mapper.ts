@@ -43,14 +43,24 @@ export const mapDocumentToTransaction = (id: string, raw: DocumentData): ITransa
     };
 };
 
+const determineTransactionType = (transactionType: string): 'entrada' | 'saida' => {
+  const entryTypes = ['deposito', 'cambio']; 
+  return entryTypes.includes(transactionType.toLowerCase()) ? 'entrada' : 'saida';
+};
+
 export const mapNewTransactionToDocument = (
   userId: string,
   transactionData: NewTransactionData,
   attachmentUrls: string[]
 ): Record<string, unknown> => {
+  const tipoOriginal = (transactionData.tipo as string) || 'saida';
+  
+  const tipoMovimento = determineTransactionType(tipoOriginal);
+  
   return {
     ...transactionData,
-    userId: userId, 
+    userId: userId,
+    tipo: tipoMovimento,
     createdAt: serverTimestamp(),
     attachments: attachmentUrls,
   };
