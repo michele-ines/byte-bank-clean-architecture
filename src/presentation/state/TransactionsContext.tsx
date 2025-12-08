@@ -1,40 +1,50 @@
-import type { ReactNode } from 'react';
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useMemo } from "react";
 
-import { TransactionUseCasesFactory } from '@/domain/use-cases/TransactionUseCasesFactory';
-import type { ITransaction } from '@domain/entities/Transaction';
-import type { AttachmentFile, NewTransactionData } from '@domain/entities/TransactionData';
-import { db, storage } from '@infrastructure/config/firebaseConfig';
-import { FirebaseTransactionRepository } from '@infrastructure/repositories/FirebaseTransactionRepository';
-import { cryptoEncryptionService } from '@infrastructure/security/CryptoEncryptionService';
-import { useAuth } from '@presentation/state/AuthContext';
-import type { IAnexo, INewTransactionInput } from '@shared/interfaces/auth.interfaces';
+import { TransactionUseCasesFactory } from "@/domain/use-cases/TransactionUseCasesFactory";
+import type { ITransaction } from "@domain/entities/Transaction";
+import type {
+  AttachmentFile,
+  NewTransactionData,
+} from "@domain/entities/TransactionData";
+import { db, storage } from "@infrastructure/config/firebaseConfig";
+import { FirebaseTransactionRepository } from "@infrastructure/repositories/FirebaseTransactionRepository";
+import { cryptoEncryptionService } from "@infrastructure/security/CryptoEncryptionService";
+import { useTransactionsQuery } from "@presentation/hooks/useTransactionsQuery";
+import { useAuth } from "@presentation/state/AuthContext";
+import type {
+  IAnexo,
+  INewTransactionInput,
+} from "@shared/interfaces/auth.interfaces";
 
-const transactionRepository = new FirebaseTransactionRepository(db, storage, cryptoEncryptionService);
-const transactionUseCases = new TransactionUseCasesFactory(transactionRepository);
+const transactionRepository = new FirebaseTransactionRepository(
+  db,
+  storage,
+  cryptoEncryptionService
+);
+const transactionUseCases = new TransactionUseCasesFactory(
+  transactionRepository
+);
 
 interface TransactionsContextData {
   transactions: ITransaction[];
   loading: boolean;
   addTransaction: {
-    (transactionData: NewTransactionData, attachments: AttachmentFile[]): Promise<string>;
+    (
+      transactionData: NewTransactionData,
+      attachments: AttachmentFile[]
+    ): Promise<string>;
     (transaction: INewTransactionInput): Promise<void>;
   };
   updateTransaction: {
-    (id: string, updatedTransaction: Partial<ITransaction>, newAttachments: AttachmentFile[], attachmentsToRemove: string[]): Promise<void>;
+    (
+      id: string,
+      updatedTransaction: Partial<ITransaction>,
+      newAttachments: AttachmentFile[],
+      attachmentsToRemove: string[]
+    ): Promise<void>;
     (id: string, updatedTransaction: Partial<ITransaction>): Promise<void>;
   };
-  deleteTransaction: (
-    id: string,
-    attachments?: string[]
-  ) => Promise<void>;
+  deleteTransaction: (id: string, attachments?: string[]) => Promise<void>;
   balance: number | null;
   loadingMore: boolean;
   hasMore: boolean;
@@ -44,53 +54,57 @@ interface TransactionsContextData {
     fileUri: string,
     fileName: string
   ) => Promise<void>;
-  deleteAttachment: (transactionId: string, attachmentToDelete: IAnexo) => Promise<void>;
+  deleteAttachment: (
+    transactionId: string,
+    attachmentToDelete: IAnexo
+  ) => Promise<void>;
   deleteTransactions: (ids: string[]) => Promise<void>;
 }
 
-const TransactionsContext = createContext<TransactionsContextData>({} as TransactionsContextData);
+const TransactionsContext = createContext<TransactionsContextData>(
+  {} as TransactionsContextData
+);
 
-export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [transactions, setTransactions] = useState<ITransaction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { user } = useAuth(); 
+interface TransactionsProviderProps {
+  children: React.ReactNode;
+}
 
-  useEffect(() => {
-    if (!user) {
-      setTransactions([]);
-      setLoading(false);
-      return;
-    }
+export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({
+  children,
+}) => {
+  const { user } = useAuth();
 
-    setLoading(true);
-    const unsubscribe = transactionUseCases.observe.execute(
-      user.uid,
-      (userTransactions): void => {
-        setTransactions(userTransactions);
-        setLoading(false);
-      }
-    );
-
-    return () => unsubscribe();
-  }, [user]); 
+  const {
+    data: transactions = [],
+    isLoading: loading,
+    refetch,
+  } = useTransactionsQuery({
+    userId: user?.uid ?? "",
+    repository: transactionRepository,
+  });
 
   const handleAddTransaction = useCallback(
     async (
       transactionData: NewTransactionData,
       attachments: AttachmentFile[]
     ) => {
-      if (!user) throw new Error('Usuário não autenticado');
-      return await transactionUseCases.add.execute(
+      if (!user) throw new Error("Usuário não autenticado");
+      const result = await transactionUseCases.add.execute(
         user.uid,
         transactionData,
         attachments
       );
+
+      await refetch();
+      return result;
     },
-    [user] 
+    [user, refetch]
   );
 
   const addTransactionWrapper = useCallback(
-    async (...args: [NewTransactionData, AttachmentFile[]] | [INewTransactionInput]): Promise<void | string> => {
+    async (
+      ...args: [NewTransactionData, AttachmentFile[]] | [INewTransactionInput]
+    ): Promise<void | string> => {
       if (args.length === 2) {
         return await handleAddTransaction(args[0], args[1]);
       }
@@ -105,9 +119,9 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
       newAttachments: AttachmentFile[],
       attachmentsToRemove: string[]
     ) => {
-      if (!user) throw new Error('Usuário não autenticado');
+      if (!user) throw new Error("Usuário não autenticado");
 
-      const currentTx = transactions.find(t => t.id === id);
+      const currentTx = transactions.find((t) => t.id === id);
       const currentAttachments = currentTx?.attachments ?? [];
 
       await transactionUseCases.update.execute(
@@ -118,46 +132,78 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
         newAttachments,
         attachmentsToRemove
       );
+
+      await refetch();
     },
-    [user, transactions]
+    [user, transactions, refetch]
   );
 
-    const updateTransactionWrapper = useCallback(async (
-      ...args: [string, Partial<ITransaction>] | [string, Partial<ITransaction>, AttachmentFile[], string[]]
+  const updateTransactionWrapper = useCallback(
+    async (
+      ...args:
+        | [string, Partial<ITransaction>]
+        | [string, Partial<ITransaction>, AttachmentFile[], string[]]
     ) => {
       if (args.length === 2) {
         const [id, updatedTransaction] = args;
         return await handleUpdateTransaction(id, updatedTransaction, [], []);
       }
-      const [id, updatedTransaction, newAttachments, attachmentsToRemove] = args;
-      return await handleUpdateTransaction(id, updatedTransaction, newAttachments, attachmentsToRemove);
-    }, [handleUpdateTransaction]);
+      const [id, updatedTransaction, newAttachments, attachmentsToRemove] =
+        args;
+      return await handleUpdateTransaction(
+        id,
+        updatedTransaction,
+        newAttachments,
+        attachmentsToRemove
+      );
+    },
+    [handleUpdateTransaction]
+  );
 
   const handleDeleteTransaction = useCallback(
     async (id: string, attachments?: string[]) => {
-      if (!user) throw new Error('Usuário não autenticado');
+      if (!user) throw new Error("Usuário não autenticado");
 
-      const urlsToDelete = attachments ?? transactions.find(t => t.id === id)?.attachments ?? [];
+      const urlsToDelete =
+        attachments ?? transactions.find((t) => t.id === id)?.attachments ?? [];
 
       await transactionUseCases.delete.execute(id, urlsToDelete);
+
+      await refetch();
     },
-    [user, transactions]
+    [user, transactions, refetch]
   );
 
-  const deleteTransactionsLegacy = useCallback(async (ids: string[]) => {
-    await Promise.all(ids.map(id => handleDeleteTransaction(id)));
-  }, [handleDeleteTransaction]);
+  const deleteTransactionsLegacy = useCallback(
+    async (ids: string[]) => {
+      await Promise.all(ids.map((id) => handleDeleteTransaction(id)));
+    },
+    [handleDeleteTransaction]
+  );
 
-  const uploadAttachmentAndUpdateTransactionLegacy = useCallback(async (transactionId: string, fileUri: string, fileName: string) => {
-    const response = await fetch(fileUri);
-    const blob = await response.blob();
-    const attachment = Object.assign(blob, { name: fileName }) as unknown as AttachmentFile;
-    await handleUpdateTransaction(transactionId, {}, [attachment], []);
-  }, [handleUpdateTransaction]);
+  const uploadAttachmentAndUpdateTransactionLegacy = useCallback(
+    async (transactionId: string, fileUri: string, fileName: string) => {
+      const response = await fetch(fileUri);
+      const blob = await response.blob();
+      const attachment = Object.assign(blob, {
+        name: fileName,
+      }) as unknown as AttachmentFile;
+      await handleUpdateTransaction(transactionId, {}, [attachment], []);
+    },
+    [handleUpdateTransaction]
+  );
 
-  const deleteAttachmentLegacy = useCallback(async (transactionId: string, attachmentToDelete: IAnexo) => {
-    await handleUpdateTransaction(transactionId, {}, [], [attachmentToDelete.url]);
-  }, [handleUpdateTransaction]);
+  const deleteAttachmentLegacy = useCallback(
+    async (transactionId: string, attachmentToDelete: IAnexo) => {
+      await handleUpdateTransaction(
+        transactionId,
+        {},
+        [],
+        [attachmentToDelete.url]
+      );
+    },
+    [handleUpdateTransaction]
+  );
 
   const loadMoreTransactionsLegacy = useCallback(async () => {
     return Promise.resolve();
@@ -170,16 +216,21 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
     () => ({
       transactions,
       loading,
-      addTransaction: addTransactionWrapper as unknown as TransactionsContextData['addTransaction'],
-      updateTransaction: updateTransactionWrapper as unknown as TransactionsContextData['updateTransaction'],
+      addTransaction:
+        addTransactionWrapper as unknown as TransactionsContextData["addTransaction"],
+      updateTransaction:
+        updateTransactionWrapper as unknown as TransactionsContextData["updateTransaction"],
       deleteTransaction: handleDeleteTransaction,
       balance: transactions.reduce((acc, t) => {
-        return t.tipo === 'entrada' ? acc + (t.valor ?? 0) : acc - (t.valor ?? 0);
+        return t.tipo === "entrada"
+          ? acc + (t.valor ?? 0)
+          : acc - (t.valor ?? 0);
       }, 0),
       loadingMore,
       hasMore,
       loadMoreTransactions: loadMoreTransactionsLegacy,
-      uploadAttachmentAndUpdateTransaction: uploadAttachmentAndUpdateTransactionLegacy,
+      uploadAttachmentAndUpdateTransaction:
+        uploadAttachmentAndUpdateTransactionLegacy,
       deleteAttachment: deleteAttachmentLegacy,
       deleteTransactions: deleteTransactionsLegacy,
     }),
@@ -208,7 +259,9 @@ export const TransactionsProvider: React.FC<{ children: ReactNode }> = ({ childr
 export function useTransactions(): TransactionsContextData {
   const context = useContext(TransactionsContext);
   if (!context) {
-    throw new Error('useTransactions deve ser usado dentro de um TransactionsProvider');
+    throw new Error(
+      "useTransactions deve ser usado dentro de um TransactionsProvider"
+    );
   }
   return context;
 }
