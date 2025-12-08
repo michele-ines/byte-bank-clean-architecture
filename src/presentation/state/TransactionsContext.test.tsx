@@ -1,10 +1,12 @@
+import { queryClient } from "@/infrastructure/config/react-query-client";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import {
   doc,
   onSnapshot,
   type Timestamp,
   updateDoc,
-  writeBatch
+  writeBatch,
 } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import type { JSX } from "react";
@@ -46,7 +48,9 @@ jest.mock("firebase/firestore", () => ({
   arrayRemove: jest.fn(() => "mock-array-remove"),
 }));
 
-const fsMock = require("firebase/firestore") as { Timestamp: { now: () => { seconds: number } } };
+const fsMock = require("firebase/firestore") as {
+  Timestamp: { now: () => { seconds: number } };
+};
 fsMock.Timestamp = { now: () => ({ seconds: Math.floor(Date.now() / 1000) }) };
 
 jest.mock("firebase/storage", () => ({
@@ -66,7 +70,9 @@ jest.mock("../../infrastructure/security/CryptoEncryptionService", () => ({
     encrypt: jest.fn((value: string) => Promise.resolve(value)),
     decrypt: jest.fn((value: string) => Promise.resolve(value)),
     encryptNumber: jest.fn((value: number) => Promise.resolve(String(value))),
-    decryptNumber: jest.fn((value: string) => Promise.resolve(parseFloat(value))),
+    decryptNumber: jest.fn((value: string) =>
+      Promise.resolve(parseFloat(value))
+    ),
   },
 }));
 
@@ -87,21 +93,27 @@ const TestComponent: React.FC = (): JSX.Element => {
 
   const [error, setError] = React.useState<string | null>(null);
 
- const handleAddTransaction = (): void => {
-  void (async (): Promise<void> => {
-    try {
-      await addTransaction({
-        tipo: "entrada",     
-        valor: 100,
-        descricao: "Teste",  
-        categoria: "Geral",   
-        data: { seconds: 1678900000, nanoseconds: 0 } as unknown as Timestamp,
-      }, []); 
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  })();
-};
+  const handleAddTransaction = (): void => {
+    void (async (): Promise<void> => {
+      try {
+        await addTransaction(
+          {
+            tipo: "entrada",
+            valor: 100,
+            descricao: "Teste",
+            categoria: "Geral",
+            data: {
+              seconds: 1678900000,
+              nanoseconds: 0,
+            } as unknown as Timestamp,
+          },
+          []
+        );
+      } catch (err) {
+        setError((err as Error).message);
+      }
+    })();
+  };
 
   const handleUpdateTransaction = (): void => {
     void (async (): Promise<void> => {
@@ -211,7 +223,11 @@ const TestComponent: React.FC = (): JSX.Element => {
 const renderWithProvider = (
   component: React.ReactElement
 ): ReturnType<typeof render> => {
-  return render(<TransactionsProvider>{component}</TransactionsProvider>);
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <TransactionsProvider>{component}</TransactionsProvider>
+    </QueryClientProvider>
+  );
 };
 
 describe("TransactionsContext", (): void => {
@@ -222,7 +238,10 @@ describe("TransactionsContext", (): void => {
     (onSnapshot as jest.Mock).mockImplementation(
       (
         _query: unknown,
-        callback: (snapshot: { forEach: (fn: (d: unknown) => void) => void; empty: boolean }) => void
+        callback: (snapshot: {
+          forEach: (fn: (d: unknown) => void) => void;
+          empty: boolean;
+        }) => void
       ): (() => void) => {
         const snapshot = {
           docs: [],
@@ -240,7 +259,7 @@ describe("TransactionsContext", (): void => {
       const { getByTestId } = renderWithProvider(<TestComponent />);
       fireEvent.press(getByTestId("addTransaction"));
 
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
       const errorElement = getByTestId("transactionsCount");
       expect(errorElement).toBeTruthy();
@@ -249,14 +268,16 @@ describe("TransactionsContext", (): void => {
     it("deve lançar erro quando usuário não está autenticado", async (): Promise<void> => {
       (useAuth as jest.Mock).mockReturnValue({ user: null });
 
-      const { getByTestId, queryByTestId } = renderWithProvider(<TestComponent />);
+      const { getByTestId, queryByTestId } = renderWithProvider(
+        <TestComponent />
+      );
       fireEvent.press(getByTestId("addTransaction"));
 
       await waitFor(() => {
         const errorElement = queryByTestId("error");
         expect(errorElement).toBeTruthy();
       });
-      
+
       expect(queryByTestId("error")?.props.children).toBe(
         "Usuário não autenticado"
       );
@@ -290,7 +311,9 @@ describe("TransactionsContext", (): void => {
       fireEvent.press(getByTestId("deleteTransactions"));
 
       await waitFor(() => {
-        const firestoreModule = require("firebase/firestore") as { deleteDoc: jest.Mock };
+        const firestoreModule = require("firebase/firestore") as {
+          deleteDoc: jest.Mock;
+        };
         expect(firestoreModule.deleteDoc).toHaveBeenCalled();
       });
     });
