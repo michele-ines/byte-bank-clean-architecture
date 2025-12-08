@@ -63,4 +63,18 @@ export const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     marginTop: spacing.xs2,
   },
+  passwordContainer: {
+    position: layout.positionRelative,
+    width: layout.widthFull,
+  },
+  eyeIcon: {
+    position: layout.positionAbsolute,
+    right: spacing.sm,
+    top: spacing.sm,
+    padding: spacing.xs2,
+    zIndex: layout.zIndex1,
+  },
+  passwordInput: {
+    paddingRight: spacing.xxl,
+  },
 });

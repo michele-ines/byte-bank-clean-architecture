@@ -10,11 +10,12 @@ module.exports = defineConfig([
     ignores: [
       "dist/**",
       "node_modules/**",
-      "coverage/**", 
+      "coverage/**",
       "babel.config.js",
       "metro.config.js",
       "jest.config.js",
       "eslint.config.js",
+      "**/__mocks__/",
     ],
   },
 
