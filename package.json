@@ -3,44 +3,29 @@
   "version": "1.0.0",
   "private": true,
   "main": "expo-router/entry",
+
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "type-check": "tsc --noEmit",
     "typescript": "tsc --noEmit",
+
     "prepare": "husky install",
-    "test": "jest --watchAll"
+
+    "test": "jest --watchAll",
+    "test:coverage": "jest --coverage"
   },
+
   "lint-staged": {
     "*.{ts,tsx}": [
       "eslint --fix --max-warnings=0",
       "tsc --noEmit",
       "git add"
-    ]
-  },
-  "jest": {
-    "preset": "jest-expo",
-    "setupFiles": [
-      "./__mocks__/@react-native-async-storage/async-storage.js"
-    ],
-    "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/$1"
-    },
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "**/*.{ts,tsx,js,jsx}",
-      "!**/coverage/**",
-      "!**/node_modules/**",
-      "!**/babel.config.js",
-      "!**/expo-env.d.ts",
-      "!**/.expo/**"
-    ],
-    "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|expo-.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|firebase)/)"
     ]
   },
   "dependencies": {
@@ -71,7 +56,7 @@
     "expo-symbols": "~1.0.7",
     "expo-system-ui": "~6.0.8",
     "expo-web-browser": "~15.0.9",
-    "firebase": "^12.1.0",
+    "firebase": "^10.14.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
