@@ -94,16 +94,12 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
         showToast("success", toasts.success.title, toasts.success.message);
     } catch (error: unknown) {
       let errorMessage = toasts.genericError.message;
-      let errorTitle = toasts.genericError.title;
-
-      if (
-        error instanceof Error &&
-        (error as { code?: string }).code === "auth/email-already-in-use"
-      ) {
-        errorMessage = toasts.emailInUse.message;
-        errorTitle = toasts.emailInUse.title;
+      
+      if (error instanceof Error && 'userMessage' in error) {
+        errorMessage = (error as any).userMessage;
       }
-      showToast("error", errorTitle, errorMessage);
+      
+      showToast("error", toasts.genericError.title, errorMessage);
     } finally {
       setIsLoading(false);
     }

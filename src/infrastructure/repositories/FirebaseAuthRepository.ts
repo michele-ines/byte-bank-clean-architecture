@@ -3,6 +3,7 @@ import type { TokenStorage } from '@domain/auth/TokenStorage';
 import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
 import type { AuthenticatedUser, UserData } from '@domain/entities/User';
 import type { AuthRepository } from '@domain/repositories/AuthRepository';
+import { FirebaseErrorHandler } from '@infrastructure/errors/FirebaseErrorHandler';
 import type { Auth } from 'firebase/auth';
 import {
   createUserWithEmailAndPassword,
@@ -93,7 +94,8 @@ export class FirebaseAuthRepository implements AuthRepository {
       this.logger.error('Erro em FirebaseAuthRepository.login', error as Error, {
         email: credentials.email,
       });
-      throw error; 
+      const appError = FirebaseErrorHandler.handle(error);
+      throw appError;
     }
   }
 
@@ -125,7 +127,8 @@ export class FirebaseAuthRepository implements AuthRepository {
       this.logger.error('Erro em FirebaseAuthRepository.signup', error as Error, {
         email: credentials.email,
       });
-      throw error; 
+      const appError = FirebaseErrorHandler.handle(error);
+      throw appError;
     }
   }
 
@@ -138,7 +141,8 @@ export class FirebaseAuthRepository implements AuthRepository {
       this.logger.error('Erro em FirebaseAuthRepository.createUserProfile', error as Error, {
         uuid: userData.uuid,
       });
-      throw error; 
+      const appError = FirebaseErrorHandler.handle(error);
+      throw appError;
     }
   }
 
@@ -159,7 +163,8 @@ export class FirebaseAuthRepository implements AuthRepository {
       this.logger.error('Erro em FirebaseAuthRepository.resetPassword', error as Error, {
         email,
       });
-      throw error; 
+      const appError = FirebaseErrorHandler.handle(error);
+      throw appError;
     }
   }
 }

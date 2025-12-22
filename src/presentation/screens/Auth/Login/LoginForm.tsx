@@ -67,10 +67,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       onLoginSuccess?.(email);
     } catch (error: unknown) {
       console.error(error);
-      const message =
-        error instanceof Error
-          ? texts.loginForm.toasts.loginError.message
-          : texts.loginForm.toasts.unexpectedError.message;
+      
+      let message = texts.loginForm.toasts.unexpectedError.message;
+      
+      if (error instanceof Error) {
+        if ('userMessage' in error) {
+          message = (error as any).userMessage;
+        } else {
+          message = texts.loginForm.toasts.loginError.message;
+        }
+      }
+      
       showToast("error", "Erro de Login", message);
     } finally {
       setIsLoading(false);

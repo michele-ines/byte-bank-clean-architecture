@@ -1,4 +1,5 @@
 import type { EncryptionService } from '@domain/security/EncryptionService';
+import { FirebaseErrorHandler } from '@infrastructure/errors/FirebaseErrorHandler';
 import type { Firestore } from 'firebase/firestore';
 import {
   addDoc,
@@ -53,16 +54,21 @@ export class FirebaseTransactionRepository implements TransactionRepository {
     userId: string, 
     attachments: AttachmentFile[]
   ): Promise<string[]> {
-    const uploadPromises = attachments.map(async (file) => {
-      const storageRef = ref(
-        this.storage,
-        `attachments/${userId}/${Date.now()}_${file.name}`
-      );
-      await uploadBytes(storageRef, file);
-      return getDownloadURL(storageRef);
-    });
-    
-    return Promise.all(uploadPromises);
+    try {
+      const uploadPromises = attachments.map(async (file) => {
+        const storageRef = ref(
+          this.storage,
+          `attachments/${userId}/${Date.now()}_${file.name}`
+        );
+        await uploadBytes(storageRef, file);
+        return getDownloadURL(storageRef);
+      });
+      
+      return Promise.all(uploadPromises);
+    } catch (error) {
+      const appError = FirebaseErrorHandler.handle(error);
+      throw appError;
+    }
   }
 
   private async deleteAttachments(attachmentUrls: string[]): Promise<void> {
@@ -129,26 +135,31 @@ export class FirebaseTransactionRepository implements TransactionRepository {
     transactionData: NewTransactionData,
     attachments: AttachmentFile[]
   ): Promise<string> {
-    let attachmentUrls: string[] = [];
-    if (attachments && attachments.length > 0) {
-      attachmentUrls = await this.uploadAttachments(userId, attachments);
+    try {
+      let attachmentUrls: string[] = [];
+      if (attachments && attachments.length > 0) {
+        attachmentUrls = await this.uploadAttachments(userId, attachments);
+      }
+
+      const newTransaction = mapNewTransactionToDocument(
+          userId, 
+          transactionData, 
+          attachmentUrls
+      );
+
+      const encryptedTransaction = {
+        ...newTransaction,
+        descricao: await this.encryptionService.encrypt(newTransaction.descricao as string),
+        valor: await this.encryptionService.encryptNumber(newTransaction.valor as number),
+        categoria: await this.encryptionService.encrypt(newTransaction.categoria as string),
+      };
+
+      const docRef = await addDoc(collection(this.db, 'transactions'), encryptedTransaction);
+      return docRef.id;
+    } catch (error) {
+      const appError = FirebaseErrorHandler.handle(error);
+      throw appError;
     }
-
-    const newTransaction = mapNewTransactionToDocument(
-        userId, 
-        transactionData, 
-        attachmentUrls
-    );
-
-    const encryptedTransaction = {
-      ...newTransaction,
-      descricao: await this.encryptionService.encrypt(newTransaction.descricao as string),
-      valor: await this.encryptionService.encryptNumber(newTransaction.valor as number),
-      categoria: await this.encryptionService.encrypt(newTransaction.categoria as string),
-    };
-
-    const docRef = await addDoc(collection(this.db, 'transactions'), encryptedTransaction);
-    return docRef.id;
   }
 
   async updateTransaction(
@@ -159,54 +170,63 @@ export class FirebaseTransactionRepository implements TransactionRepository {
     newAttachments: AttachmentFile[],
     attachmentsToRemove: string[]
   ): Promise<void> {
-    
-    if (attachmentsToRemove && attachmentsToRemove.length > 0) {
-      await this.deleteAttachments(attachmentsToRemove);
-    }
-
-    let newAttachmentUrls: string[] = [];
-    if (newAttachments && newAttachments.length > 0) {
-      if (userId) {
-        newAttachmentUrls = await this.uploadAttachments(userId, newAttachments);
-      } else {
-        console.warn("userId do usuário não foi fornecido ao tentar fazer upload de novos anexos.");
+    try {
+      if (attachmentsToRemove && attachmentsToRemove.length > 0) {
+        await this.deleteAttachments(attachmentsToRemove);
       }
-    }
 
-    const finalAttachments = [
-      ...currentAttachments.filter(url => !attachmentsToRemove?.includes(url)),
-      ...newAttachmentUrls
-    ];
+      let newAttachmentUrls: string[] = [];
+      if (newAttachments && newAttachments.length > 0) {
+        if (userId) {
+          newAttachmentUrls = await this.uploadAttachments(userId, newAttachments);
+        } else {
+          console.warn("userId do usuário não foi fornecido ao tentar fazer upload de novos anexos.");
+        }
+      }
 
-    const encryptedUpdates: Partial<ITransaction> = { ...updates };
-    
-    if (updates.descricao) {
-      encryptedUpdates.descricao = await this.encryptionService.encrypt(updates.descricao);
-    }
-    if (updates.valor !== undefined) {
-      encryptedUpdates.valor = await this.encryptionService.encryptNumber(updates.valor) as unknown as number;
-    }
-    if (updates.categoria) {
-      encryptedUpdates.categoria = await this.encryptionService.encrypt(updates.categoria);
-    }
-    
-    const docRef = doc(this.db, 'transactions', transactionId);
-    
-    const dataToUpdate = mapUpdateTransactionToDocument(
-        encryptedUpdates, 
-        finalAttachments
-    );
+      const finalAttachments = [
+        ...currentAttachments.filter(url => !attachmentsToRemove?.includes(url)),
+        ...newAttachmentUrls
+      ];
 
-    await updateDoc(docRef, dataToUpdate);
+      const encryptedUpdates: Partial<ITransaction> = { ...updates };
+      
+      if (updates.descricao) {
+        encryptedUpdates.descricao = await this.encryptionService.encrypt(updates.descricao);
+      }
+      if (updates.valor !== undefined) {
+        encryptedUpdates.valor = await this.encryptionService.encryptNumber(updates.valor) as unknown as number;
+      }
+      if (updates.categoria) {
+        encryptedUpdates.categoria = await this.encryptionService.encrypt(updates.categoria);
+      }
+      
+      const docRef = doc(this.db, 'transactions', transactionId);
+      
+      const dataToUpdate = mapUpdateTransactionToDocument(
+          encryptedUpdates, 
+          finalAttachments
+      );
+
+      await updateDoc(docRef, dataToUpdate);
+    } catch (error) {
+      const appError = FirebaseErrorHandler.handle(error);
+      throw appError;
+    }
   }
 
   async deleteTransaction(
     transactionId: string,
     attachmentUrls: string[]
   ): Promise<void> {
-    if (attachmentUrls && attachmentUrls.length > 0) {
-      await this.deleteAttachments(attachmentUrls);
+    try {
+      if (attachmentUrls && attachmentUrls.length > 0) {
+        await this.deleteAttachments(attachmentUrls);
+      }
+      await deleteDoc(doc(this.db, 'transactions', transactionId));
+    } catch (error) {
+      const appError = FirebaseErrorHandler.handle(error);
+      throw appError;
     }
-    await deleteDoc(doc(this.db, 'transactions', transactionId));
   }
 }
