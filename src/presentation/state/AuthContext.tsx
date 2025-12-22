@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import type { ReactNode } from 'react';
+import { router } from "expo-router";
+import type { ReactNode } from "react";
 import React, {
   createContext,
   useCallback,
@@ -7,25 +7,35 @@ import React, {
   useEffect,
   useMemo,
   useState,
-} from 'react';
+} from "react";
 
-import type { AuthContextData } from '@/shared/interfaces/auth.interfaces';
-import type { AuthCredentials, SignupCredentials } from '@domain/entities/AuthCredentials';
-import type { AuthenticatedUser, UserData } from '@domain/entities/User';
-import type { AuthRepository } from '@domain/repositories/AuthRepository';
-import { AuthUseCasesFactory } from '@domain/use-cases/AuthUseCaseFactory';
-import { auth, db } from '@infrastructure/config/firebaseConfig';
-import { secureTokenStorage } from '@infrastructure/persistence/SecureTokenStorage';
-import { FirebaseAuthRepository } from '@infrastructure/repositories/FirebaseAuthRepository';
-import { loggerService } from '../config/loggerService';
-import { useLogger } from './LoggerContext';
+import type { AuthContextData } from "@/shared/interfaces/auth.interfaces";
+import type {
+  AuthCredentials,
+  SignupCredentials,
+} from "@domain/entities/AuthCredentials";
+import type { AuthenticatedUser, UserData } from "@domain/entities/User";
+import type { AuthRepository } from "@domain/repositories/AuthRepository";
+import { AuthUseCasesFactory } from "@domain/use-cases/AuthUseCaseFactory";
+import { auth, db } from "@infrastructure/config/firebaseConfig";
+import { secureTokenStorage } from "@infrastructure/persistence/SecureTokenStorage";
+import { FirebaseAuthRepository } from "@infrastructure/repositories/FirebaseAuthRepository";
+import { loggerService } from "../config/loggerService";
+import { useInactivityLogout } from "../hooks/useInactivityLogout";
+import { useLogger } from "./LoggerContext";
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const authUseCases = useMemo(() => {
-    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(auth, db,loggerService, secureTokenStorage);
+    const firebaseAuthRepository: AuthRepository = new FirebaseAuthRepository(
+      auth,
+      db,
+      loggerService,
+      secureTokenStorage
+    );
     return new AuthUseCasesFactory(firebaseAuthRepository);
   }, []);
 
@@ -67,17 +77,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, [authUseCases]);
 
-  const handleSignup = useCallback(async (credentials: SignupCredentials) => {
+  const handleSignup = useCallback(
+    async (credentials: SignupCredentials) => {
       await authUseCases.signup.execute(credentials);
-      router.replace('/dashboard'); 
-  }, [authUseCases]);
-
+      router.replace("/dashboard");
+    },
+    [authUseCases]
+  );
 
   const handleSignupWrapper = useCallback(
     async (...args: [SignupCredentials] | [string, string, string?]) => {
       if (args.length === 1) return await handleSignup(args[0]);
       const [email, password, name] = args;
-      await handleSignup({ email, password, name: name ?? '' });
+      await handleSignup({ email, password, name: name ?? "" });
     },
     [handleSignup]
   );
@@ -85,7 +97,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const handleLogin = useCallback(
     async (credentials: AuthCredentials) => {
       await authUseCases.login.execute(credentials);
-      router.replace('/dashboard');
+      router.replace("/dashboard");
     },
     [authUseCases]
   );
@@ -109,11 +121,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const handleSignOut = useCallback(async () => {
     try {
       await authUseCases.logout.execute();
-      router.replace('/');
+      router.replace("/");
     } catch (error) {
-      logger.error('Erro ao fazer logout no AuthContext', error as Error);
+      logger.error("Erro ao fazer logout no AuthContext", error as Error);
     }
   }, [authUseCases, logger]);
+
+  useInactivityLogout({ user, onSignOut: handleSignOut });
 
   const contextValue = useMemo(
     () => ({
@@ -145,7 +159,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
   return context;
 }
