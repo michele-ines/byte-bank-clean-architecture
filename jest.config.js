@@ -43,7 +43,10 @@ module.exports = {
 
   coverageReporters: ['text', 'lcov'],
 
-  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+  ],
 
   transformIgnorePatterns: [
     'node_modules/(?!((jest-)?react-native|' +
