@@ -25,6 +25,7 @@ export function useTransactionsQuery({
           }
         );
       }),
+    enabled: !!userId && userId !== "",
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true,
   });
