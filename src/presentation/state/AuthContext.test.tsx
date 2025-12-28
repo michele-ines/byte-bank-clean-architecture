@@ -1,43 +1,8 @@
+/* eslint-disable import/first */
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-} from 'firebase/auth';
-import { onSnapshot, setDoc } from 'firebase/firestore';
-import type { JSX } from 'react';
-import React from 'react';
+import React, { type JSX } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { AuthProvider, useAuth } from './AuthContext';
-
-beforeAll((): void => {
-  jest.spyOn(console, 'error').mockImplementation(jest.fn());
-});
-
-
-afterAll((): void => {
-  (console.error as jest.Mock).mockRestore();
-});
-
-jest.mock('firebase/auth', () => ({
-  getAuth: jest.fn(() => ({})),
-  createUserWithEmailAndPassword: jest.fn(),
-  signInWithEmailAndPassword: jest.fn(),
-  sendPasswordResetEmail: jest.fn(),
-  signOut: jest.fn(),
-  onAuthStateChanged: jest.fn(),
-}));
-
-jest.mock('firebase/firestore', () => ({
-  getFirestore: jest.fn(() => ({})),
-  doc: jest.fn(() => 'mock-doc-ref'),
-  setDoc: jest.fn(),
-  onSnapshot: jest.fn(),
-  serverTimestamp: jest.fn(() => ({ seconds: 1234567890, nanoseconds: 0 })),
-}));
 
 jest.mock('expo-router', () => ({
   router: {
@@ -50,12 +15,14 @@ jest.mock('@infrastructure/config/firebaseConfig', () => ({
   db: {},
 }));
 
-jest.mock('./LoggerContext', () => ({
-  useLogger: () => ({
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-  }),
+jest.mock(
+  '@infrastructure/repositories/FirebaseAuthRepository',
+  () => ({
+    FirebaseAuthRepository: jest.fn(),
+  })
+);
+
+jest.mock('../config/loggerService', () => ({
   loggerService: {
     info: jest.fn(),
     warn: jest.fn(),
@@ -63,243 +30,223 @@ jest.mock('./LoggerContext', () => ({
   },
 }));
 
-const TestComponent: React.FC = (): JSX.Element => {
-  const {
-    user,
-    userData,
-    isAuthenticated,
-    loading,
-    signup,
-    login,
-    resetPassword,
-    signOut: handleSignOut,
-  } = useAuth();
+jest.mock('../hooks/useInactivityLogout', () => ({
+  useInactivityLogout: jest.fn(),
+}));
 
+jest.mock('./LoggerContext', () => ({
+  useLogger: () => ({
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  }),
+}));
+
+const mockSignupExecute = jest.fn<Promise<void>, [unknown]>();
+const mockLoginExecute = jest.fn<Promise<void>, [unknown]>();
+const mockLogoutExecute = jest.fn<Promise<void>, []>();
+const mockResetPasswordExecute = jest.fn<Promise<void>, [string]>();
+
+jest.mock('@domain/use-cases/AuthUseCaseFactory', () => ({
+  AuthUseCasesFactory: jest.fn().mockImplementation(() => ({
+    signup: { execute: mockSignupExecute },
+    login: { execute: mockLoginExecute },
+    logout: { execute: mockLogoutExecute },
+    resetPassword: { execute: mockResetPasswordExecute },
+    observeAuth: {
+      execute: jest.fn((callback: (user: null) => void) => {
+        callback(null);
+        return jest.fn();
+      }),
+    },
+    observeUserData: {
+      execute: jest.fn((_uid: string, callback: (data: null) => void) => {
+        callback(null);
+        return jest.fn();
+      }),
+    },
+  })),
+}));
+
+import { AuthProvider, useAuth } from './AuthContext';
+
+const TestComponent: React.FC = (): JSX.Element => {
+  const auth = useAuth();
   const [error, setError] = React.useState<string | null>(null);
 
-  const handleSignup = (): void => {
-    void (async (): Promise<void> => {
-      try {
-        await signup('test@example.com', 'password123', 'Test User');
-      } catch (err) {
-        setError((err as Error).message);
+  const handleAsync = async (fn: () => Promise<void>): Promise<void> => {
+    try {
+      await fn();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
       }
-    })();
-  };
-
-  const handleLogin = (): void => {
-    void (async (): Promise<void> => {
-      try {
-        await login('test@example.com', 'password123');
-      } catch (err) {
-        setError((err as Error).message);
-      }
-    })();
-  };
-
-  const handleResetPassword = (): void => {
-    void (async (): Promise<void> => {
-      try {
-        await resetPassword('test@example.com');
-      } catch (err) {
-        setError((err as Error).message);
-      }
-    })();
-  };
-
-  const handleSignOutClick = (): void => {
-    void (async (): Promise<void> => {
-      try {
-        await handleSignOut();
-      } catch (err) {
-        setError((err as Error).message);
-      }
-    })();
+    }
   };
 
   return (
     <View>
-      <Text testID="isAuthenticated">{isAuthenticated.toString()}</Text>
-      <Text testID="loading">{loading.toString()}</Text>
-      <Text testID="userExists">{user ? 'true' : 'false'}</Text>
-      <Text testID="userDataExists">{userData ? 'true' : 'false'}</Text>
       {error && <Text testID="error">{error}</Text>}
 
-      <TouchableOpacity testID="signup" onPress={handleSignup}>
+      <TouchableOpacity
+        testID="signup"
+        onPress={() => {
+          void handleAsync(() =>
+            auth.signup('test@example.com', 'password123', 'Test User')
+          );
+        }}
+      >
         <Text>Signup</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity testID="login" onPress={handleLogin}>
+      <TouchableOpacity
+        testID="login"
+        onPress={() => {
+          void handleAsync(() =>
+            auth.login('test@example.com', 'password123')
+          );
+        }}
+      >
         <Text>Login</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity testID="resetPassword" onPress={handleResetPassword}>
+      <TouchableOpacity
+        testID="resetPassword"
+        onPress={() => {
+          void handleAsync(() =>
+            auth.resetPassword('test@example.com')
+          );
+        }}
+      >
         <Text>Reset Password</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity testID="signOut" onPress={handleSignOutClick}>
+      <TouchableOpacity
+        testID="signOut"
+        onPress={() => {
+          void handleAsync(() => auth.signOut());
+        }}
+      >
         <Text>Sign Out</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-const renderWithProvider = (
-  component: React.ReactElement
-): ReturnType<typeof render> => {
-  return render(<AuthProvider>{component}</AuthProvider>);
-};
+const renderWithProvider = (): ReturnType<typeof render> =>
+  render(
+    <AuthProvider>
+      <TestComponent />
+    </AuthProvider>
+  );
 
-describe('AuthContext', (): void => {
+describe('AuthContext', () => {
   beforeEach((): void => {
     jest.clearAllMocks();
+  });
 
-    (onAuthStateChanged as jest.Mock).mockImplementation(
-      (_auth: unknown, callback: (user: unknown) => void): (() => void) => {
-        callback(null);
-        return jest.fn();
-      }
+  it('deve criar conta com sucesso e navegar para /dashboard', async (): Promise<void> => {
+    mockSignupExecute.mockResolvedValueOnce(undefined);
+
+    const { getByTestId } = renderWithProvider();
+    fireEvent.press(getByTestId('signup'));
+
+    await waitFor(() => {
+      expect(mockSignupExecute).toHaveBeenCalled();
+      expect(router.replace).toHaveBeenCalledWith('/dashboard');
+    });
+  });
+
+  it('deve mostrar erro quando signup falha', async (): Promise<void> => {
+    mockSignupExecute.mockRejectedValueOnce(
+      new Error('Email already in use')
     );
 
-    (onSnapshot as jest.Mock).mockImplementation(
-      (
-        _docRef: unknown,
-        callback: (snap: { exists: () => boolean }) => void
-      ): (() => void) => {
-        callback({ exists: () => false });
-        return jest.fn();
-      }
+    const { getByTestId } = renderWithProvider();
+    fireEvent.press(getByTestId('signup'));
+
+    await waitFor(() => {
+      expect(getByTestId('error').children[0]).toBe(
+        'Email already in use'
+      );
+    });
+  });
+
+  it('deve fazer login com sucesso e navegar para /dashboard', async (): Promise<void> => {
+    mockLoginExecute.mockResolvedValueOnce(undefined);
+
+    const { getByTestId } = renderWithProvider();
+    fireEvent.press(getByTestId('login'));
+
+    await waitFor(() => {
+      expect(mockLoginExecute).toHaveBeenCalled();
+      expect(router.replace).toHaveBeenCalledWith('/dashboard');
+    });
+  });
+
+  it('deve mostrar erro quando login falha', async (): Promise<void> => {
+    mockLoginExecute.mockRejectedValueOnce(
+      new Error('Invalid credentials')
     );
-  });
 
-  describe('signup method', (): void => {
-    it('deve criar conta com sucesso', async (): Promise<void> => {
-      const mockUser = { uid: 'test-user-id' };
-      const mockUserCredential = { user: mockUser };
-      (createUserWithEmailAndPassword as jest.Mock).mockResolvedValueOnce(
-        mockUserCredential
+    const { getByTestId } = renderWithProvider();
+    fireEvent.press(getByTestId('login'));
+
+    await waitFor(() => {
+      expect(getByTestId('error').children[0]).toBe(
+        'Invalid credentials'
       );
-      (setDoc as jest.Mock).mockResolvedValueOnce(undefined);
-
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      fireEvent.press(getByTestId('signup'));
-
-      return waitFor((): void => {
-        expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
-          expect.anything(),
-          'test@example.com',
-          'password123'
-        );
-        expect(setDoc).toHaveBeenCalledWith(
-          expect.anything(),
-          expect.objectContaining({
-            uuid: 'test-user-id',
-            name: 'Test User',
-            email: 'test@example.com',
-          }),
-          { merge: true }
-        );
-      });
     });
+  });
 
-    it('deve mostrar erro quando signup falha', async (): Promise<void> => {
-      const error = new Error('Email already in use');
-      (createUserWithEmailAndPassword as jest.Mock).mockRejectedValueOnce(
-        error
+  it('deve enviar email de reset com sucesso', async (): Promise<void> => {
+    mockResetPasswordExecute.mockResolvedValueOnce(undefined);
+
+    const { getByTestId } = renderWithProvider();
+    fireEvent.press(getByTestId('resetPassword'));
+
+    await waitFor(() => {
+      expect(mockResetPasswordExecute).toHaveBeenCalledWith(
+        'test@example.com'
       );
-
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      fireEvent.press(getByTestId('signup'));
-
-      return waitFor((): void => {
-        expect(getByTestId('error').children[0]).toBe('Email already in use');
-      });
     });
   });
 
-  describe('login method', (): void => {
-    it('deve fazer login com sucesso', async (): Promise<void> => {
-      const mockUserCredential = { user: { uid: 'test-user-id' } };
-      (signInWithEmailAndPassword as jest.Mock).mockResolvedValueOnce(
-        mockUserCredential
-      );
+  it('deve mostrar erro quando reset falha', async (): Promise<void> => {
+    mockResetPasswordExecute.mockRejectedValueOnce(
+      new Error('User not found')
+    );
 
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      fireEvent.press(getByTestId('login'));
+    const { getByTestId } = renderWithProvider();
+    fireEvent.press(getByTestId('resetPassword'));
 
-      return waitFor((): void => {
-        expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
-          expect.anything(),
-          'test@example.com',
-          'password123'
-        );
-      });
-    });
-
-    it('deve mostrar erro quando login falha', async (): Promise<void> => {
-      const error = new Error('Invalid credentials');
-      (signInWithEmailAndPassword as jest.Mock).mockRejectedValueOnce(error);
-
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      fireEvent.press(getByTestId('login'));
-
-      return waitFor((): void => {
-        expect(getByTestId('error').children[0]).toBe('Invalid credentials');
-      });
+    await waitFor(() => {
+      expect(getByTestId('error').children[0]).toBe('User not found');
     });
   });
 
-  describe('resetPassword method', (): void => {
-    it('deve enviar email de reset com sucesso', async (): Promise<void> => {
-      (sendPasswordResetEmail as jest.Mock).mockResolvedValueOnce(undefined);
+  it('deve fazer logout com sucesso e navegar para /', async (): Promise<void> => {
+    mockLogoutExecute.mockResolvedValueOnce(undefined);
 
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      fireEvent.press(getByTestId('resetPassword'));
+    const { getByTestId } = renderWithProvider();
+    fireEvent.press(getByTestId('signOut'));
 
-      return waitFor((): void => {
-        expect(sendPasswordResetEmail).toHaveBeenCalledWith(
-          expect.anything(),
-          'test@example.com'
-        );
-      });
-    });
-
-    it('deve mostrar erro quando reset falha', async (): Promise<void> => {
-      const error = new Error('User not found');
-      (sendPasswordResetEmail as jest.Mock).mockRejectedValueOnce(error);
-
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      fireEvent.press(getByTestId('resetPassword'));
-
-      return waitFor((): void => {
-        expect(getByTestId('error').children[0]).toBe('User not found');
-      });
+    await waitFor(() => {
+      expect(mockLogoutExecute).toHaveBeenCalled();
+      expect(router.replace).toHaveBeenCalledWith('/');
     });
   });
 
-  describe('handleSignOut method', (): void => {
-    it('deve fazer logout com sucesso e navegar', async (): Promise<void> => {
-      (signOut as jest.Mock).mockResolvedValueOnce(undefined);
+  it('não deve quebrar a aplicação quando logout falha', async (): Promise<void> => {
+    mockLogoutExecute.mockRejectedValueOnce(
+      new Error('Logout failed')
+    );
 
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      fireEvent.press(getByTestId('signOut'));
+    const { getByTestId } = renderWithProvider();
+    fireEvent.press(getByTestId('signOut'));
 
-      return waitFor((): void => {
-        expect(signOut).toHaveBeenCalled();
-        expect(router.replace).toHaveBeenCalledWith('/');
-      });
-    });
-
-    it('deve capturar erro quando logout falha', async (): Promise<void> => {
-      const error = new Error('Logout failed');
-      (signOut as jest.Mock).mockRejectedValueOnce(error);
-
-      const { getByTestId } = renderWithProvider(<TestComponent />);
-      fireEvent.press(getByTestId('signOut'));
-
-      return waitFor((): void => {
-        expect(signOut).toHaveBeenCalled();
-      });
+    await waitFor(() => {
+      expect(mockLogoutExecute).toHaveBeenCalled();
     });
   });
 });
