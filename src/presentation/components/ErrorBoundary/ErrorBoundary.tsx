@@ -1,15 +1,7 @@
+import { Props, State } from '@/shared/interfaces/error.interface';
 import type { AppError } from '@domain/errors/AppErrors';
 import { showToast } from '@shared/utils/transactions.utils';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-
-interface Props {
-  children: ReactNode;
-}
-
-interface State {
-  hasError: boolean;
-}
-
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
