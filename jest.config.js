@@ -1,3 +1,4 @@
+
 /** @type {import('jest').Config} */
 module.exports = {
   preset: 'jest-expo',
@@ -8,7 +9,6 @@ module.exports = {
 
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
-    '^firebase/(.*)$': '<rootDir>/__mocks__/firebase/$1.js',
   },
 
   collectCoverage: true,
@@ -56,7 +56,6 @@ module.exports = {
       '@expo(nent)?/.*|' +
       'expo-.*|' +
       '@expo-google-fonts/.*|' +
-      '@firebase/.*|' +
       'react-navigation|' +
       '@react-navigation/.*|' +
       '@unimodules/.*|' +
