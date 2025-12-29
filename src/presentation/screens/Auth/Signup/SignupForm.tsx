@@ -95,8 +95,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
     } catch (error: unknown) {
       let errorMessage = toasts.genericError.message;
       
-      if (error instanceof Error && 'userMessage' in error) {
-        errorMessage = (error as any).userMessage;
+      if (error instanceof Error && 'userMessage' in error && typeof error.userMessage === 'string') {
+        errorMessage = error.userMessage;
       }
       
       showToast("error", toasts.genericError.title, errorMessage);

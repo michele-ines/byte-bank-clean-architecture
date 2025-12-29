@@ -1,4 +1,4 @@
-import { ErrorMapping } from "../interfaces/error.interface";
+import type { ErrorMapping } from "../interfaces/error.interface";
 
 export const authErrorMessages: Record<string, ErrorMapping> = {
   'auth/email-already-in-use': {

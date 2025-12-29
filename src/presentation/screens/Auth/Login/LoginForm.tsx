@@ -71,8 +71,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       let message = texts.loginForm.toasts.unexpectedError.message;
       
       if (error instanceof Error) {
-        if ('userMessage' in error) {
-          message = (error as any).userMessage;
+        if ('userMessage' in error && typeof error.userMessage === 'string') {
+          message = error.userMessage;
         } else {
           message = texts.loginForm.toasts.loginError.message;
         }

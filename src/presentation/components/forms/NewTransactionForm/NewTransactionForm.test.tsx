@@ -132,6 +132,7 @@ afterAll((): void => {
 const mockAddTransaction = jest.fn();
 
 beforeEach((): void => {
+  mockAddTransaction.mockResolvedValue(undefined);
   (useTransactions as jest.Mock).mockReturnValue({
     addTransaction: mockAddTransaction,
   });

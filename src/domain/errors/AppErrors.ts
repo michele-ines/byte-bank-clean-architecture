@@ -25,7 +25,7 @@ export class AuthError extends AppError {
   constructor(
     message: string,
     userMessage: string,
-    code: string = 'AUTH_ERROR',
+    code = 'AUTH_ERROR',
     originalError?: Error
   ) {
     super(message, userMessage, code, originalError);
@@ -36,7 +36,7 @@ export class TransactionError extends AppError {
   constructor(
     message: string,
     userMessage: string,
-    code: string = 'TRANSACTION_ERROR',
+    code = 'TRANSACTION_ERROR',
     originalError?: Error
   ) {
     super(message, userMessage, code, originalError);
@@ -46,8 +46,8 @@ export class TransactionError extends AppError {
 export class NetworkError extends AppError {
   constructor(
     message: string,
-    userMessage: string = 'Erro de conexão. Verifique sua internet e tente novamente.',
-    code: string = 'NETWORK_ERROR',
+    userMessage = 'Erro de conexão. Verifique sua internet e tente novamente.',
+    code = 'NETWORK_ERROR',
     originalError?: Error
   ) {
     super(message, userMessage, code, originalError);
@@ -58,7 +58,7 @@ export class StorageError extends AppError {
   constructor(
     message: string,
     userMessage: string,
-    code: string = 'STORAGE_ERROR',
+    code = 'STORAGE_ERROR',
     originalError?: Error
   ) {
     super(message, userMessage, code, originalError);
@@ -69,7 +69,7 @@ export class ValidationError extends AppError {
   constructor(
     message: string,
     userMessage: string,
-    code: string = 'VALIDATION_ERROR',
+    code = 'VALIDATION_ERROR',
     originalError?: Error
   ) {
     super(message, userMessage, code, originalError);
@@ -78,9 +78,9 @@ export class ValidationError extends AppError {
 
 export class UnknownError extends AppError {
   constructor(
-    message: string = 'Erro desconhecido',
-    userMessage: string = 'Ocorreu um erro inesperado. Por favor, tente novamente.',
-    code: string = 'UNKNOWN_ERROR',
+    message = 'Erro desconhecido',
+    userMessage = 'Ocorreu um erro inesperado. Por favor, tente novamente.',
+    code = 'UNKNOWN_ERROR',
     originalError?: Error
   ) {
     super(message, userMessage, code, originalError);
