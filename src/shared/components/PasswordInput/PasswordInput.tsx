@@ -63,13 +63,15 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
+          accessibilityLabel={label ?? placeholder}
+          accessibilityHint={error ?? undefined}
+          {...rest}
           style={[
             styles.input,
             styles.passwordInput,
             error ? styles.inputError : null,
           ]}
           secureTextEntry={!showPassword}
-          {...rest}
         />
         
         <Pressable

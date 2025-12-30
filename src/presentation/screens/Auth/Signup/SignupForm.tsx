@@ -3,6 +3,7 @@ import { DefaultButton } from "@presentation/components/common/common/DefaultBut
 import { useAuth } from "@presentation/state/AuthContext";
 import { colors, sizes, texts } from "@presentation/theme";
 import { Checkbox } from "@shared/components/Checkbox/Checkbox";
+import { PasswordInput } from "@shared/components/PasswordInput/PasswordInput";
 import { ROUTES } from "@shared/constants/routes";
 import type { SignupFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
@@ -166,34 +167,26 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSignupSuccess }) => {
           ) : null}
 
           <Text style={styles.label}>{texts.signupForm.fields.password}</Text>
-          <TextInput
+          <PasswordInput
             placeholder={texts.signupForm.placeholders.password}
             value={password}
             onChangeText={handlePasswordChange}
-            style={[styles.input, passwordError ? styles.inputError : null]}
-            secureTextEntry
+            error={passwordError}
+            showLabel={false}
             accessibilityLabel={texts.signupForm.fields.password}
           />
-          {passwordError ? (
-            <Text style={styles.errorText} accessibilityLiveRegion="polite">
-              {passwordError}
-            </Text>
-          ) : null}
+        
 
           <Text style={styles.label}>{texts.signupForm.fields.confirmPassword}</Text>
-          <TextInput
+          <PasswordInput
             placeholder={texts.signupForm.placeholders.confirmPassword}
             value={confirmPassword}
             onChangeText={handleConfirmPasswordChange}
-            style={[styles.input, confirmPasswordError ? styles.inputError : null]}
-            secureTextEntry
+            error={confirmPasswordError}
+            showLabel={false}
             accessibilityLabel={texts.signupForm.fields.confirmPassword}
           />
-          {confirmPasswordError ? (
-            <Text style={styles.errorText} accessibilityLiveRegion="polite">
-              {confirmPasswordError}
-            </Text>
-          ) : null}
+         
 
           <View style={styles.checkboxContainer}>
             <Checkbox

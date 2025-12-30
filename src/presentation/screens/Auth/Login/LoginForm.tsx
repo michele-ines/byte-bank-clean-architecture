@@ -1,8 +1,8 @@
 import LoginIllustration from "@assets/images/login/ilustracao-login.svg";
-import { Feather } from "@expo/vector-icons";
 import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useAuth } from "@presentation/state/AuthContext";
-import { colors, texts } from "@presentation/theme";
+import { texts } from "@presentation/theme";
+import { PasswordInput } from "@shared/components/PasswordInput/PasswordInput";
 import { ROUTES } from "@shared/constants/routes";
 import type { LoginFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";
@@ -12,7 +12,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   Text,
   TextInput,
   View
@@ -26,13 +25,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [emailError, setEmailError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const { login } = useAuth();
 
-  const handleTogglePasswordVisibility = useCallback(() => {
-    setShowPassword((prev) => !prev);
-  }, []);
+
 
   const handleEmailChange = useCallback((text: string): void => {
     setEmail(text);
@@ -130,38 +126,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         ) : null}
 
         <Text style={styles.label}>{texts.loginForm.labels.password}</Text>
-        <View style={styles.passwordContainer}>
-          <TextInput
-            placeholder={texts.loginForm.placeholders.password}
-            value={password}
-            onChangeText={handlePasswordChange}
-            style={[
-              styles.input,
-              styles.passwordInput,
-              passwordError ? styles.inputError : null,
-            ]}
-            secureTextEntry={!showPassword}
-            accessibilityLabel={texts.loginForm.accessibility.passwordInput}
-            accessibilityHint={texts.loginForm.accessibility.passwordHint}
-          />
-          <Pressable
-            onPress={handleTogglePasswordVisibility}
-            style={styles.eyeIcon}
-            accessibilityLabel={showPassword ? "Ocultar senha" : "Mostrar senha"}
-            accessibilityRole="button"
-          >
-            <Feather
-              name={showPassword ? "eye-off" : "eye"}
-              size={20}
-              color={colors.byteGray450}
-            />
-          </Pressable>
-        </View>
-        {passwordError ? (
-          <Text style={styles.errorText} accessibilityLiveRegion="polite">
-            {passwordError}
-          </Text>
-        ) : null}
+        <PasswordInput
+          placeholder={texts.loginForm.placeholders.password}
+          value={password}
+          onChangeText={handlePasswordChange}
+          error={passwordError}
+          showLabel={false}
+          accessibilityLabel={texts.loginForm.accessibility.passwordInput}
+          accessibilityHint={texts.loginForm.accessibility.passwordHint}
+        />
+
 
         <Link
           href={ROUTES.FORGOT_PASSWORD}
