@@ -6,11 +6,13 @@ import { useEffect, useRef } from "react";
 interface UseTransactionsQueryProps {
   userId: string;
   repository: FirebaseTransactionRepository;
+  enabled?: boolean;
 }
 
 export function useTransactionsQuery({
   userId,
   repository,
+  enabled = true,
 }: UseTransactionsQueryProps): ReturnType<typeof useQuery<ITransaction[]>> {
   const unsubscribeRef = useRef<() => void>(undefined);
 
@@ -25,7 +27,7 @@ export function useTransactionsQuery({
           }
         );
       }),
-    enabled: !!userId && userId !== "",
+    enabled: !!userId && userId !== "" && enabled,
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true,
   });

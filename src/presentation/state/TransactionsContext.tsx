@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 import { TransactionUseCasesFactory } from "@/application/use-cases/TransactionUseCasesFactory";
 import type { ITransaction } from "@domain/entities/Transaction";
@@ -28,6 +28,7 @@ const transactionUseCases = new TransactionUseCasesFactory(
 interface TransactionsContextData {
   transactions: ITransaction[];
   loading: boolean;
+  startLoading: () => void;
   addTransaction: {
     (
       transactionData: NewTransactionData,
@@ -73,6 +74,7 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({
   children,
 }) => {
   const { user } = useAuth();
+  const [shouldLoad, setShouldLoad] = useState(false);
 
   const {
     data: transactions = [],
@@ -81,7 +83,12 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({
   } = useTransactionsQuery({
     userId: user?.uid ?? "",
     repository: transactionRepository,
+    enabled: shouldLoad,
   });
+
+  const startLoading = useCallback(() => {
+    setShouldLoad(true);
+  }, []);
 
   const handleAddTransaction = useCallback(
     async (
@@ -216,6 +223,7 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({
     () => ({
       transactions,
       loading,
+      startLoading,
       addTransaction:
         addTransactionWrapper as unknown as TransactionsContextData["addTransaction"],
       updateTransaction:
@@ -237,6 +245,7 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({
     [
       transactions,
       loading,
+      startLoading,
       addTransactionWrapper,
       updateTransactionWrapper,
       loadingMore,

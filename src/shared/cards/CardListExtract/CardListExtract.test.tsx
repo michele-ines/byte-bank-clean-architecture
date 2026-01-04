@@ -22,6 +22,7 @@ jest.mock("@/presentation/state/TransactionsContext", () => ({
     uploadAttachmentAndUpdateTransaction: jest.fn(),
     deleteAttachment: jest.fn(),
     deleteTransactions: jest.fn(),
+    startLoading: jest.fn()
   }),
 }));
 
@@ -98,3 +99,4 @@ describe("CardListExtract", () => {
     expect(screen.getByText("R$ 120,50")).toBeTruthy();
   });
 });
+

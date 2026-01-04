@@ -8,7 +8,7 @@ import { truncateString } from "@shared/utils/string";
 import { showToast } from "@shared/utils/transactions.utils";
 import * as DocumentPicker from "expo-document-picker";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -32,8 +32,12 @@ export const CardListExtract: React.FC<CardListExtractProps> = ({
   filterFn,
   title,
 }) => {
-  const { transactions, loading, updateTransaction, deleteTransaction } =
+  const { transactions, loading, startLoading, updateTransaction, deleteTransaction } =
     useTransactions();
+
+  useEffect(() => {
+    startLoading();
+  }, [startLoading]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
