@@ -1,13 +1,7 @@
+import type { UseTransactionsQueryProps } from "@/domain/entities/AuthCredentials";
 import type { ITransaction } from "@domain/entities/Transaction";
-import type { FirebaseTransactionRepository } from "@infrastructure/repositories/FirebaseTransactionRepository";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-
-interface UseTransactionsQueryProps {
-  userId: string;
-  repository: FirebaseTransactionRepository;
-  enabled?: boolean;
-}
 
 export function useTransactionsQuery({
   userId,

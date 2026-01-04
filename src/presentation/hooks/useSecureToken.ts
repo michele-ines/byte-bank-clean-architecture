@@ -1,12 +1,6 @@
+import type { UseSecureTokenReturn } from '@/domain/entities/AuthCredentials';
 import { secureTokenStorage } from '@infrastructure/persistence/SecureTokenStorage';
 import { useCallback } from 'react';
-
-interface UseSecureTokenReturn {
-  saveToken: (token: string) => Promise<void>;
-  getToken: () => Promise<string | null>;
-  removeToken: () => Promise<void>;
-  hasToken: () => Promise<boolean>;
-}
 
 export const useSecureToken = (): UseSecureTokenReturn => {
 

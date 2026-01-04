@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 
-import type { AuthenticatedUser } from "@domain/entities/User";
+import type { UseInactivityLogoutProps } from "@/domain/entities/AuthCredentials";
 import { Alert, AppState, type AppStateStatus } from "react-native";
 
-interface UseInactivityLogoutProps {
-  user: AuthenticatedUser | null;
-  onSignOut: () => Promise<void>;
-}
 
 const INACTIVITY_TIMEOUT = 2 * 60 * 1000;
 

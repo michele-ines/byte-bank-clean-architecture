@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 import { TransactionUseCasesFactory } from "@/application/use-cases/TransactionUseCasesFactory";
-import type { ITransaction } from "@domain/entities/Transaction";
+import type { ITransaction, TransactionsContextData, TransactionsProviderProps } from "@domain/entities/Transaction";
 import type {
   AttachmentFile,
   NewTransactionData,
@@ -25,50 +25,10 @@ const transactionUseCases = new TransactionUseCasesFactory(
   transactionRepository
 );
 
-interface TransactionsContextData {
-  transactions: ITransaction[];
-  loading: boolean;
-  startLoading: () => void;
-  addTransaction: {
-    (
-      transactionData: NewTransactionData,
-      attachments: AttachmentFile[]
-    ): Promise<string>;
-    (transaction: INewTransactionInput): Promise<void>;
-  };
-  updateTransaction: {
-    (
-      id: string,
-      updatedTransaction: Partial<ITransaction>,
-      newAttachments: AttachmentFile[],
-      attachmentsToRemove: string[]
-    ): Promise<void>;
-    (id: string, updatedTransaction: Partial<ITransaction>): Promise<void>;
-  };
-  deleteTransaction: (id: string, attachments?: string[]) => Promise<void>;
-  balance: number | null;
-  loadingMore: boolean;
-  hasMore: boolean;
-  loadMoreTransactions: () => Promise<void>;
-  uploadAttachmentAndUpdateTransaction: (
-    transactionId: string,
-    fileUri: string,
-    fileName: string
-  ) => Promise<void>;
-  deleteAttachment: (
-    transactionId: string,
-    attachmentToDelete: IAnexo
-  ) => Promise<void>;
-  deleteTransactions: (ids: string[]) => Promise<void>;
-}
 
 const TransactionsContext = createContext<TransactionsContextData>(
   {} as TransactionsContextData
 );
-
-interface TransactionsProviderProps {
-  children: React.ReactNode;
-}
 
 export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({
   children,
