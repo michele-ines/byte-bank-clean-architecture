@@ -11,6 +11,7 @@ import { colors, radius, spacing, typography } from "@presentation/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import LoadingFallback from "@/presentation/components/common/LoadingFallback/LoadingFallback";
+import { TransactionsProvider } from "@presentation/state/TransactionsContext";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import type { AppLayoutStyles } from "@shared/ProfileStyles/profile.styles.types";
 import type { JSX } from "react";
@@ -36,25 +37,26 @@ export default function AppLayout(): JSX.Element {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
-      <Drawer
-        drawerContent={(props: DrawerContentComponentProps) => (
-          <CustomDrawerContent {...props} />
-        )}
-        screenOptions={{
-          headerShown: true,
-          header: () => (
-            <View accessibilityRole="header">
-              <Header />
-            </View>
-          ),
-          drawerStyle: styles.drawerStyle,
-          drawerLabelStyle: styles.drawerLabel,
-          drawerActiveTintColor: colors.byteColorGreen500,
-          drawerInactiveTintColor: colors.byteGray100,
-          drawerItemStyle: styles.drawerItem,
-        }}
-      >
+    <TransactionsProvider>
+      <SafeAreaView style={{ flex: 1 }} edges={["top", "bottom"]}>
+        <Drawer
+          drawerContent={(props: DrawerContentComponentProps) => (
+            <CustomDrawerContent {...props} />
+          )}
+          screenOptions={{
+            headerShown: true,
+            header: () => (
+              <View accessibilityRole="header">
+                <Header />
+              </View>
+            ),
+            drawerStyle: styles.drawerStyle,
+            drawerLabelStyle: styles.drawerLabel,
+            drawerActiveTintColor: colors.byteColorGreen500,
+            drawerInactiveTintColor: colors.byteGray100,
+            drawerItemStyle: styles.drawerItem,
+          }}
+        >
         <Drawer.Screen
           name="dashboard"
           options={{
@@ -146,8 +148,9 @@ export default function AppLayout(): JSX.Element {
             ),
           }}
         />
-      </Drawer>
-    </SafeAreaView>
+        </Drawer>
+      </SafeAreaView>
+    </TransactionsProvider>
   );
 }
 

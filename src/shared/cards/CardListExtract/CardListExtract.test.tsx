@@ -22,6 +22,7 @@ jest.mock("@/presentation/state/TransactionsContext", () => ({
     uploadAttachmentAndUpdateTransaction: jest.fn(),
     deleteAttachment: jest.fn(),
     deleteTransactions: jest.fn(),
+    startLoading: jest.fn()
   }),
 }));
 

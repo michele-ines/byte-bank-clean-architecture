@@ -6,11 +6,12 @@ import {
   collection,
   deleteDoc,
   doc,
+  limit,
   onSnapshot,
   orderBy,
   query,
   updateDoc,
-  where,
+  where
 } from 'firebase/firestore';
 import type { FirebaseStorage } from 'firebase/storage';
 import {
@@ -93,13 +94,13 @@ export class FirebaseTransactionRepository implements TransactionRepository {
     const transactionsQuery = query(
       collection(this.db, 'transactions'),
       where('userId', '==', userId),
-      orderBy('createdAt', 'desc')
+      orderBy('createdAt', 'desc'),
+      limit(20)
     );
 
     const unsubscribe = onSnapshot(transactionsQuery, async (snapshot) => {
-      const userTransactions: ITransaction[] = [];
-      
-      for (const docSnap of snapshot.docs) {
+      // Paralelização: descriptografar todas as transações ao mesmo tempo
+      const decryptionPromises = snapshot.docs.map(async (docSnap) => {
         const data = docSnap.data();
         const transaction = mapDocumentToTransaction(docSnap.id, data);
         
@@ -117,13 +118,14 @@ export class FirebaseTransactionRepository implements TransactionRepository {
               : transaction.categoria,
           };
 
-          userTransactions.push(decryptedTransaction);
+          return decryptedTransaction;
         } catch (error) {
           console.error('Erro ao descriptografar transação:', error);
-          userTransactions.push(transaction);
+          return transaction;
         }
-      }
-      
+      });
+
+      const userTransactions = await Promise.all(decryptionPromises);
       callback(userTransactions);
     });
 
