@@ -1,5 +1,5 @@
+import { texts } from "@/presentation/styles/theme";
 import { useTransactions } from "@presentation/state/TransactionsContext";
-import { texts } from "@presentation/theme";
 import {
   formatTransactionDescription,
   showToast,

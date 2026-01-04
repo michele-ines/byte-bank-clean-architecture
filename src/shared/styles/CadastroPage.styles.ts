@@ -1,0 +1,11 @@
+import { colors, layout, typography } from "@/presentation/styles/theme";
+import type { CadastroPageStyles } from "@/shared/interfaces/auth.interfaces";
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create<CadastroPageStyles>({
+  container: { 
+    flex: layout.flex1, 
+    padding: typography.padding, 
+    backgroundColor: colors.byteBgDefault,
+  },
+});

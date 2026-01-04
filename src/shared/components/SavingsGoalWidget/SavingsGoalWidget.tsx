@@ -1,4 +1,4 @@
-import { radius, spacing, texts } from "@presentation/theme";
+import { radius, spacing, texts } from "@/presentation/styles/theme";
 import type { JSX } from "react";
 import React from "react";
 import { Text, View } from "react-native";

@@ -1,4 +1,4 @@
-import { border, colors, layout, spacing, typography } from "@presentation/theme";
+import { border, colors, layout, spacing, typography } from "@/presentation/styles/theme";
 import type { TextStyle, ViewStyle } from "react-native";
 import { StyleSheet } from "react-native";
 

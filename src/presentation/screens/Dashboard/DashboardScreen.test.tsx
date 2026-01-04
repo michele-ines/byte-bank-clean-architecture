@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react-native";
 import React, { type JSX, type PropsWithChildren } from "react";
 import DashboardScreen from "./DashboardScreen";
 
-jest.mock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper", () => {
+jest.mock("@/presentation/components/common/ScreenWrapper/ScreenWrapper", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
   const mockView = reactNative.View;
@@ -21,7 +21,7 @@ jest.mock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper", 
 });
 
 Object.assign(
-  jest.requireMock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper"),
+  jest.requireMock("@/presentation/components/common/ScreenWrapper/ScreenWrapper"),
   { displayName: "MockScreenWrapper" }
 );
 

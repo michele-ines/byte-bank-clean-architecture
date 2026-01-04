@@ -1,5 +1,5 @@
+import { ScreenWrapper } from "@/presentation/components/common/ScreenWrapper/ScreenWrapper";
 import FinancialChart from "@presentation/components/charts/FinancialChart";
-import { ScreenWrapper } from "@presentation/components/common/common/ScreenWrapper/ScreenWrapper";
 import { useWidgetPreferences } from "@presentation/state/WidgetPreferencesContext";
 import SavingsGoalWidget from "@shared/components/SavingsGoalWidget/SavingsGoalWidget";
 import SpendingAlertWidget from "@shared/components/SpendingAlertWidget/SpendingAlertWidget";

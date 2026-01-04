@@ -1,13 +1,13 @@
 import { useAuth } from "@presentation/state/AuthContext";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import {
-    DrawerContentScrollView,
-    DrawerItemList,
+  DrawerContentScrollView,
+  DrawerItemList,
 } from "@react-navigation/drawer";
 import type { JSX } from "react";
 import React from "react";
 import { Text, View } from "react-native";
-import { DefaultButton } from "../common/DefaultButton/DefaultButton";
+import { DefaultButton } from "../../DefaultButton/DefaultButton";
 import { styles } from "./CustomDrawerContent.styles";
 
 type CustomDrawerContentProps = DrawerContentComponentProps;

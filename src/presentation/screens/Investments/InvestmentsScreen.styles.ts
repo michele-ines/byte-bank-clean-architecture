@@ -1,5 +1,5 @@
 
-import { colors } from "@presentation/theme";
+import { colors } from "@/presentation/styles/theme";
 import type { InvestmentsScreenStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
 

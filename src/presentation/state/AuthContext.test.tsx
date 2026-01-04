@@ -47,7 +47,7 @@ const mockLoginExecute = jest.fn<Promise<void>, [unknown]>();
 const mockLogoutExecute = jest.fn<Promise<void>, []>();
 const mockResetPasswordExecute = jest.fn<Promise<void>, [string]>();
 
-jest.mock('@domain/use-cases/AuthUseCaseFactory', () => ({
+jest.mock('@/application/use-cases/AuthUseCaseFactory', () => ({
   AuthUseCasesFactory: jest.fn().mockImplementation(() => ({
     signup: { execute: mockSignupExecute },
     login: { execute: mockLoginExecute },

@@ -1,5 +1,5 @@
 
-import { layout, radius } from "@presentation/theme";
+import { layout, radius } from "@/presentation/styles/theme";
 import type { DonutChartProps } from "@shared/ProfileStyles/profile.styles.types";
 import React from "react";
 import { View } from "react-native";

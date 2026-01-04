@@ -1,4 +1,4 @@
-import { colors, layout, radius, spacing, typography } from "@presentation/theme";
+import { colors, layout, radius, spacing, typography } from "@/presentation/styles/theme";
 import { StyleSheet } from "react-native";
 import type { BalanceComponentStyle } from "../../ProfileStyles/profile.styles.types";
 

@@ -2,10 +2,10 @@ import CardPixelsTop from "@assets/images/dash-card-new-transacao/card-pixels-3.
 import CardPixelBotton from "@assets/images/dash-card-new-transacao/card-pixels-4.svg";
 import TransactionIllustration from "@assets/images/dash-card-new-transacao/Ilustracao-2.svg";
 
+import { DefaultButton } from "@/presentation/components/DefaultButton/DefaultButton";
+import { layout, texts } from "@/presentation/styles/theme";
 import type { AttachmentFile, NewTransactionData, TransactionType } from "@domain/entities/TransactionData";
-import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useTransactions } from "@presentation/state/TransactionsContext";
-import { layout, texts } from "@presentation/theme";
 import { TransactionTypeItems } from "@shared/ProfileStyles/profile.styles.types";
 import { formatTransactionDescription, showToast } from "@shared/utils/transactions.utils";
 import { Timestamp } from "firebase/firestore";

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo } from "react";
 
-import { TransactionUseCasesFactory } from "@/domain/use-cases/TransactionUseCasesFactory";
+import { TransactionUseCasesFactory } from "@/application/use-cases/TransactionUseCasesFactory";
 import type { ITransaction } from "@domain/entities/Transaction";
 import type {
   AttachmentFile,

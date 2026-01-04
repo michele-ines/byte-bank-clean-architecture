@@ -1,7 +1,7 @@
+import { DefaultButton } from "@/presentation/components/DefaultButton/DefaultButton";
+import { colors, sizes, texts } from "@/presentation/styles/theme";
 import SignupIllustration from "@assets/images/cadastro/ilustracao-cadastro.svg";
-import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useAuth } from "@presentation/state/AuthContext";
-import { colors, sizes, texts } from "@presentation/theme";
 import { Checkbox } from "@shared/components/Checkbox/Checkbox";
 import { PasswordInput } from "@shared/components/PasswordInput/PasswordInput";
 import { ROUTES } from "@shared/constants/routes";

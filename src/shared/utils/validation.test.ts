@@ -1,4 +1,4 @@
-import { texts } from "@presentation/theme";
+import { texts } from "@/presentation/styles/theme";
 import { validateEmail, validateName, validatePassword } from "./validation";
 
 describe("validateEmail", () => {

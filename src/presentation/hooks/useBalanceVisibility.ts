@@ -2,7 +2,7 @@
 import type { UseBalanceVisibilityProps, UseBalanceVisibilityReturn } from '@/shared/interfaces/auth.interfaces';
 import { formatBRL } from '@shared/utils/currency-formatte';
 import { useMemo, useState } from 'react';
-import { texts } from '../theme';
+import { texts } from '../styles/theme';
 
 /**
  * Hook customizado para gerenciar a visibilidade e formatação do saldo

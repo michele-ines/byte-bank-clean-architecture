@@ -6,9 +6,9 @@ import type { GestureResponderEvent } from "react-native";
 import { Pressable, View } from "react-native";
 import { styles } from "./Header.styles";
 
+import { colors, sizes, spacing, typography } from "@/presentation/styles/theme";
 import HeaderLogo from "@assets/images/header/header-logo.svg";
 import { useAuth } from "@presentation/state/AuthContext";
-import { colors, sizes, spacing, typography } from "@presentation/theme";
 
 export const Header: React.FC = () => {
   const navigation = useNavigation();

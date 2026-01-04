@@ -29,9 +29,9 @@ jest.mock("@/shared/utils/transactions.utils", () => ({
   showToast: jest.fn(),
 }));
 
-jest.mock("@presentation/theme", () => {
+jest.mock("@/presentation/styles/theme", () => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const actual = jest.requireActual("@presentation/theme");
+  const actual = jest.requireActual("@/presentation/styles/theme");
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return {
     ...actual,

@@ -1,5 +1,5 @@
+import { sizes, texts } from "@/presentation/styles/theme";
 import { MaterialIcons } from "@expo/vector-icons";
-import { sizes, texts } from "@presentation/theme";
 import type { JSX } from "react";
 import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";

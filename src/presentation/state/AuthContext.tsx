@@ -9,6 +9,7 @@ import React, {
   useState,
 } from "react";
 
+import { AuthUseCasesFactory } from "@/application/use-cases/AuthUseCaseFactory";
 import type { AuthContextData } from "@/shared/interfaces/auth.interfaces";
 import type {
   AuthCredentials,
@@ -16,7 +17,6 @@ import type {
 } from "@domain/entities/AuthCredentials";
 import type { AuthenticatedUser, UserData } from "@domain/entities/User";
 import type { AuthRepository } from "@domain/repositories/AuthRepository";
-import { AuthUseCasesFactory } from "@domain/use-cases/AuthUseCaseFactory";
 import { auth, db } from "@infrastructure/config/firebaseConfig";
 import { secureTokenStorage } from "@infrastructure/persistence/SecureTokenStorage";
 import { FirebaseAuthRepository } from "@infrastructure/repositories/FirebaseAuthRepository";

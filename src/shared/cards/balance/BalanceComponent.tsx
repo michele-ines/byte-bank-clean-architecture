@@ -5,8 +5,8 @@ import { Pressable, Text, View } from "react-native";
 import PixelImage from "@assets/images/dash-card-saldo/card-pixels-1.svg";
 import PixelImage2 from "@assets/images/dash-card-saldo/card-pixels-2.svg";
 
+import { colors, typography } from "@/presentation/styles/theme";
 import { useBalanceVisibility } from "@presentation/hooks/useBalanceVisibility";
-import { colors, typography } from "@presentation/theme";
 import { getCurrentDate } from "@shared/utils/date";
 import { getFirstName } from "@shared/utils/string";
 import { styles } from "./BalanceComponent.styles";

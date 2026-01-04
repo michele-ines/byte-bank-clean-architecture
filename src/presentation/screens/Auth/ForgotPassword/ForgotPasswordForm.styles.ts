@@ -1,8 +1,8 @@
 
-import { border, colors, radius, spacing, typography } from "@presentation/theme";
+import { border, colors, radius, spacing, typography } from "@/presentation/styles/theme";
+import { sharedStyles } from "@/shared/styles/shared.styles";
 import type { ForgotPasswordFormStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
-import { sharedStyles } from "src/styles/shared.styles";
 
 export const styles = StyleSheet.create<ForgotPasswordFormStyles>({
   card: {

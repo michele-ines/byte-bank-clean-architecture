@@ -5,15 +5,15 @@ import type { StyleProp, TextStyle } from "react-native";
 import { ScrollView, Text, View } from "react-native";
 import type { SvgProps } from "react-native-svg";
 
+import { DefaultButton } from "@/presentation/components/DefaultButton/DefaultButton";
+import { colors, sizes, texts } from "@/presentation/styles/theme";
 import BannerIlustracao from "@assets/images/page/banner-ilustracao.svg";
 import IconDispositivos from "@assets/images/page/icon-dispositivos.svg";
 import IconPontos from "@assets/images/page/icon-pontos.svg";
 import IconPresente from "@assets/images/page/icon-presente.svg";
 import IconSaque from "@assets/images/page/icon-saque.svg";
-import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { Footer } from "@presentation/layout/Footer/Footer";
 import { Header } from "@presentation/layout/Header/Header";
-import { colors, sizes, texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
 import { markEnd, markStart } from "@shared/utils/performance";
 import { styles } from "./MainScreen.styles";

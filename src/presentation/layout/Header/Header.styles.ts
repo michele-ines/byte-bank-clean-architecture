@@ -1,4 +1,4 @@
-import { layout, spacing, typography } from "@presentation/theme";
+import { layout, spacing, typography } from "@/presentation/styles/theme";
 import type { HeaderStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { Platform, StyleSheet } from "react-native";
 

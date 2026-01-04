@@ -1,4 +1,4 @@
-import { typography } from "@presentation/theme";
+import { typography } from "@/presentation/styles/theme";
 import type { ChartStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
 

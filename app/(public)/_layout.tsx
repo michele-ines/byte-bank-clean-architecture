@@ -1,4 +1,4 @@
-import { colors, layout } from "@presentation/theme";
+import { colors, layout } from "@/presentation/styles/theme";
 import { Slot } from "expo-router";
 import type { JSX } from "react";
 import React from "react";

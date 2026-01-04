@@ -1,4 +1,4 @@
-import { layout, spacing, texts } from "@presentation/theme";
+import { layout, spacing, texts } from "@/presentation/styles/theme";
 import { render } from "@testing-library/react-native";
 import type { JSX } from "react";
 import React from "react";

@@ -3,14 +3,14 @@ import { Drawer } from "expo-router/drawer";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
+import { colors, radius, spacing, typography } from "@/presentation/styles/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { CustomDrawerContent } from "@presentation/components/common/CustomDrawerContent/CustomDrawerContent";
 import { Header } from "@presentation/layout/Header/Header";
 import { useAuth } from "@presentation/state/AuthContext";
-import { colors, radius, spacing, typography } from "@presentation/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import LoadingFallback from "@/presentation/components/common/LoadingFallback/LoadingFallback";
+import LoadingFallback from "@/presentation/components/LoadingFallback/LoadingFallback";
 import type { DrawerContentComponentProps } from "@react-navigation/drawer";
 import type { AppLayoutStyles } from "@shared/ProfileStyles/profile.styles.types";
 import type { JSX } from "react";

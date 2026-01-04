@@ -1,5 +1,5 @@
+import { colors } from "@/presentation/styles/theme";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "@presentation/theme";
 import React, { useCallback, useState } from "react";
 import {
   Pressable,

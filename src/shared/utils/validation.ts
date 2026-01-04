@@ -1,4 +1,4 @@
-import { texts } from "@presentation/theme";
+import { texts } from "@/presentation/styles/theme";
 
 export const validateEmail = (text: string): string => {
   if (text.length === 0) {

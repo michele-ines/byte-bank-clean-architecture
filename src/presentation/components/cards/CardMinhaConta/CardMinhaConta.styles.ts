@@ -1,7 +1,7 @@
+import { border, colors, layout, radius, sizes, spacing, typography } from "@/presentation/styles/theme";
 import type { CardMinhaContaStyles } from "@/shared/interfaces/auth.interfaces";
-import { border, colors, layout, radius, sizes, spacing, typography } from "@presentation/theme";
+import { sharedStyles } from "@/shared/styles/shared.styles";
 import { StyleSheet } from "react-native";
-import { sharedStyles } from "src/styles/shared.styles";
 
 export const styles = StyleSheet.create<CardMinhaContaStyles>({
   title: {

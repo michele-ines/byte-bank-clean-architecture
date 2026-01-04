@@ -1,4 +1,4 @@
-import { border, colors, layout, radius, shadows, spacing, typography } from "@presentation/theme";
+import { border, colors, layout, radius, shadows, spacing, typography } from "@/presentation/styles/theme";
 import { StyleSheet } from "react-native";
 import type { TransactionsStyles } from "../../ProfileStyles/profile.styles.types";
 

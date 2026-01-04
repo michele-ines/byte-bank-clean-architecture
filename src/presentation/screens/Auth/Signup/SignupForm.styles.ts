@@ -1,6 +1,6 @@
-import { border, colors, layout, spacing, typography } from "@presentation/theme";
+import { border, colors, layout, spacing, typography } from "@/presentation/styles/theme";
+import { sharedStyles } from "@/shared/styles/shared.styles";
 import { StyleSheet } from "react-native";
-import { sharedStyles } from "src/styles/shared.styles";
 
 export const styles = StyleSheet.create({
   keyboardView: {

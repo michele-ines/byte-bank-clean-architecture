@@ -1,9 +1,9 @@
-import { texts } from "@presentation/theme";
+import { texts } from "@/presentation/styles/theme";
 import { render, screen } from "@testing-library/react-native";
 import React, { type JSX, type PropsWithChildren } from "react";
 import CardsScreen from "./CardsScreen";
 
-jest.mock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper", () => {
+jest.mock("@/presentation/components/common/ScreenWrapper/ScreenWrapper", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
   const mockView = reactNative.View;
@@ -20,11 +20,11 @@ jest.mock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper", 
 
   return { ScreenWrapper };
 });
-Object.assign(jest.requireMock("@presentation/components/common/common/ScreenWrapper/ScreenWrapper"), {
+Object.assign(jest.requireMock("@/presentation/components/common/ScreenWrapper/ScreenWrapper"), {
   displayName: "MockScreenWrapper",
 });
 
-jest.mock("@presentation/components/cards/cards/PersonalCards/PersonalCards", () => {
+jest.mock("@/presentation/components/cards/PersonalCards/PersonalCards", () => {
   const mockReact = jest.requireActual<{ createElement: (type: unknown, props: unknown, ...children: unknown[]) => JSX.Element }>("react");
   const reactNative = jest.requireActual<{ View: unknown; Text: unknown }>("react-native");
   const mockText = reactNative.Text;
@@ -32,7 +32,7 @@ jest.mock("@presentation/components/cards/cards/PersonalCards/PersonalCards", ()
     mockReact.createElement(mockText, { testID: "mock-personal-cards" }, "PersonalCards");
   return { __esModule: true, default: PersonalCards };
 });
-Object.assign(jest.requireMock("@presentation/components/cards/cards/PersonalCards/PersonalCards"), {
+Object.assign(jest.requireMock("@/presentation/components/cards/PersonalCards/PersonalCards"), {
   displayName: "MockPersonalCards",
 });
 

@@ -1,4 +1,4 @@
-import { CreateLogUseCase } from '@/domain/use-cases/CreateLogUseCaseFactory';
+import { CreateLogUseCase } from '@/application/use-cases/CreateLogUseCaseFactory';
 import type { DI } from '@/shared/ProfileStyles/profile.styles.types';
 import type { ILoggerService } from '@/shared/interfaces/log.Interfaces';
 import { db } from '@infrastructure/config/firebaseConfig';

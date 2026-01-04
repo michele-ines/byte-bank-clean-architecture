@@ -1,5 +1,5 @@
 
-import { colors, radius, spacing, typography } from "@presentation/theme";
+import { colors, radius, spacing, typography } from "@/presentation/styles/theme";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({

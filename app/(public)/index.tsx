@@ -1,4 +1,4 @@
-import LoadingFallback from "@presentation/components/common/LoadingFallback/LoadingFallback";
+import LoadingFallback from "@/presentation/components/LoadingFallback/LoadingFallback";
 import { markEnd, markStart } from "@shared/utils/performance";
 import React, { Suspense } from "react";
 

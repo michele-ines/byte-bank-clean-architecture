@@ -1,7 +1,7 @@
+import { DefaultButton } from "@/presentation/components/DefaultButton/DefaultButton";
+import { texts } from "@/presentation/styles/theme";
 import { MaterialIcons } from "@expo/vector-icons";
-import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useEditField } from "@presentation/hooks/useEditField";
-import { texts } from "@presentation/theme";
 import type { EditFieldModalProps } from "@shared/ProfileStyles/profile.styles.types";
 import React, { useEffect, useRef } from "react";
 import {

@@ -1,4 +1,4 @@
-import { ErrorScreen } from "@presentation/components/common/common/ErrorScreen/ErrorScreen";
+import { ErrorScreen } from "@/presentation/components/ErrorScreen/ErrorScreen";
 import { useRouter } from "expo-router";
 import type { JSX } from "react";
 import React from "react";

@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { border, colors, layout, radius, spacing, typography } from "@presentation/theme";
+import { border, colors, layout, radius, spacing, typography } from "@/presentation/styles/theme";
 import type { ToastStyles } from "@shared/ProfileStyles/profile.styles.types";
 
 export const toastStyles = StyleSheet.create<ToastStyles>({

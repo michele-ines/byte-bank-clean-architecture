@@ -1,4 +1,4 @@
-import type { CreateLogUseCase } from '@/domain/use-cases/CreateLogUseCaseFactory';
+import type { CreateLogUseCase } from '@/application/use-cases/CreateLogUseCaseFactory';
 import type { ILoggerService, LogLevel } from '@/shared/interfaces/log.Interfaces';
 import type { LogEntry } from '@domain/entities/LogEntry';
 

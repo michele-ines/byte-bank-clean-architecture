@@ -1,6 +1,6 @@
-import PersonalCards from "@presentation/components/cards/cards/PersonalCards/PersonalCards";
-import { ScreenWrapper } from "@presentation/components/common/common/ScreenWrapper/ScreenWrapper";
-import { texts } from "@presentation/theme";
+import PersonalCards from "@/presentation/components/cards/PersonalCards/PersonalCards";
+import { ScreenWrapper } from "@/presentation/components/common/ScreenWrapper/ScreenWrapper";
+import { texts } from "@/presentation/styles/theme";
 import { markEnd, markStart } from "@shared/utils/performance";
 import React, { useEffect } from "react";
 import { Text, View } from "react-native";

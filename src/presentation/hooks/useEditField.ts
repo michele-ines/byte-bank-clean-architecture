@@ -4,16 +4,16 @@ import { showToast } from "@shared/utils/transactions.utils";
 import { validateEmail, validateName, validatePassword } from "@shared/utils/validation";
 import { FirebaseError } from "firebase/app";
 import {
-    EmailAuthProvider,
-    reauthenticateWithCredential,
-    updatePassword,
-    updateProfile,
-    verifyBeforeUpdateEmail,
-    type User,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
+  updateProfile,
+  verifyBeforeUpdateEmail,
+  type User,
 } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
-import { texts } from "../theme";
+import { texts } from "../styles/theme";
 
 export function useEditField(
   field: "name" | "email" | "password" | null,

@@ -1,4 +1,4 @@
-import { ScreenWrapper } from "@presentation/components/common/common/ScreenWrapper/ScreenWrapper";
+import { ScreenWrapper } from "@/presentation/components/common/ScreenWrapper/ScreenWrapper";
 import { NewTransactionForm } from "@presentation/components/forms/NewTransactionForm/NewTransactionForm";
 import { markEnd, markStart } from "@shared/utils/performance";
 import React, { useEffect } from "react";

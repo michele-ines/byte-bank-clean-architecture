@@ -1,4 +1,4 @@
-import { typography } from '@presentation/theme';
+import { typography } from '@/presentation/styles/theme';
 import React from 'react';
 import { Text, View } from 'react-native';
 import { styles } from './ListFooter.styles';

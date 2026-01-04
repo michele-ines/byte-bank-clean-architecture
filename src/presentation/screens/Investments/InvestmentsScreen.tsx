@@ -1,5 +1,5 @@
-import { InvestmentSummaryCard } from "@presentation/components/cards/cards/InvestmentSummaryCard/InvestmentSummaryCard";
-import { ScreenWrapper } from "@presentation/components/common/common/ScreenWrapper/ScreenWrapper";
+import { InvestmentSummaryCard } from "@/presentation/components/cards/InvestmentSummaryCard/InvestmentSummaryCard";
+import { ScreenWrapper } from "@/presentation/components/common/ScreenWrapper/ScreenWrapper";
 import { markEnd, markStart } from "@shared/utils/performance";
 import React, { useEffect } from "react";
 import { View } from "react-native";

@@ -1,8 +1,8 @@
 
-import { border, colors, layout, radius, shadows, spacing, typography } from "@presentation/theme";
+import { border, colors, layout, radius, shadows, spacing, typography } from "@/presentation/styles/theme";
+import { sharedStyles } from "@/shared/styles/shared.styles";
 import type { NewTransactionFormStyle } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
-import { sharedStyles } from "src/styles/shared.styles";
 
 export const styles = StyleSheet.create<NewTransactionFormStyle>({
   safeArea: {

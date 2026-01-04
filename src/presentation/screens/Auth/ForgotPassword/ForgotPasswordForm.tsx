@@ -2,9 +2,9 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Text, TextInput, View } from "react-native";
 
-import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
+import { DefaultButton } from "@/presentation/components/DefaultButton/DefaultButton";
+import { texts } from "@/presentation/styles/theme";
 import { useAuth } from "@presentation/state/AuthContext";
-import { texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
 import type { ForgotPasswordFormProps } from "@shared/ProfileStyles/profile.styles.types";
 import { showToast } from "@shared/utils/transactions.utils";

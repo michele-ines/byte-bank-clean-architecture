@@ -1,4 +1,4 @@
-import { colors, layout, sizes, spacing, typography } from "@presentation/theme";
+import { colors, layout, sizes, spacing, typography } from "@/presentation/styles/theme";
 import type { DashboardExtraStyles } from "@shared/ProfileStyles/profile.styles.types";
 import { StyleSheet } from "react-native";
 

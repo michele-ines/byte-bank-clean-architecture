@@ -1,8 +1,8 @@
 import { router } from "expo-router";
 import React from "react";
 
+import { texts } from "@/presentation/styles/theme";
 import { useAuth } from "@presentation/state/AuthContext";
-import { texts } from "@presentation/theme";
 import { ROUTES } from "@shared/constants/routes";
 import { showToast } from "@shared/utils/transactions.utils";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";

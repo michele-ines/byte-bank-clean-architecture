@@ -1,7 +1,7 @@
+import { DefaultButton } from "@/presentation/components/DefaultButton/DefaultButton";
+import { texts } from "@/presentation/styles/theme";
 import LoginIllustration from "@assets/images/login/ilustracao-login.svg";
-import { DefaultButton } from "@presentation/components/common/common/DefaultButton/DefaultButton";
 import { useAuth } from "@presentation/state/AuthContext";
-import { texts } from "@presentation/theme";
 import { PasswordInput } from "@shared/components/PasswordInput/PasswordInput";
 import { ROUTES } from "@shared/constants/routes";
 import type { LoginFormProps } from "@shared/ProfileStyles/profile.styles.types";

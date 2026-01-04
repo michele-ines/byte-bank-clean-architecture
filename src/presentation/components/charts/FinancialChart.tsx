@@ -1,4 +1,4 @@
-import { colors, layout, spacing, texts } from "@presentation/theme";
+import { colors, layout, spacing, texts } from "@/presentation/styles/theme";
 import React, { type JSX } from "react";
 import { Dimensions, Text, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";

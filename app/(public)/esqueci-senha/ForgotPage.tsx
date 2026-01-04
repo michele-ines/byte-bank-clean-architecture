@@ -1,8 +1,8 @@
+import { styles } from "@/shared/styles/ForgotPage.styles";
 import { ForgotPasswordForm } from "@presentation/screens/Auth/ForgotPassword/ForgotPasswordForm";
 import { markEnd, markStart } from "@shared/utils/performance";
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import { styles } from "src/styles/ForgotPage.styles";
 
 markStart("ForgotPage");
 

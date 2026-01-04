@@ -28,7 +28,7 @@ module.exports = {
     '!src/presentation/hooks/**/*',
     '!src/presentation/screens/Auth/Signup/**/*',
     '!src/presentation/screens/OtherServices/**/*',
-    '!src/presentation/components/common/LoadingFallback/**/*',
+    '!src/presentation/components/LoadingFallback**/*',
     '!src/presentation/components/ErrorBoundary/**/*',
     '!src/shared/interfaces/**/*',
     '!src/shared/components/**/*',
